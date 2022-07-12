@@ -2,10 +2,12 @@ Package: moped
 Title: Moment-Based Density Estimation of Confidential Micro-data.
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Bradley", "Wakefiled", , "bradleyw@uow.edu.au", role = c("aut", "cre"),
+    person("Bradley", "Wakefiled", "bradleyw@uow.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID")),
-    person("Pauline", "O'Shaughnessy", , "poshaugh@uow.edu.au", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))           
+    person("Pauline", "O'Shaughnessy", "poshaugh@uow.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID")),
+    person("Mengyun", "Yang", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))          
            )
 Description: What the package does (one paragraph).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a

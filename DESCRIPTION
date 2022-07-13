@@ -1,5 +1,5 @@
 Package: moped
-Title: Moment-Based Density Estimation of Confidential Micro-data.
+Title: Multivariate Orthogonal Polynomial Based Estimation of Density.
 Version: 0.0.0.9000
 Authors@R: c(
     person("Bradley", "Wakefiled", "bradleyw@uow.edu.au", role = c("aut", "cre"),

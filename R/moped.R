@@ -1,20 +1,66 @@
-#' Title
+#' Fitting multivariate orthogonal polynomial based density estimation.
 #'
-#' @param Sample
-#' @param K
-#' @param Distrib
-#' @param bounds
-#' @param ListP
-#' @param variance
-#' @param recurrence
-#' @param parallel
-#' @param ncores
-#' @param mpo
+#' @description
+#' `moped()` is used to fit multivariate orthogonal polynomial based density
+#' estimation. It requires a data frame of bounds to fit on data. Categorical
+#' variables need to be converted into continuous variables before fitting data
+#' to the density estimation.
 #'
-#' @return
+#' @param Sample A data frame.
+#' @param K Integer vector. Maximum Truncation of Approximation on each variable.
+#' @param Distrib Character string, specifying the reference distribution to be
+#'   used. Choices are `"uniform"`, `"normal"`, `"gamma"` and `"beta"`
+#'   distributions.
+#' @param bounds A data frame. The limits on the compact space. Should be a
+#'   array of 2 x number of variables with each column having the lower and
+#'   upper limit. `NULL` is the default.
+#' @param ListP Logical. If `FALSE` (the default), the Pn-Array is calculated
+#'   for Coefficient Variance Calculations.
+#' @param variance Logical. If `TRUE` (the default), a variance estimate of each
+#'   coefficient is calculated.
+#' @param recurrence Logical. If `FALSE` (the default), recurrence relation is
+#'   not used to determine coefficient.
+#' @param parallel Logical. If `FALSE` (the default), parallel computing is not
+#'   used.
+#' @param ncores Integer vector. NCores to use in parallel computing.
+#' @param mpo Logical. If `TRUE` (the default), an optimal MOP estimate is
+#'   calculated.
+#'
+#' @returns `moped()` returns a list object.
+
 #' @export
 #'
 #' @examples
+#' Data_full <- ISLR::Wage
+#' Data <- Data_full %>%
+#' select(age, education, jobclass,wage)
+#'
+#' # Convert Categorical Data to Continuous Data
+#' Data_x <- make.cont(Data, catvar = 2:3)
+#'
+#' # Fitting multivariate orthogonal polynomial based
+#' # density estimation function
+#' # Requires a data frame of bounds to fit on data.
+#' bounds <- data.frame(
+#' age  = c(18,80),
+#' education = c(0,1),
+#' jobclass = c(0,1),
+#' wage = c(0,350)
+#' )
+#'
+#' Fitting the Data
+#' Fit <- moped(
+#' Data_x,
+#' K=10,
+#' Distrib = rep("Uniform", 7),
+#' bounds = bounds,
+#' variance = T,
+#' recurrence = F,
+#' parallel = F,
+#' ncores = NULL,
+#' mpo = T
+#' )
+
 moped <- function(
     Sample, # Nv-Dimensional Sample SS X Nv dataframe (SS = Sample Size, Nv = Number of Variables)
     K = rep(15,NCOL(Sample)), # Maximum Truncation of Approximation on each variable

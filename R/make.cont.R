@@ -1,21 +1,33 @@
-# Convert (continulize) categorical variables into continuous.
-# Must done before fit data to the density estimation (moped)
-
-
-#' Title
+#' Convert categorical variables into continuous.
 #'
-#' @param Sample
-#' @param catvar
-#' @param amalgams
+#' @description
+#' `make.cont()` is used to converting categorical variables into continuous
+#' variables. It must done before fitting data to the density estimation
+#' function `moped()`.
 #'
-#' @return
+#' @param Sample A data frame.
+#' @param catvar Columns to convert into continuous variables. Variable names
+#'   can be used as if they were positions in the data frame.
+#' @param amalgams A list using numeric indicating the order of variables in
+#'   `"catvar"`. It is the structure of amalgamating categorical variable when
+#'   being continulized.
+#'
+#' @return `make.cont()` returns a data frame.
 #' @export
 #'
 #' @examples
+#' Data_full <- ISLR::Wage
+#' Data <- Data_full %>%
+#' select(age, education, jobclass, wage)
 #'
-#'
+#' # Convert Categorical Data to Continuous Data
+#' Data_x <- make.cont(Data,catvar = 2:3)
+#' # Select variables by name
+#' Data_x <- make.cont(Data,catvar = c("education","jobclass"))
+
+
 make.cont <- function(
-    Sample,  # must be a dataframe
+    Sample,
     catvar = 1:NCOL(Sample), # indicating the categorical variables need to continulized
     amalgams = NULL #structure of amalgamating categorical variable when being continulized. Must be a list using the numeris, which indicate the order of variables in "catvar".
 ){

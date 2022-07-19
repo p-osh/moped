@@ -90,7 +90,4 @@ mpo = T
 # Maximum optimal MPO
 Fit$MPO$opt.mpo
 
-# check marginal densities with different polynomial K
-marginal.plot(Fit)
-marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
 }

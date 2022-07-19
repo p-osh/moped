@@ -61,6 +61,14 @@
 #' ncores = NULL,
 #' mpo = T
 #' )
+#'
+#' # Maximum optimal MPO
+#' Fit$MPO$opt.mpo
+#'
+#' # check marginal densities with different polynomial K
+#' marginal.plot(Fit)
+#' marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
+
 
 moped <- function(
     Sample, # Nv-Dimensional Sample SS X Nv dataframe (SS = Sample Size, Nv = Number of Variables)

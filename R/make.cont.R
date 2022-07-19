@@ -17,13 +17,20 @@
 #'
 #' @examples
 #' Data_full <- ISLR::Wage
-#' Data <- Data_full %>%
-#' select(age, education, jobclass, wage)
 #'
 #' # Convert Categorical Data to Continuous Data
+#' Data <- Data_full %>%
+#' select(age, education, jobclass, wage)
 #' Data_x <- make.cont(Data,catvar = 2:3)
 #' # Select variables by name
 #' Data_x <- make.cont(Data,catvar = c("education","jobclass"))
+#'
+#' # Convert Categorical with amalgamations
+#' Data <- Data_full %>%
+#' select(age, maritl, race, education, jobclass, wage)
+#' Data_amal <- make.cont(Data,catvar = c("maritl","race","education","jobclass"),
+#' amalgams = list(1:2,3:4))
+#'
 
 
 make.cont <- function(

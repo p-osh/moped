@@ -27,7 +27,8 @@
 #'   calculated.
 #'
 #' @returns `moped()` returns a list object.
-
+#'
+#'
 #' @export
 #'
 #' @examples

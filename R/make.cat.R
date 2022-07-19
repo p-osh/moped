@@ -1,14 +1,18 @@
-#' Convert previously continulized variables back to categorical variables
+#' Convert previously continulized variables back to categorical variables.
 #'
-#' @param Sample
+#' @param Sample A data frame.
 #'
-#' @return
+#' @return `make.cat()` returns a data frame.
 #' @export
 #'
 #' @examples
-#'
-#'
-#'
+#' Data_full <- ISLR::Wage
+#' Data <- Data_full %>%
+#' select(age, maritl, race, education, jobclass, wage)
+#' Data_amal <- make.cont(Data,catvar = c("maritl","race","education","jobclass"),
+#' amalgams = list(1:2,3:4))
+#' # Convert previously continulized variables back to categorical variables.
+#' make.cat(Data_amal)
 
 
 

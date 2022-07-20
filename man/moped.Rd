@@ -26,7 +26,7 @@ moped(
 used. Choices are \code{"uniform"}, \code{"normal"}, \code{"gamma"} and \code{"beta"}
 distributions.}
 
-\item{bounds}{A data frame. The limits on the compact space. Should be a
+\item{bounds}{A data frame. The limits on the compact space. Should be an
 array of 2 x number of variables with each column having the lower and
 upper limit. \code{NULL} is the default.}
 
@@ -87,7 +87,6 @@ ncores = NULL,
 mpo = T
 )
 
-# Maximum optimal MPO
+Maximum optimal MPO
 Fit$MPO$opt.mpo
-
 }

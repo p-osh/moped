@@ -11,7 +11,7 @@
 #' @param Distrib Character string, specifying the reference distribution to be
 #'   used. Choices are `"uniform"`, `"normal"`, `"gamma"` and `"beta"`
 #'   distributions.
-#' @param bounds A data frame. The limits on the compact space. Should be a
+#' @param bounds A data frame. The limits on the compact space. Should be an
 #'   array of 2 x number of variables with each column having the lower and
 #'   upper limit. `NULL` is the default.
 #' @param ListP Logical. If `FALSE` (the default), the Pn-Array is calculated
@@ -62,10 +62,8 @@
 #' mpo = T
 #' )
 #'
-#' # Maximum optimal MPO
+#' Maximum optimal MPO
 #' Fit$MPO$opt.mpo
-#'
-
 
 
 moped <- function(

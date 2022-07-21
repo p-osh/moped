@@ -20,7 +20,7 @@ m.resample(
 )
 }
 \arguments{
-\item{fit}{MBDensity Type Variable. Outputed from MBDensity.}
+\item{fit}{MBDensity Type Variable. Outputed from \code{moped()}.}
 
 \item{K}{Integer vector. Maximum Truncation of Approximation on each variable.
 The default is the maximum MPO Order in \code{moped} object.}

@@ -18,7 +18,7 @@ predict(
 )
 }
 \arguments{
-\item{fit}{MBDensity Type Variable, outputed from \code{moped()}}
+\item{fit}{MBDensity Type Variable. Outputed from \code{moped()}.}
 
 \item{Sample}{A data frame for which the probabilities to be calculated. If
 \code{NULL} (the default) than generates nodes^Nv grid. Usually used to

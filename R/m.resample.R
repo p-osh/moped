@@ -3,7 +3,7 @@
 #' @description
 #' `m.resample()` is used to genderate synthetic samples.
 #'
-#' @param fit MBDensity Type Variable. Outputed from MBDensity.
+#' @param fit MBDensity Type Variable. Outputed from `moped()`.
 #' @param K Integer vector. Maximum Truncation of Approximation on each variable.
 #'   The default is the maximum MPO Order in `moped` object.
 #' @param variables Integer vector or character string. Variables to be

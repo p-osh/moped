@@ -6,7 +6,7 @@
 #' together. Sample must be a data frame and its variable length must equal to
 #' the length in var.
 #'
-#' @param fit MBDensity Type Variable, outputed from `moped()`
+#' @param fit MBDensity Type Variable. Outputed from `moped()`.
 #' @param Sample A data frame for which the probabilities to be calculated. If
 #'   `NULL` (the default) than generates nodes^Nv grid. Usually used to
 #'   calculate probability for a specific set of obs.

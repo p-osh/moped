@@ -49,7 +49,7 @@
 #' wage = c(0,350)
 #' )
 #'
-#' Fitting the Data
+#' # Fitting the Data
 #' Fit <- moped(
 #' Data_x,
 #' K=10,

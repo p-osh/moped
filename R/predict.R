@@ -17,12 +17,12 @@
 #'   whichever smallest.
 #' @param bounds A data frame. Bounds allows you to control the grid min and max.
 #'   Should be an array of 2 x number of variables. `NULL` is the default.
-#' @param normalise Logical. If `TRUE` (the default), ?????????
+#' @param normalise Logical. If `TRUE` (the default). (?Brad)
 #' @param nodes Integer vector. Nodes allows you to control how many grid points.
 #' @param parallel Logical. If `FALSE` (the default), parallel computing is not
 #'   used.
 #' @param ncores Integer vector. NCores to use in parallel computing.
-#' @param mps Integer vector.
+#' @param mps Integer vector. The default is 5000. (?Brad)
 #'
 #' @return `predict()` returns a data frame.
 #' @export
@@ -45,7 +45,7 @@
 #' wage = c(0,350)
 #' )
 #'
-#' Fitting the Data
+#' # Fitting the Data
 #' Fit <- moped(
 #' Data_x,
 #' K=10,

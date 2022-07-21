@@ -34,7 +34,7 @@ whichever smallest.}
 \item{bounds}{A data frame. Bounds allows you to control the grid min and max.
 Should be an array of 2 x number of variables. \code{NULL} is the default.}
 
-\item{normalise}{Logical. If \code{TRUE} (the default), ?????????}
+\item{normalise}{Logical. If \code{TRUE} (the default). (?Brad)}
 
 \item{nodes}{Integer vector. Nodes allows you to control how many grid points.}
 
@@ -43,7 +43,7 @@ used.}
 
 \item{ncores}{Integer vector. NCores to use in parallel computing.}
 
-\item{mps}{Integer vector.}
+\item{mps}{Integer vector. The default is 5000. (?Brad)}
 }
 \value{
 \code{predict()} returns a data frame.
@@ -72,7 +72,7 @@ jobclass = c(0,1),
 wage = c(0,350)
 )
 
-Fitting the Data
+# Fitting the Data
 Fit <- moped(
 Data_x,
 K=10,

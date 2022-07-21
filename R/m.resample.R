@@ -1,36 +1,93 @@
-#' Generate syntheic samples
+#' Generate synthetic samples
 #'
-#' @param fit
-#' @param K
-#' @param variables
-#' @param Sample
-#' @param n
-#' @param bounds
-#' @param replicates
-#' @param parallel
-#' @param ncores
-#' @param mps
-#' @param fixed.var
-#' @param er_alert
+#' @description
+#' `m.resample()` is used to genderate synthetic samples.
 #'
-#' @return
+#' @param fit MBDensity Type Variable. Outputed from MBDensity.
+#' @param K Integer vector. Maximum Truncation of Approximation on each variable.
+#'   The default is the maximum MPO Order in `moped` object.
+#' @param variables Integer vector or character string. Variables to be
+#'   predicted from `moped` object. The default is 1:Nv or 1:NCOL(Sample)
+#'   whichever smallest.
+#' @param Sample A data frame defines the size of the synthetic data frame.
+#' @param n Integer vector. The number of rows in the sample data frame.
+#' @param bounds A data frame. Bounds allows you to control the grid min and max.
+#'   Should be an array of 2 x number of variables. `NULL` is the default.
+#' @param replicates Integer vector. The default is 1.
+#' @param parallel Logical. If `FALSE` (the default), parallel computing is not
+#'   used.
+#' @param ncores Integer vector. NCores to use in parallel computing.
+#' @param mps Integer vector. The default is 5000. (?Brad)
+#' @param fixed.var The position of the variable(s) conditional upon. The
+#'   default is `NULL`.
+#' @param er_alert Logical. The default is `TRUE`. (?Brad)
+#'
+#' @return `m.resample()` returns a data frame.
 #' @export
 #'
 #' @examples
+#' Data_full <- ISLR::Wage
+#' Data <- Data_full %>%
+#' select(age, education, jobclass,wage)
+#'
+#' # Convert Categorical Data to Continuous Data
+#' Data_x <- make.cont(Data, catvar = 2:3)
+#'
+#' # Fitting multivariate orthogonal polynomial based
+#' # density estimation function
+#' # Requires a data frame of bounds to fit on data.
+#' bounds <- data.frame(
+#' age  = c(18,80),
+#' education = c(0,1),
+#' jobclass = c(0,1),
+#' wage = c(0,350)
+#' )
+#'
+#' # Fitting the Data
+#' Fit <- moped(
+#' Data_x,
+#' K=10,
+#' Distrib = rep("Uniform", 7),
+#' bounds = bounds,
+#' variance = T,
+#' recurrence = F,
+#' parallel = F,
+#' ncores = NULL,
+#' mpo = T
+#' )
+#'
+#' # Generating resampled Obs
+#'resampled <- m.resample(Fit, K=3, Sample=Data_x, fixed.var = 1, replicates = 1)
+#'resampled <- m.resample(Fit, K=3, replicates = 1) # A fully resampled dataset
+#'resampled <- m.resample(Fit, K=3, Sample = Data_x, variables = 4, replicates = 1)
+#'
+#' # Marginal Synthetic
+#' resampled_marginal <- m.resample(Fit,
+#' Sample = Data_x[,3:4],
+#' K = c(3,4),
+#' variables = 3:4,
+#' replicates = 1
+#' )
+#'
+#' # Convert previously continulized variables back to categorical variables.
+#' resampled <- make.cat(resampled)
+#'
+#'
+#'
+#'
 
 
-
-m.resample <- function(fit, # MBDensity Type Variable (Outputed from MBDensity)
-                       K=NULL, # Truncation to be used (Default is max in Fit)
-                       variables = NULL, # Which variables to be predicted from Fit (Default is 1:Nv or 1:NCOL(X) whichever smallest) )
-                       Sample = fit$SampleStats$Sample, #initial values and deine the size of the synthetic dataframe
+m.resample <- function(fit,
+                       K=NULL,
+                       variables = NULL,
+                       Sample = fit$SampleStats$Sample,
                        n = NROW(Sample),
-                       bounds = NULL , #Bounds allows you to control the grid min and max (2 X Nv Dataframe)
+                       bounds = NULL ,
                        replicates = 1,
                        parallel = F,
                        ncores = NULL,
                        mps = 5000,
-                       fixed.var = NULL, #position of the variable(s) conditional upon
+                       fixed.var = NULL,
                        er_alert = T
 ){
   #try(if(NCOL(Sample) == 1){

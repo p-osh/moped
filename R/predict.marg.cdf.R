@@ -1,10 +1,12 @@
 #' Title
 #'
-#' @param fit
-#' @param X
-#' @param K
+#' @param fit MBDensity type variable. Outputed from `moped()`.
+#' @param X Grid of probabilities to be calculated. If `NULL` (the default) than
+#'   generates nodes x Nv grid.
+#' @param K Truncation to be used. If `NULL`( the default). it is max in Fit.
 #' @param nprobs
-#' @param variable
+#' @param variable Which variables to be predicted from Fit. The Default `NULL`
+#'   is 1:Nv or 1:NCOL(X) whichever smallest.
 #'
 #' @return
 #' @export

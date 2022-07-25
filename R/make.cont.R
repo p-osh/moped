@@ -21,22 +21,22 @@
 #' # Convert Categorical Data to Continuous Data
 #' Data <- Data_full %>%
 #' select(age, education, jobclass, wage)
-#' Data_x <- make.cont(Data,catvar = 2:3)
+#' Data_x <- make.cont(Data, catvar = 2:3)
 #' # Select variables by name
-#' Data_x <- make.cont(Data,catvar = c("education","jobclass"))
+#' Data_x <- make.cont(Data, catvar = c("education","jobclass"))
 #'
-#' # Convert Categorical with amalgamations
+#' # Convert categorical with amalgamations
 #' Data <- Data_full %>%
 #' select(age, maritl, race, education, jobclass, wage)
-#' Data_amal <- make.cont(Data,catvar = c("maritl","race","education","jobclass"),
-#' amalgams = list(1:2,3:4))
+#' Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
+#' amalgams = list(1:2, 3:4))
 #'
 
 
 make.cont <- function(
     Sample,
-    catvar = 1:NCOL(Sample), # indicating the categorical variables need to continulized
-    amalgams = NULL #structure of amalgamating categorical variable when being continulized. Must be a list using the numeris, which indicate the order of variables in "catvar".
+    catvar = 1:NCOL(Sample),
+    amalgams = NULL
 ){
 
   if(is.character(catvar)){

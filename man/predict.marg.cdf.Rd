@@ -2,13 +2,26 @@
 % Please edit documentation in R/predict.marg.cdf.R
 \name{predict.marg.cdf}
 \alias{predict.marg.cdf}
-\title{Title}
+\title{Title (?Brad)}
 \usage{
 predict.marg.cdf(fit, X = NULL, K = NULL, nprobs = 1, variable = NULL)
 }
 \arguments{
-\item{variable}{}
+\item{fit}{MBDensity type variable. Outputed from \code{moped()}.}
+
+\item{X}{Grid of probabilities to be calculated. If \code{NULL} (the default) than
+generates nodes x Nv grid.}
+
+\item{K}{Truncation to be used. If \code{NULL}( the default). it is max in Fit.}
+
+\item{nprobs}{(?Brad)}
+
+\item{variable}{Which variables to be predicted from Fit. The Default \code{NULL}
+is 1:Nv or 1:NCOL(X) whichever smallest.}
 }
 \description{
-Title
+Title (?Brad)
+}
+\examples{
+(?Brad)
 }

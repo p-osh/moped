@@ -12,7 +12,7 @@ test_that("check categorical variables are continulized", {
 
 
 
-test_that("check categorical variables are continulized with amalgamations", {
+test_that("check amalgamated variables are continulized", {
   Data_full <- ISLR::Wage
   Data <- Data_full %>%
     dplyr::select(age, maritl, race, education, jobclass, wage)

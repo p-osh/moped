@@ -11,7 +11,7 @@ test_that("check categorical variables are continulized", {
 #> Test passed!
 
 
-test_that("check catvar using variable names", {
+test_that("check specifing categorical variables by variable names", {
   Data_full <- ISLR::Wage
   Data <- Data_full %>%
     dplyr::select(age, education, jobclass, wage)

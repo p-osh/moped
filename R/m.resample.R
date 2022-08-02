@@ -104,24 +104,39 @@ m.resample <- function(fit,
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }
   if(is.null(variables)) variables <- 1:length(fit$KMax)
+  if(is.null(fixed.var)) impute.vars <- 1:length(variables) else impute.vars <- (1:length(variables))[-fixed.var]
   Nv <- length(variables)
+  
+  variables_names <- colnames(fit$SampleStats$Sample)[variables]
+  
+  test_names <- prod(variables_names %in% colnames(Sample))
+  
+  try(if(test_names == 0){
+    return(cat("\r Error: Sample must contain columns named ",variables_names))
+  } else {
   if(is.null(bounds)) bounds <- sapply(variables, function(i) fit$SampleStats$Range[,i])
   if(is.null(K)) K <- fit$KMax[variables]
   if(length(K)==1) K <- rep(K,Nv)
-  if(is.null(fixed.var)) impute.vars <- 1:length(variables) else impute.vars <- (1:length(variables))[-fixed.var]
-
   K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
+  
+  OSample <- Sample
   SS <- NROW(Sample)
   if(NS != SS) Sample <- Sample[sample(1:SS,NS,replace = T),]
   SS <- NS
-  OSample <- Sample
+  Sample <- as.data.frame(Sample[,variables_names])
+  colnames(Sample) <- variables_names
+  
   nonerror <- 1:NS
   for(re in 1:replicates){
     for(nu in impute.vars){
+      if(length(variables[-n])){
+      Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
+                                variable = variables[nu])  
+      }else{
       Condk <- predict.conditional(fit,K.X = K[nu],Y = Sample[,-nu], K.Y = K[-nu],
                                    X.variable = variables[nu], Y.variables = variables[-nu],
                                    X.bounds = bounds[,nu], Y.bounds = bounds[,-nu])
-
+      }
       error <- which(apply(is.nan(Condk$coef),1,sum)>0)
 
       if(length(error)> 0){
@@ -201,12 +216,12 @@ m.resample <- function(fit,
     Sample <- rbind(Sample,ErrorSample)
 
   }
-
-  Synth <- as.data.frame(Sample[1:NS,])
+  Synth <- OSample
+  Synth[,variables_names] <- as.data.frame(Sample[1:NS,])
   Cats <- fit$Cats
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats
   return(Synth)
-  #})
+  })
 }
 

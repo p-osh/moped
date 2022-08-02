@@ -81,8 +81,10 @@ predict.conditional <- function(fit,
                                 Y.bounds= NULL){
   tNv <- length(fit$KMax)
   tKm <- max(fit$KMax)
-
   if(is.null(X.variable)) X.variable <- 1
+  try(if(is.null(X) & fit$Distrib[X.variable] != "Uniform"){
+    return(cat("Error: Non-uniform approximations require numeric values for X."))
+  }else{
   if(is.null(Y.variables)) Y.variables <- setdiff(1:tNv,X.variable)
   if(is.null(X.bounds)) X.bounds <- fit$SampleStats$Range[,X.variable]
   if(is.null(Y.bounds)) Y.bounds <- sapply(Y.variables, function(i) fit$SampleStats$Range[,i])
@@ -122,17 +124,25 @@ predict.conditional <- function(fit,
       tt = apply(tt,2:length(dim(tt)),sum)
     }
   }
-
+  if(fit$Distrib[variable]=="Uniform"){
   fnu <- 1/(fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
   E <- t(t(XDP)%*%tt)*Y.poly$PdfTerms*fnu/fY$Density
   coef <- cbind(fit$Sigma[3,X.variable]*E,0,0) + cbind(0,fit$Sigma[2,X.variable]*E,0) + cbind(0,0,fit$Sigma[1,X.variable]*E)
   coef[,1] <- coef[,1]-fit$Paramaters[1,X.variable]/
     (fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
   coef[,2] <- coef[,2]+1/(fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
+  }else{
+    fnu <- fit$PDFControl(X.variable)$PDF(X)
+    Fnu <- fit$PDFControl(X.variable)$CDF(X)
+    E <- t(t(XDP)%*%tt)*Y.poly$PdfTerms*fnu/fY$Density
+    coef <- cbind(fit$Sigma[3,variable]*E,0,0) + cbind(0,fit$Sigma[2,variable]*E,0) + cbind(0,0,fit$Sigma[1,variable]*E)
+    coef[,1] <- coef[,1] + Fnu
+  }
   if(is.null(X)){
     return(list(coef = coef, E = E))
   }else{
     Prob <- apply(coef*(sapply(0:(K.X+1),function(k)X^k)),1,sum)
     return(list(coef = coef, E = E,Prob = Prob))
   }
+  })
 }

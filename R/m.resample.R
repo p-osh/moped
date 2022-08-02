@@ -129,6 +129,7 @@ m.resample <- function(fit,
   nonerror <- 1:NS
   for(re in 1:replicates){
     for(nu in impute.vars){
+      
       if(length(variables[-n])){
       Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
                                 variable = variables[nu])  

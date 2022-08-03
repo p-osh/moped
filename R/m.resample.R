@@ -130,7 +130,7 @@ m.resample <- function(fit,
   for(re in 1:replicates){
     for(nu in impute.vars){
       if(fit$Distrib[variables[nu]] == "Uniform"){
-      if(length(variables[-n])){
+      if(length(variables[-n])==0){
       Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
                                 variable = variables[nu])  
       }else{
@@ -207,7 +207,7 @@ m.resample <- function(fit,
         SS <- NROW(Sample)
       }
       }else{
-        if(length(variables[-n])){
+        if(length(variables[-n])==0){
         lb <- predict.marg.cdf(fit,K = K[nu], 
                                X= fit$SampleStats$Range[1,variables[nu]],
                                variable = variables[nu])$Prob
@@ -234,7 +234,7 @@ m.resample <- function(fit,
         }
         
         synthetic_generator <- function(i){
-          if(length(variables[-n])){
+          if(length(variables[-n])==0){
             xi<- median(fit$SampleStats$Sample[,variables[nu]])
             x0<-xi+1
             u <- runif(1,lb,ub)
@@ -299,6 +299,7 @@ m.resample <- function(fit,
                     , error = function(e) {an.error.occured <<- TRUE})
           if(an.error.occured) error <- c(error,i)
         }
+        error <- unique(c(error,which(is.nan(Sample[,nu]))))
         
         if(length(error)> 0){
           Sample <- Sample[-error,]
@@ -317,8 +318,8 @@ m.resample <- function(fit,
     Sample <- rbind(Sample,ErrorSample)
 
   }
-  Synth <- OSample
-  Synth[,variables_names] <- as.data.frame(Sample[1:NS,])
+  Synth <- OSample[1:NS,]
+  Synth[,variables_names] <- as.data.frame(Sample)[1:NS,]
   Cats <- fit$Cats
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats

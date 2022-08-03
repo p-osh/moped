@@ -3,7 +3,7 @@ test_that("check output has correct class", {
 })
 #> Test passed!
 
-test_that("arguments are correctly passed", {
+test_that("check arguments are correctly passed", {
 
   # sample data
   expect_identical(dim(fit[["SampleStats"]][["Sample"]]), dim(df_cont))
@@ -14,22 +14,21 @@ test_that("arguments are correctly passed", {
   # reference distribution
   expect_identical(fit[["Distrib"]], rep("Uniform", 4))
 
-  # varCn is calculated
-
 })
 
 #> Test passed!
 
 
+test_that("check all outputs are calculated in moped object", {
+  expect_identical(c("Cn", "PolyCoef", "Poly", "MPO", "PDFControl", "NaTerms",
+                     "Cats", "Sigma", "Tau", "Limits", "varCn", "Distrib",
+                     "Bounds", "PnList", "Lambda", "Bn", "Recurrence", "KMax",
+                     "Paramaters", "Kappa", "Kappa2", "SampleStats"),
+               names(fit))
 
+})
 
-
-
-
-
-
-
-
+#> Test passed!
 
 
 

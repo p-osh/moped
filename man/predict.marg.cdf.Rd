@@ -19,6 +19,9 @@ generates nodes x Nv grid.}
 \item{variable}{Which variables to be predicted from Fit. The Default \code{NULL}
 is 1:Nv or 1:NCOL(X) whichever smallest.}
 }
+\value{
+A data frame
+}
 \description{
 Title (?Brad)
 }

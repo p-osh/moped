@@ -78,7 +78,7 @@ marginal.plot <- function(fit,
     for (i in k.range) {
       pred.temp <- predict(fit,K=i,variables = j)
       p1 <- eval(substitute(
-        ggplot(Data_x) +
+        ggplot(as.data.frame(fit$SampleStats$Sample)) +
           geom_histogram(aes(x=fit$SampleStats$Sample[,j],y=..density..), binwidth = bw)+
           geom_line(aes(x=pred.temp[,1],y=Density),data=pred.temp,col='red')+
           ggtitle(paste0("K = ", i)) +

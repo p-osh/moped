@@ -8,7 +8,7 @@
 #' @param variable Which variables to be predicted from Fit. The Default `NULL`
 #'   is 1:Nv or 1:NCOL(X) whichever smallest.
 #'
-#' @return
+#' @return A data frame
 #' @export
 #'
 #' @examples (?Brad)

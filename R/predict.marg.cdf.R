@@ -29,7 +29,7 @@ predict.marg.cdf <- function(fit, # MBDensity Type Variable (Outputed from MBDen
     return(cat("Error: Non-uniform approximations require numeric values for X."))
   }else{
   if(is.null(K)) K <- max(fit$KMax)
-  if(!is.null(X)) nprobs <- nrow(X)
+  if(!is.null(X)) nprobs <- NROW(X)
   subsetnames <- lapply(1:NCOL(fit$SampleStats$Sample),function(k)1)
   subsetnames[[variable]] <- 1:K+1
   C <- c(extract.array(fit$Cn,indices = subsetnames))%o%array(1,dim=c(nprobs))

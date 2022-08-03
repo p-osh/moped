@@ -441,7 +441,7 @@ moped <- function(
                                    Tn = Tn[-(max(K):NROW(lambda)),]), KMax = K,
                  Paramaters = par, Kappa = Kappa, Kappa2 = Kappa2,
                  SampleStats = list(Range = sapply(1:Nv,function(k) range(Sample[,k],na.rm = T)),
-                                    Sample = Sample))
+                                    Sample = data.frame(Sample)))
   class(output) <- "moped"
 
   return(output)

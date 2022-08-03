@@ -124,7 +124,7 @@ predict.conditional <- function(fit,
       tt = apply(tt,2:length(dim(tt)),sum)
     }
   }
-  if(fit$Distrib[variable]=="Uniform"){
+  if(fit$Distrib[X.variable]=="Uniform"){
   fnu <- 1/(fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
   E <- t(t(XDP)%*%tt)*Y.poly$PdfTerms*fnu/fY$Density
   coef <- cbind(fit$Sigma[3,X.variable]*E,0,0) + cbind(0,fit$Sigma[2,X.variable]*E,0) + cbind(0,0,fit$Sigma[1,X.variable]*E)
@@ -135,7 +135,7 @@ predict.conditional <- function(fit,
     fnu <- fit$PDFControl(X.variable)$PDF(X)
     Fnu <- fit$PDFControl(X.variable)$CDF(X)
     E <- t(t(XDP)%*%tt)*Y.poly$PdfTerms*fnu/fY$Density
-    coef <- cbind(fit$Sigma[3,variable]*E,0,0) + cbind(0,fit$Sigma[2,variable]*E,0) + cbind(0,0,fit$Sigma[1,variable]*E)
+    coef <- cbind(fit$Sigma[3,X.variable]*E,0,0) + cbind(0,fit$Sigma[2,X.variable]*E,0) + cbind(0,0,fit$Sigma[1,X.variable]*E)
     coef[,1] <- coef[,1] + Fnu
   }
   if(is.null(X)){

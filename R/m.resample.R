@@ -129,7 +129,7 @@ m.resample <- function(fit,
   nonerror <- 1:NS
   for(re in 1:replicates){
     for(nu in impute.vars){
-      
+      if(fit$Distrib[variables[nu]] == "Uniform"){
       if(length(variables[-n])){
       Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
                                 variable = variables[nu])  
@@ -205,6 +205,106 @@ m.resample <- function(fit,
         Condk$coef <- Condk$coef[-error,]
         nonerror <- nonerror[-error]
         SS <- NROW(Sample)
+      }
+      }else{
+        if(length(variables[-n])){
+        lb <- predict.marg.cdf(fit,K = K[nu], 
+                               X= fit$SampleStats$Range[1,variables[nu]],
+                               variable = variables[nu])$Prob
+        ub <- predict.marg.cdf(fit,K = K[nu], 
+                               X= fit$SampleStats$Range[2,variables[nu]],
+                               variable = variables[nu])$Prob
+        }else{
+          lb <- predict.conditional(fit,K.X = K[nu], 
+                                    X= rep(fit$SampleStats$Range[1,variables[nu]],
+                                           NROW(Sample)), 
+                                    Y = Sample[,-nu], K.Y = K[-nu],
+                                    X.variable = variables[nu], 
+                                    Y.variables = variables[-nu],
+                                    X.bounds = bounds[,nu], 
+                                    Y.bounds = bounds[,-nu])$Prob
+          ub <- predict.conditional(fit,K.X = K[nu], 
+                                    X= rep(fit$SampleStats$Range[2,variables[nu]],
+                                           NROW(Sample)), 
+                                    Y = Sample[,-nu], K.Y = K[-nu],
+                                    X.variable = variables[nu], 
+                                    Y.variables = variables[-nu],
+                                    X.bounds = bounds[,nu], 
+                                    Y.bounds = bounds[,-nu])$Prob
+        }
+        
+        synthetic_generator <- function(i){
+          if(length(variables[-n])){
+            xi<- median(fit$SampleStats$Sample[,variables[nu]])
+            x0<-xi+1
+            u <- runif(1,lb,ub)
+            it_cnt <- 0
+            while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
+            x0 <- xi
+            FX <- predict.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob 
+            fX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
+            xi <- xi - (FX-u)/fX
+            it_cnt <- it_cnt + 1
+            }
+            if(is.nan(xi) | it_cnt>=100 | 
+               xi < fit$SampleStats$Range[1,variables[nu]] | 
+               xi > fit$SampleStats$Range[2,variables[nu]]){
+              fX <- predict(fit, K= K[nu],variables = variables[nu],nodes=200)
+              FX_p <- cumsum(fX$Density)
+              FX_p <- (FX_p - min(FX_p))/(max(FX_p)- min(FX_p))
+              FX_p <- (ub-lb)*FX_p + lb
+              FX <- approxfun(x=FX_p,y=fX[,1])
+              xi <- FX(u)
+            }
+            return(xi)
+          }else{
+            xi<- median(fit$SampleStats$Sample[,variables[nu]])
+            x0<-xi+1
+            u <- runif(1,lb[i],ub[i])
+            it_cnt <- 0
+            while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
+            x0 <- xi
+            xi_vec <- cbind(xi,Sample[i,-nu])
+            FX <- predict.conditional(fit,K.X = K[nu],X=xi,
+                                         Y = Sample[i,-nu], K.Y = K[-nu],
+                                         X.variable = variables[nu], Y.variables = variables[-nu],
+                                         X.bounds = bounds[,nu], Y.bounds = bounds[,-nu])$Prob
+            mfX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
+            fX <-  predict(fit, K= c(K[nu],K[-nu]),Sample=xi_vec,
+                           variables = c(variables[nu],variables[-nu]))$Density
+            xi <- xi - mfX*(FX-u)/fX
+            it_cnt <- it_cnt + 1
+            }
+            if(is.nan(xi) | it_cnt>=100 | 
+               xi < fit$SampleStats$Range[1,variables[nu]] | 
+               xi > fit$SampleStats$Range[2,variables[nu]]){
+              grid_pts <- seq(fit$SampleStats$Range[1,variables[nu]],
+                              fit$SampleStats$Range[2,variables[nu]],length.out=200)
+              grid_pts <- suppressWarnings(cbind(grid_pts,Sample[i,-nu]))
+              fX <- predict(fit, K= c(K[nu],K[-nu]),Sample=grid_pts,
+                            variables = c(variables[nu],variables[-nu]))
+              FX_p <- cumsum(fX$Density)
+              FX_p <- (FX_p - min(FX_p))/(max(FX_p)- min(FX_p))
+              FX_p <- (ub[i]-lb[i])*FX_p + lb[i]
+              FX <- suppressWarnings(approxfun(x=FX_p,y=fX[,1]))
+              xi <- FX(u)
+            }
+            return(xi)
+          }
+        }
+        error <- c()
+        for(i in 1:SS){
+          an.error.occured <- FALSE
+          tryCatch( { Sample[i,nu] <- synthetic_generator(i) }
+                    , error = function(e) {an.error.occured <<- TRUE})
+          if(an.error.occured) error <- c(error,i)
+        }
+        
+        if(length(error)> 0){
+          Sample <- Sample[-error,]
+          nonerror <- nonerror[-error]
+          SS <- NROW(Sample)
+        }
       }
     }}
   if(SS < NS){

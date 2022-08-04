@@ -119,7 +119,13 @@ m.resample <- function(fit,
   try(if(test_names){
     return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
   } else {
-  if(is.null(bounds)) bounds <- sapply(variables, function(i) fit$SampleStats$Range[,i])
+    tryCatch(bounds <- setNames(data.frame(bounds[,variables_names]),
+                                variables_names),
+             error = function(e) bounds <<- NULL)
+    if(is.null(bounds)){
+      bounds <- as.data.frame(fit$SampleStats$Range[,variables])
+      colnames(bounds) <- variables_names
+    }
   if(is.null(K)) K <- fit$KMax[variables]
   if(length(K)==1) K <- rep(K,Nv)
   K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
@@ -242,15 +248,16 @@ m.resample <- function(fit,
         }
         
         synthetic_generator <- function(i){
-          if(length(variables[-n])==0){
-            xi<- median(fit$SampleStats$Sample[,variables[nu]])
+          if(length(variables[-nu])==0){
+            xi<- data.frame(median(fit$SampleStats$Sample[,variables[nu]]))
+            colnames(xi) <- variables_names[nu]
             x0<-xi+1
             u <- runif(1,lb,ub)
             it_cnt <- 0
             while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
             x0 <- xi
             FX <- predict.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob 
-            fX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
+            fX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
             xi <- xi - (FX-u)/fX
             it_cnt <- it_cnt + 1
             }
@@ -264,22 +271,23 @@ m.resample <- function(fit,
               FX <- approxfun(x=FX_p,y=fX[,1])
               xi <- FX(u)
             }
-            return(xi)
+            return(unlist(xi))
           }else{
-            xi<- median(fit$SampleStats$Sample[,variables[nu]])
+            xi<- data.frame(median(fit$SampleStats$Sample[,variables[nu]]))
+            colnames(xi) <- variables_names[nu]
             x0<-xi+1
             u <- runif(1,lb[i],ub[i])
             it_cnt <- 0
             while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
             x0 <- xi
-            xi_vec <- cbind(xi,Sample[i,-nu])
+            xi_vec <- cbind(xi,setNames(data.frame(Sample[i,-nu]),colnames(Sample)[-nu]))
             FX <- predict.conditional(fit,K.X = K[nu],X=xi,
                                          Y = setNames(data.frame(Sample[,-nu]),
                                                       colnames(Sample)[-nu]), 
                                          K.Y = K[-nu],
                                          X.variable = variables[nu], Y.variables = variables[-nu])$Prob
-            mfX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
-            fX <-  predict(fit, K= c(K[nu],K[-nu]),Sample=xi_vec,
+            mfX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
+            fX <-  predict(fit, K= c(K[nu],K[-nu]),X=xi_vec,
                            variables = c(variables[nu],variables[-nu]))$Density
             xi <- xi - mfX*(FX-u)/fX
             it_cnt <- it_cnt + 1
@@ -287,10 +295,12 @@ m.resample <- function(fit,
             if(is.nan(xi) | it_cnt>=100 | 
                xi < fit$SampleStats$Range[1,variables[nu]] | 
                xi > fit$SampleStats$Range[2,variables[nu]]){
-              grid_pts <- seq(fit$SampleStats$Range[1,variables[nu]],
-                              fit$SampleStats$Range[2,variables[nu]],length.out=200)
-              grid_pts <- suppressWarnings(cbind(grid_pts,Sample[i,-nu]))
-              fX <- predict(fit, K= c(K[nu],K[-nu]),Sample=grid_pts,
+              grid_pts <- data.frame(seq(fit$SampleStats$Range[1,variables[nu]],
+                              fit$SampleStats$Range[2,variables[nu]],length.out=200))
+              colnames(grid_pts) <- variables_names[nu]
+              grid_pts <- suppressWarnings(cbind(grid_pts,setNames(data.frame(Sample[,-nu]),
+                                                                   colnames(Sample)[-nu])))
+              fX <- predict(fit, K= c(K[nu],K[-nu]),X=grid_pts,
                             variables = c(variables[nu],variables[-nu]))
               FX_p <- cumsum(fX$Density)
               FX_p <- (FX_p - min(FX_p))/(max(FX_p)- min(FX_p))
@@ -298,7 +308,7 @@ m.resample <- function(fit,
               FX <- suppressWarnings(approxfun(x=FX_p,y=fX[,1]))
               xi <- FX(u)
             }
-            return(xi)
+            return(unlist(xi))
           }
         }
         error <- c()

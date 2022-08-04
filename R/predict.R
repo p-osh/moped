@@ -1,30 +1,38 @@
 #' Predicting the probability of an observation based on moped density estimate
 #'
 #' @description
-#' `predict()` is used to predict marginal density for a set of observations.
-#' When constructing partically joint density, sample and variables must be used
-#' together. Sample must be a data frame and its variable length must equal to
+#' `predict.moped()` is used to predict marginal density for a set of observations.
+#' When constructing partially joint density, sample and variables must be used
+#' together. X must be a data frame and its variable length must equal to
 #' the length in var.
 #'
-#' @param fit MBDensity Type Variable. Outputed from `moped()`.
-#' @param Sample A data frame for which the probabilities to be calculated. If
-#'   `NULL` (the default) than generates nodes^Nv grid. Usually used to
-#'   calculate probability for a specific set of obs.
-#' @param K Integer vector. Truncation to be used, the default is the maximum
-#'   MPO Order in `moped` object.
-#' @param variables Integer vector or character string. Variables to be
-#'   predicted from `moped` object. The default is 1:Nv or 1:NCOL(Sample)
-#'   whichever smallest.
+#' @param fit `moped` type variable. Outputted from `moped()`.
+#' @param X An optional data frame in which to look for variables with which
+#'  to estimate density values. Must contain column names matching variables in 
+#'  the `moped` object. If `NULL` (the default) then generates a nodes^Nv 
+#'  (number of variables) grid with density values. 
+#' @param K Integer vector. Maximum Polynomial Order of approximation on each 
+#'   variable. Must be less than or equal to the maximum MPO K specified in 
+#'   `moped()`. The default is the K specified in `moped` object.
+#' @param variables Integer vector or character string of variable names. The 
+#'   `moped` position or column name of the variable(s) to be predicted from 
+#'   `moped` object. The default is 1:Nv or 1:NCOL(X) whichever smallest.
 #' @param bounds A data frame. Bounds allows you to control the grid min and max.
 #'   Should be an array of 2 x number of variables. `NULL` is the default.
-#' @param normalise Logical. If `TRUE` (the default). (?Brad)
-#' @param nodes Integer vector. Nodes allows you to control how many grid points.
+#' @param type string equal to `"density"` (default) or `"distribution"`. If
+#'  `type = "density"` density values are estimated. If `type = "distribution"`
+#'  cumulative distribution function probabilities are estimated.   
+#' @param normalise Logical. If `TRUE` (the default) then scale data to correct 
+#'   for any estimated negative values.
+#' @param nodes Integer vector. Number of grid points per dimension when grid is
+#'   calculated.
 #' @param parallel Logical. If `FALSE` (the default), parallel computing is not
 #'   used.
-#' @param ncores Integer vector. NCores to use in parallel computing.
-#' @param mps Integer vector. The default is 5000. (?Brad)
+#' @param ncores Integer vector. Number of cores used in parallel computing.
+#' @param mps Integer vector. Limit on maximum number of probabilities 
+#'  calculated at a time. The default is 5000.
 #'
-#' @return `predict()` returns a data frame.
+#' @return `predict.moped()` returns a data frame with estimated density values.
 #' @export
 #'
 #' @examples
@@ -39,7 +47,7 @@
 #' # density estimation function
 #' # Requires a data frame of bounds to fit on data.
 #' bounds <- data.frame(
-#' age  = c(18,80),
+#' age  = c(17,80),
 #' education = c(0,1),
 #' jobclass = c(0,1),
 #' wage = c(0,350)
@@ -49,7 +57,7 @@
 #' Fit <- moped(
 #' Data_x,
 #' K=10,
-#' Distrib = rep("Uniform", 7),
+#' Distrib = rep("Uniform", 4),
 #' bounds = bounds,
 #' variance = T,
 #' recurrence = F,
@@ -60,15 +68,15 @@
 #'
 #' # Define the observation which the probability is desired
 #' x0 <- Data_x[1,]
-#' pred <- predict(Fit, K= 7, Sample = x0)
+#' pred <- predict(Fit, K= 7, X = x0)
 #'
 #' # Predicting Marginal Density for a set of observations
-#' # When constructing partically joint density, Sample and varaibles must be used together.
-#  # Sample must be a dataframe and its variable length must equal to the length in var.
-#' pred <- predict(Fit, K= 7, Sample= Data_x[,3:4] , variables =c("jobclass", "wage"))
-#' pred <- predict(Fit, K= 7, Sample= Data_x[,4] , variables =c("wage"))
-#' pred <- predict(Fit, K= 7, Sample= Data_x[,4] , variables =4 )
-#' pred <- predict(Fit, K= c(2,7), Sample= Data_x[,3:4] , variables =c("jobclass","wage"))
+#' # When constructing partially joint density, X and variables must be used together.
+#  # X must be a data frame and its variable length must equal to the length in var.
+#' pred <- predict(Fit, K= 7, X= Data_x[,3:4] , variables =c("jobclass", "wage"))
+#' pred <- predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables =c("wage"))
+#' pred <- predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables =4 )
+#' pred <- predict(Fit, K= c(2,7), X= Data_x[,3:4] , variables =c("jobclass","wage"))
 #'
 #' # Plotting marginal density
 #' predict(Fit, K= 7, variables =4) %>%
@@ -82,52 +90,55 @@
 #' scale_fill_distiller(palette = "Spectral")
 
 
-predict <- function(fit,
-                    Sample = NULL,
+predict.moped <- function(fit,
+                    X = NULL,
                     K=NULL,
                     variables = NULL,
                     bounds = NULL ,
+                    type = "density",
                     normalise = T,
                     nodes = 100,
                     parallel = F,
                     ncores = NULL,
                     mps = 5000
 ){
-
-  if( length(Sample) != 0 & length(variables) != 0 & NCOL(Sample) != length(variables)){
+  if(is.null(variables)) variables <- 1:length(fit$KMax)
+  if(is.character(variables)){
+    variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
+  }
+  Nv <- length(variables)
+  variables_names <- colnames(fit$SampleStats$Sample)[variables]
+  tryCatch(bounds <- setNames(data.frame(bounds[,variables_names]),
+                              variables_names),
+           error = function(e) bounds <<- NULL)
+  if(is.null(bounds)){
+    bounds <- as.data.frame(fit$SampleStats$Range[,variables])
+    colnames(bounds) <- variables_names
+  }
+  
+  # X Setup
+  if(is.null(X)){
+    Grid <- T
+    X <- data.frame(expand.grid(lapply(1:length(variables),
+          function(i) seq(bounds[1,i],bounds[2,i],length.out = nodes))))
+    colnames(X) <- variables_names
+    deltaX <- sapply(1:length(variables),function(i) (bounds[2,i] - bounds[1,i])/(nodes - 1))
+  }else{
+    Grid <- F
+  }
+  
+  test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X) 
+  Sample <- X
+  X <- setNames(data.frame(X[,variables_names]),variables_names)
+  if(F){
     return(cat("Error: Sample must be a dataframe and the number of columns must equal to the length in 'variables'"))
   } else {
-
-    #Default Allocations
-    if(is.character(variables)){
-      variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
-    }
-
-    if(is.null(Sample)){
-      Grid = T
-      if(is.null(variables)) variables <- 1:length(fit$KMax)
-      if(is.null(bounds)) bounds = sapply(variables, function(i) fit$SampleStats$Range[,i])
-      Sample = expand.grid(lapply(1:length(variables),function(i) seq(bounds[1,i],bounds[2,i],length.out = nodes)))
-      deltaX = sapply(1:length(variables),function(i) (bounds[2,i] - bounds[1,i])/(nodes - 1))
-    }else{
-      Grid=F
-    }
-
-
-    onerow <- F
-    if(NROW(Sample)==1){
-      Sample <- rbind(Sample,Sample)
-      onerow <- T
-    }
-    Nv <- NCOL(Sample)
-    if(is.null(variables)) variables <- 1:Nv
-    if(Nv > length(variables)) Sample <- Sample[,1:length(variables)]
-    Nv <- NCOL(Sample)
-    if(Nv == 1) Sample <- as.matrix(Sample)
+    #Max Polynomial Order
     if(is.null(K)) K <- fit$KMax[variables]
     if(length(K)==1) K <- rep(K,Nv)
     K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
-    Km <- max(K) #Max Truncation
+    Km <- max(K) 
+    
     require(tensor)
     require(R.utils)
 
@@ -140,13 +151,9 @@ predict <- function(fit,
       C <- aperm(extract.array(fit$Cn,indices = subsetnames), perm = c(variables,setdiff(1:length(fit$KMax),variables)))
     }
     #Split Grid for allocation (OVERCOME VECTOR ALLOCATION SIZE ISSUES)
-    SS <- NROW(Sample)
-    nsplits = ceiling(NROW(Sample)/mps)
-    if(parallel) nsplits = max(ceiling(NROW(Sample)/mps))
-
-    if(nsplits==1){
-      splitindex <- list(1:SS)
-    }else{
+    SS <- NROW(X)
+    nsplits <- ceiling(SS/mps)
+    if(nsplits==1){ splitindex <- list(1:SS) }else{
       splitindex <- lapply(1:nsplits, function(j) (((j-1)*mps)+1):min((j*mps),SS))
     }
 
@@ -159,48 +166,97 @@ predict <- function(fit,
       PdfTerms <- rep(1,nprobs) # Reference PDF f_v(X)
 
       for(k in 1:Nv){
-        XM[[k]] <- t(sapply(0:Km, function(i) Sample[splitindex[[j]],k]^i))
+        XM[[k]] <- t(sapply(0:Km, function(i) X[splitindex[[j]],k]^i))
+        if(length(splitindex[[j]])==1) XM[[k]] <- t(XM[[k]])
         P[[k]] <- fit$PolyCoef[0:K[k]+1,0:K[k]+1,variables[k]]%*%((XM[[k]])[0:K[k]+1,])
         PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
-        PdfTerms <- PdfTerms*PDFk(Sample[splitindex[[j]],k])
+        PdfTerms <- PdfTerms*PDFk(X[splitindex[[j]],k])
       }
-      Terms = c()
-      tt = tensor(C,P[[1]],1,1)
+      Terms <- c()
+      tt <- tensor(C,P[[1]],1,1)
       if(Nv > 1) {
         for(k in 2:Nv){
           if(length(dim(tt))==2){
-            tt = tt*P[[k]]
+            tt <- tt*P[[k]]
           }else{
-            dimperm = c(dim(tt)[1],nprobs,dim(tt)[2:(length(dim(tt))-1)])
-            tt = tt*aperm(array(P[[k]],dim = dimperm),perm = c(1,3:length(dimperm),2))
+            dimperm <- c(dim(tt)[1],nprobs,dim(tt)[2:(length(dim(tt))-1)])
+            tt <- tt*aperm(array(P[[k]],dim = dimperm),perm = c(1,3:length(dimperm),2))
           }
-          tt = apply(tt,2:length(dim(tt)),sum)
+          tt <- apply(tt,2:length(dim(tt)),sum)
         }
       }
       Terms <- c(Terms,tt)
       return(Terms*PdfTerms)
     }
-
+    Tgen_cdf <- function(j){
+      nprobs <- length(splitindex[[j]])
+      #Array Definitions
+      Km <- max(K) #Max Truncation
+      XM <- list() # Array of 1, X, X^2, .... 
+      P <- list() # Polynomial Terms P_0(X), P_1(X), ...  
+      
+      for(k in 1:Nv){
+        CDFk <- as.function(fit$PDFControl(variables[k])$CDF)
+        PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
+        PDFkX <- PDFk(X[splitindex[[j]],k])
+        CDFkX <- CDFk(X[splitindex[[j]],k])
+        sigX <-  c(fit$Sigma[,variables[k]]%*%t(cbind((X[splitindex[[j]],k])^2,X[splitindex[[j]],k],1)))
+        XM[[k]] <- t(sapply(1:K[k], function(i) i*(X[splitindex[[j]],k]^(i-1)))*sigX*PDFkX)
+        if(length(splitindex[[j]])==1) XM[[k]] <- t(XM[[k]])
+        P[[k]] <- fit$PolyCoef[1:K[k]+1,1:K[k]+1,variables[k]]%*%((XM[[k]])[1:K[k],])
+        P[[k]] <- rbind(CDFkX,P[[k]])/c(1,fit$Lambda[1:K[k],variables[k]])
+      }
+      Terms <- c()
+      tt <- tensor(C,P[[1]],1,1)
+      if(Nv > 1) {
+        for(k in 2:Nv){
+          if(length(dim(tt))==2){
+            tt <- tt*P[[k]]
+          }else{
+            dimperm <- c(dim(tt)[1],nprobs,dim(tt)[2:(length(dim(tt))-1)])
+            tt <- tt*aperm(array(P[[k]],dim = dimperm),perm = c(1,3:length(dimperm),2))
+          }
+          tt <- apply(tt,2:length(dim(tt)),sum)
+        }
+      }
+      Terms <- c(Terms,tt)
+      return(Terms)
+    }
+    
     if(parallel){
       if(is.null(ncores)) ncores <- detectCores()
-      Terms <- unlist(mclapply(1:nsplits,function(j) Tgen(j),mc.cores = ncores))
+      if(type=="distribution"){
+        Terms <- unlist(mclapply(1:nsplits,function(j) Tgen_cdf(j),mc.cores = ncores))
+      }else{
+        Terms <- unlist(mclapply(1:nsplits,function(j) Tgen(j),mc.cores = ncores))
+      }
     }else{
-      Terms <- unlist(lapply(1:nsplits,function(j) Tgen(j)))
+      if(type=="distribution"){
+        Terms <- unlist(lapply(1:nsplits,function(j) Tgen_cdf(j)))
+      }else{
+        Terms <- unlist(lapply(1:nsplits,function(j) Tgen(j)))
+      }
     }
 
-    Probability <-Terms
-    Prob1 <- Probability
+    Probability <- Terms
     if(normalise){
+      Prob_old <- Probability
       Probability[Probability<0] <- 0 #Truncate -ve probabilities
-      norm <- abs(sum(Probability)/sum(Prob1)) #Rescale
+      if(type=="density") norm <- abs(sum(Probability)/sum(Prob_old)) #Rescale
+      if(type=="distribution") norm <- max(1,Probability)
     }else{
       norm <- 1
     }
-    if(Grid == T & normalise ==T) norm = sum(Probability)*prod(deltaX)
-
-    output = as.data.frame(cbind(Sample,Probability/norm))
-    names(output) = c(colnames(fit$SampleStats$Sample)[variables], "Density")
-    if(onerow) return(output[1,]) else return(output)
+    if(Grid == T & normalise ==T){
+      if(type=="density") norm <- sum(Probability)*prod(deltaX)
+      if(type=="distribution"){
+        Probability <- (Prob_old - min(Prob_old))/(max(Prob_old)-min(Prob_old))
+      } 
+    }
+    
+    if(type=="density") Sample$Density <- Probability
+    if(type=="distribution") Sample$Prob <- Probability
+    return(Sample)
   }
 
 }

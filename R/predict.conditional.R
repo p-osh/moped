@@ -87,7 +87,7 @@ predict.conditional <- function(fit,
   nprobs <- NROW(Y)
   tvariables <- c(c(Y.variables,X.variable),setdiff(1:tNv,c(Y.variables,X.variable)))
 
-  fY <- predict(fit,Sample = Y,K=K.Y,normalise = F,variables = Y.variables)
+  fY <- predict(fit,X = Y,K=K.Y,normalise = F,variables = Y.variables)
   Y.poly <- polynomial(fit,X = Y,K=K.Y,variables = Y.variables)
 
   Km <- max(K.Y,K.X)
@@ -108,9 +108,9 @@ predict.conditional <- function(fit,
 
   if(Y.Nv > 1) {
     for(k in 2:Y.Nv){
-      dimperm = c(dim(tt)[1],nprobs,dim(tt)[2:(length(dim(tt))-1)])
-      tt = tt*aperm(array(Y.poly$P[[k]],dim = dimperm),perm = c(1,3:length(dimperm),2))
-      tt = apply(tt,2:length(dim(tt)),sum)
+      dimperm <- c(dim(tt)[1],nprobs,dim(tt)[2:(length(dim(tt))-1)])
+      tt <- tt*aperm(array(Y.poly$P[[k]],dim = dimperm),perm = c(1,3:length(dimperm),2))
+      tt <- apply(tt,2:length(dim(tt)),sum)
     }
   }
   if(fit$Distrib[X.variable]=="Uniform"){

@@ -54,21 +54,21 @@
 #' @export
 #'
 #' @examples
-#' Data_full <- ISLR::Wage
-#' Data <- Data_full %>%
-#' select(age, education, jobclass,wage)
+#' 
+#' require(sdcMicro)
+#' Data <- CASCrefmicrodata[,c(2,3,4,6)]
+#' str(Data)
+#' 
+#'# Fitting multivariate orthogonal polynomial based
+#'# density estimation function using default setting
+#'Fit <- moped(Data)
 #'
-#' # Convert Categorical Data to Continuous Data
-#' Data_x <- make.cont(Data, catvar = 2:3)
-#'
-#' # Fitting multivariate orthogonal polynomial based
-#' # density estimation function
-#' # Requires a data frame of bounds to fit on data.
-#' bounds <- data.frame(
-#' age  = c(18,80),
-#' education = c(0,1),
-#' jobclass = c(0,1),
-#' wage = c(0,350)
+#'# Requires a data frame of bounds to fit on data.
+#'bounds <- data.frame(
+#'  AGI  = c(7192, 109883),
+#'  EMCONTRB = c(17, 7800),
+#'  FEDTAX = c(1, 23386),
+#'  STATETAX = c(2,12628)
 #' )
 #'
 #' # Fitting the Data

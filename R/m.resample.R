@@ -139,8 +139,12 @@ m.resample <- function(fit,
       Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
                                 variable = variables[nu])  
       }else{
-      Condk <- predict.conditional(fit,K.X = K[nu],Y = Sample[,-nu], K.Y = K[-nu],
-                                   X.variable = variables[nu], Y.variables = variables[-nu])
+      Condk <- predict.conditional(fit,
+                                   K.X = K[nu],
+                                   Y = setNames(data.frame(Sample[,-nu]),
+                                                colnames(Sample)[-nu]), K.Y = K[-nu],
+                                   X.variable = variables[nu], 
+                                   Y.variables = variables[-nu])
       }
       error <- which(apply(is.nan(Condk$coef),1,sum)>0)
 
@@ -222,13 +226,17 @@ m.resample <- function(fit,
           lb <- predict.conditional(fit,K.X = K[nu], 
                                     X= rep(fit$SampleStats$Range[1,variables[nu]],
                                            NROW(Sample)), 
-                                    Y = Sample[,-nu], K.Y = K[-nu],
+                                    Y = setNames(data.frame(Sample[,-nu]),
+                                                 colnames(Sample)[-nu]), 
+                                    K.Y = K[-nu],
                                     X.variable = variables[nu], 
                                     Y.variables = variables[-nu])$Prob
           ub <- predict.conditional(fit,K.X = K[nu], 
                                     X= rep(fit$SampleStats$Range[2,variables[nu]],
                                            NROW(Sample)), 
-                                    Y = Sample[,-nu], K.Y = K[-nu],
+                                    setNames(data.frame(Sample[,-nu]),
+                                             colnames(Sample)[-nu]),
+                                    K.Y = K[-nu],
                                     X.variable = variables[nu], 
                                     Y.variables = variables[-nu])$Prob
         }
@@ -266,7 +274,9 @@ m.resample <- function(fit,
             x0 <- xi
             xi_vec <- cbind(xi,Sample[i,-nu])
             FX <- predict.conditional(fit,K.X = K[nu],X=xi,
-                                         Y = Sample[i,-nu], K.Y = K[-nu],
+                                         Y = setNames(data.frame(Sample[,-nu]),
+                                                      colnames(Sample)[-nu]), 
+                                         K.Y = K[-nu],
                                          X.variable = variables[nu], Y.variables = variables[-nu])$Prob
             mfX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
             fX <-  predict(fit, K= c(K[nu],K[-nu]),Sample=xi_vec,

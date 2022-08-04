@@ -14,9 +14,6 @@
 #'   it is 1:Nv or 1:NCOL(X) whichever smallest.
 #' @param X.variable (?Brad)
 #' @param Y.variables (?Brad)
-#' @param X.bounds A data frame. Bounds allows you to control the grid min and
-#'   Should be an array of 2 x number of variables.
-#' @param Y.bounds (?Brad)
 #'
 #' @return `predict.conditional()` returns a list object
 #' @export
@@ -58,8 +55,6 @@
 #' Y = x0[rep(1,100),-4],
 #' K.Y=rep(7,3),
 #' K.X=c(7),
-#' X.bounds = data.frame(wage=bounds$wage),
-#' Y.bounds = bounds[,-4],
 #' X.variable = 4,
 #' Y.variables = 1:3)
 #'
@@ -76,9 +71,7 @@ predict.conditional <- function(fit,
                                 Y,
                                 K.Y=NULL,
                                 X.variable = NULL,
-                                Y.variables = NULL,
-                                X.bounds = NULL ,
-                                Y.bounds= NULL){
+                                Y.variables = NULL){
   tNv <- length(fit$KMax)
   tKm <- max(fit$KMax)
   if(is.null(X.variable)) X.variable <- 1
@@ -86,8 +79,6 @@ predict.conditional <- function(fit,
     return(cat("Error: Non-uniform approximations require numeric values for X."))
   }else{
   if(is.null(Y.variables)) Y.variables <- setdiff(1:tNv,X.variable)
-  if(is.null(X.bounds)) X.bounds <- fit$SampleStats$Range[,X.variable]
-  if(is.null(Y.bounds)) Y.bounds <- sapply(Y.variables, function(i) fit$SampleStats$Range[,i])
   Y.Nv <- length(Y.variables)
   if(is.null(K.X)) K.X <- tKm
   if(is.null(K.Y)) K.Y <- rep(tKm,Y.Nv)
@@ -96,10 +87,8 @@ predict.conditional <- function(fit,
   nprobs <- NROW(Y)
   tvariables <- c(c(Y.variables,X.variable),setdiff(1:tNv,c(Y.variables,X.variable)))
 
-  fY <- predict(fit,Sample = Y,K=K.Y,normalise = F,
-                bounds = Y.bounds,variables = Y.variables)
-  Y.poly <- polynomial(fit,X = Y,K=K.Y,
-                       bounds = Y.bounds,variables = Y.variables)
+  fY <- predict(fit,Sample = Y,K=K.Y,normalise = F,variables = Y.variables)
+  Y.poly <- polynomial(fit,X = Y,K=K.Y,variables = Y.variables)
 
   Km <- max(K.Y,K.X)
   XDP <- (fit$PolyCoef[2:(K.X+1),2:(K.X+1),X.variable]/

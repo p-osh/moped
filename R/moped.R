@@ -1,34 +1,56 @@
 #' Fitting multivariate orthogonal polynomial based density estimation.
 #'
 #' @description
-#' `moped()` is used to fit multivariate orthogonal polynomial based density
-#' estimation. It requires a data frame of bounds to fit on data. Categorical
+#' `moped()` is used to fit a multivariate orthogonal polynomial-based density
+#' estimate. It requires a data frame to fit on data. Categorical
 #' variables need to be converted into continuous variables before fitting data
 #' to the density estimation.
 #'
 #' @param Sample A data frame.
-#' @param K Integer vector. Maximum Truncation of Approximation on each variable.
-#' @param Distrib Character string, specifying the reference distribution to be
-#'   used. Choices are `"uniform"`, `"normal"`, `"gamma"` and `"beta"`
-#'   distributions.
-#' @param bounds A data frame. The limits on the compact space. Should be an
+#' @param K Integer vector. Maximum Polynomial Order of approximation on each 
+#'   variable.
+#' @param Distrib Character string vector, specifying the reference distribution 
+#'   to be used for each variable (column) of Sample. Choices are 
+#'   `"Uniform"` (default), `"Normal"`, `"Gamma"`, and `"Beta"` distributions.
+#' @param bounds A data frame. The limits to be used on bounded space. Should be an
 #'   array of 2 x number of variables with each column having the lower and
 #'   upper limit. `NULL` is the default.
-#' @param ListP Logical. If `FALSE` (the default), the Pn-Array is calculated
-#'   for Coefficient Variance Calculations.
+#' @param ListP Logical. If `FALSE` (the default), a list of polynomial terms
+#'   for each observation of Sample is computed and returned. 
 #' @param variance Logical. If `TRUE` (the default), a variance estimate of each
 #'   coefficient is calculated.
-#' @param recurrence Logical. If `FALSE` (the default), recurrence relation is
-#'   not used to determine coefficient.
+#' @param recurrence Logical. If `FALSE` (the default), two-term recurrence 
+#'   relation is not used to determine estimated coefficients.
 #' @param parallel Logical. If `FALSE` (the default), parallel computing is not
 #'   used.
-#' @param ncores Integer vector. NCores to use in parallel computing.
-#' @param mpo Logical. If `TRUE` (the default), an optimal MOP estimate is
-#'   calculated.
+#' @param ncores Integer vector. Number of cores used in parallel computing.
+#' @param mpo Logical. If `TRUE` (the default), an optimal max polynomial order 
+#' estimate is calculated using cross-validation. 
 #'
-#' @returns `moped()` returns a list object.
-#'
-#'
+#' @returns `moped()` returns a moped (list) object containing:
+#' \itemize{
+#'   \item `Cn` - Array of estimated moment-based coefficients.
+#'   \item `varCn` - Array of variance estimates for Cn computed if `variance = TRUE`.
+#'   \item `Cats` - List of categorical data information from Sample.
+#'   \item `MPO` - List of estimated optimal max polynomial order information.
+#'   \item `PolyCoef` - Array of orthogonal polynomial coefficients.
+#'   \item `Poly` - Array of orthogonal polynomial values for each obs of Sample. 
+#'   \item `Distrib` - String vector of reference densities used for each variable. 
+#'   \item `PDFControl` - List of reference density distribution functions. 
+#'   \item `Sigma` - Array of polynomial coefficients of sigma terms in polynomial. 
+#'   \item `Tau` - Array of polynomial coefficients of tau terms in polynomial. 
+#'   \item `Limits` - Array of theoretical limits of each variable.
+#'   \item `Bounds` - Data frame of the parameter `Bounds`.
+#'   \item `PnList` - List of polynomial terms computed if `ListP = TRUE`.
+#'   \item `Lambda` - Array of lambda terms for each variable.
+#'   \item `Bn` - Array of Bn terms for each variable.
+#'   \item `Kappa` - Array of leading polynomial coefficients for each variable.
+#'   \item `Kappa2` - Array of second leading polynomial coefficients for each variable.
+#'   \item `Recurrence` - List of polynomial recurrence relationship values. 
+#'   \item `KMax` - Maximum max polynomial order (K) specified. 
+#'   \item `Parameters` - Array of parameters of reference densities.
+#'   \item `SampleStats` - List containing Range, Sample, and NaTerms on `Sample`.
+#' }
 #' @export
 #'
 #' @examples
@@ -53,7 +75,7 @@
 #' Fit <- moped(
 #' Data_x,
 #' K=10,
-#' Distrib = rep("Uniform", 7),
+#' Distrib = rep("Uniform", 4),
 #' bounds = bounds,
 #' variance = T,
 #' recurrence = F,
@@ -62,16 +84,16 @@
 #' mpo = T
 #' )
 #'
-#' Maximum optimal MPO
+#' Estimated optimal max polynomial order. 
 #' Fit$MPO$opt.mpo
 
 
 moped <- function(
-    Sample, # Nv-Dimensional Sample SS X Nv dataframe (SS = Sample Size, Nv = Number of Variables)
-    K = rep(15,NCOL(Sample)), # Maximum Truncation of Approximation on each variable
-    Distrib = rep("Uniform",NCOL(Sample)), # Reference Distribution to be used. Choices are uniform, normal, gamma and beta distributions.
-    bounds = NULL, # The limits on the compact space. Should be a 2 x Nv array with each column having the lower and upper limit
-    ListP = FALSE, #Calculate the Pn-Array for Coefficient Variance Calculations
+    Sample, 
+    K = rep(15,NCOL(Sample)),
+    Distrib = rep("Uniform",NCOL(Sample)), 
+    bounds = NULL, 
+    ListP = FALSE, 
     variance = TRUE,
     recurrence = FALSE,
     parallel = FALSE,
@@ -431,17 +453,20 @@ moped <- function(
 
   if(Nv==1)   lam <- array(lambda[-(max(K+1):NROW(lambda)),],dim =c(K,1)) else  lam <- lambda[-(max(K+1):NROW(lambda)),]
 
-  output <- list(Cn = Cn, PolyCoef = A, Poly = Poly, MPO = MPO,
-                 PDFControl = PDFControl,
-                 NaTerms = NaTerms, Cats = Cats,
-                 Sigma = sigma, Tau = tau, Limits = limits, varCn = varCn,
-                 Distrib = Distrib, Bounds = bounds, PnList = PnList,
+  output <- list(Cn = Cn, varCn = varCn, Cats = Cats, MPO = MPO,
+                 PolyCoef = A, Poly = Poly,
+                 Distrib = Distrib, PDFControl = PDFControl,
+                 Sigma = sigma, Tau = tau, Limits = limits, 
+                 Bounds = bounds, PnList = PnList,
                  Lambda = lam, Bn = rbind(rep(1,Nv),Bn[-(max(K):NROW(lambda)+1),]),
-                 Recurrence = list(Rn = Rn[-(max(K):NROW(lambda)),], Sn = Sn[-(max(K):NROW(lambda)),],
-                                   Tn = Tn[-(max(K):NROW(lambda)),]), KMax = K,
-                 Paramaters = par, Kappa = Kappa, Kappa2 = Kappa2,
+                 Kappa = Kappa, Kappa2 = Kappa2,
+                 Recurrence = list(Rn = Rn[-(max(K):NROW(lambda)),], 
+                                   Sn = Sn[-(max(K):NROW(lambda)),],
+                                   Tn = Tn[-(max(K):NROW(lambda)),]), 
+                 KMax = K, Paramaters = par,
                  SampleStats = list(Range = sapply(1:Nv,function(k) range(Sample[,k],na.rm = T)),
-                                    Sample = data.frame(Sample)))
+                                    Sample = data.frame(Sample),
+                                    NaTerms = NaTerms))
   class(output) <- "moped"
 
   return(output)

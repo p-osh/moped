@@ -1,4 +1,4 @@
-#' Predicting the probability of an observation based on MBD Estimate
+#' Predicting the probability of an observation based on moped density estimate
 #'
 #' @description
 #' `predict()` is used to predict marginal density for a set of observations.

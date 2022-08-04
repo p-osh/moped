@@ -1,17 +1,25 @@
-#' Computing MBD polynomials.
+#' Computing the univariate hyper-geometric type orthogonal polynomials.
 #'
-#' @param fit MBDensity type variable. Outputed from `moped()`.
-#' @param X Grid of probabilities to be calculated. If `NULL` (the default) than
-#'   generates nodes x Nv grid.
-#' @param K K Integer vector. Maximum Truncation of Approximation on each
-#'   variable. The default is the maximum MPO Order in `moped` object.
-#' @param variables Integer vector or character string. Variables to be
-#'   predicted from `moped` object. The default is 1:Nv or 1:NCOL(Sample)
-#'   whichever smallest.
-#' @param bounds A data frame. Bounds allows you to control the grid min and max.
-#'   Should be an array of 2 x number of variables. `NULL` is the default.
+#'@description `polynomial()` is used to calculate the univariate hyper-geometric
+#'  type orthogonal polynomials used in the `moped()` function. 
 #'
-#' @return MBD polynomials from MBDensity type object.
+#' @param fit `moped` type object. Outputted from `moped()`.
+#' @param X data frame of observations with column names matching selected 
+#'   variables from `moped` type object.
+#' @param K Integer vector. Maximum Polynomial Order of approximation on each 
+#'   variable. Must be less than or equal to the maximum MPO K specified in 
+#'   `moped()`. The default is the K specified in `moped` type object.
+#' @param variables Integer vector or character string of variable names. The 
+#'   `moped` position or column name of the variable(s) to be predicted from 
+#'   `moped` object. The default is 1:Nv (number of variables) or 1:NCOL(Sample),
+#'    whichever smallest.
+#' @return A list with the following components:
+#' \itemize{
+#'   \item `P` - List of marginal hyper-geometric orthogonal polynomial values. 
+#'   \item `PdfTerms` - Vector of reference density values for each obs of X.   
+#' }
+#' 
+#' 
 #' @export
 #'
 #' @examples
@@ -36,7 +44,7 @@
 #' Fit <- moped(
 #' Data_x,
 #' K=10,
-#' Distrib = rep("Uniform", 7),
+#' Distrib = rep("Uniform", 4),
 #' bounds = bounds,
 #' variance = T,
 #' recurrence = F,
@@ -45,25 +53,31 @@
 #' mpo = T
 #' )
 #'
-#' # define the observation which the probability is desired.
-#' x0 <- Data_x[1,]
+#' # Define the observation which the probability is desired.
+#' x0 <- Data_x[1:2,]
 #'
 #' # Manually Compute MBD Polynomials
 #' polynomial(Fit, X=x0, K=7)
 
 
 
-
 polynomial <-  function(fit,
-                        X = NULL,
+                        X,
                         K=NULL,
-                        variables = NULL,
-                        bounds = NULL  #Bounds allows you to control the grid min and max (2 X Nv Dataframe)
+                        variables = NULL
 ){
-  Nv <- NCOL(X)
+  Nv <- NCOL(fit$SampleStats$Sample)
   if(is.null(variables)) variables <- 1:Nv
-  if(Nv > length(variables)) X <- X[,1:length(variables)]
-  Nv <- NCOL(X)
+  if(is.character(variables)){
+    variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
+  }
+  variables_names <- colnames(fit$SampleStats$Sample)[variables]
+  test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X) 
+  Nv <- length(variables)
+  try(if(test_names){
+    return(cat("\r Error: X must be data frame and contain columns named ",variables_names))
+  } else {
+  X <- X[,variables_names]
   if(Nv == 1) X <- as.matrix(X)
   if(is.null(K)) K <- fit$KMax[variables]
   if(length(K)==1) K <- rep(K,Nv)
@@ -79,10 +93,14 @@ polynomial <-  function(fit,
     if(NROW(X)==1) XM[[k]] <- as.matrix(sapply(0:Km, function(i) X[,k]^i))
     else XM[[k]] <- t(sapply(0:Km, function(i) X[,k]^i))
     P[[k]] <- fit$PolyCoef[0:K[k]+1,0:K[k]+1,variables[k]]%*%((XM[[k]])[0:K[k]+1,])
+    colnames(P[[k]]) <- rownames(X)
+    rownames(P[[k]]) <- paste0("n=",0:K[k])
     PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
     PdfTerms <- PdfTerms*PDFk(X[,k])
+    names(PdfTerms) <- rownames(X)
   }
-
+  names(P) <- variables_names
   output <- list(P = P, PdfTerms = PdfTerms)
   return(output)
+   })
 }

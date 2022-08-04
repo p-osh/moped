@@ -1,7 +1,8 @@
 #' Generate resampled (synthetic) samples
 #'
 #' @description
-#' `m.resample()` is used to generate synthetic samples.
+#' `m.resample()` is used to generate synthetic samples from full, conditional,
+#'  or marginal moped density estimate.
 #'
 #' @param fit moped type variable. Outputted from `moped()`.
 #' @param K Integer vector. Maximum Polynomial Order of approximation on each 
@@ -98,10 +99,6 @@ m.resample <- function(fit,
                        fixed.var = NULL,
                        er_alert = T
 ){
-  #try(if(NCOL(Sample) == 1){
-  #  return(cat("\r Error: Sample must be a data frame with the length of variables"))
-  #} else {
-
 
   #Default Allocations
   NS <- n
@@ -117,10 +114,10 @@ m.resample <- function(fit,
   
   variables_names <- colnames(fit$SampleStats$Sample)[variables]
   
-  test_names <- prod(variables_names %in% colnames(Sample))
+  test_names <- prod(variables_names %in% colnames(Sample)) == 0 | !is.data.frame(Sample) 
   
-  try(if(test_names == 0){
-    return(cat("\r Error: Sample must contain columns named ",variables_names))
+  try(if(test_names){
+    return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
   } else {
   if(is.null(bounds)) bounds <- sapply(variables, function(i) fit$SampleStats$Range[,i])
   if(is.null(K)) K <- fit$KMax[variables]
@@ -138,13 +135,12 @@ m.resample <- function(fit,
   for(re in 1:replicates){
     for(nu in impute.vars){
       if(fit$Distrib[variables[nu]] == "Uniform"){
-      if(length(variables[-n])==0){
+      if(length(variables[-nu])==0){
       Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
                                 variable = variables[nu])  
       }else{
       Condk <- predict.conditional(fit,K.X = K[nu],Y = Sample[,-nu], K.Y = K[-nu],
-                                   X.variable = variables[nu], Y.variables = variables[-nu],
-                                   X.bounds = bounds[,nu], Y.bounds = bounds[,-nu])
+                                   X.variable = variables[nu], Y.variables = variables[-nu])
       }
       error <- which(apply(is.nan(Condk$coef),1,sum)>0)
 
@@ -228,17 +224,13 @@ m.resample <- function(fit,
                                            NROW(Sample)), 
                                     Y = Sample[,-nu], K.Y = K[-nu],
                                     X.variable = variables[nu], 
-                                    Y.variables = variables[-nu],
-                                    X.bounds = bounds[,nu], 
-                                    Y.bounds = bounds[,-nu])$Prob
+                                    Y.variables = variables[-nu])$Prob
           ub <- predict.conditional(fit,K.X = K[nu], 
                                     X= rep(fit$SampleStats$Range[2,variables[nu]],
                                            NROW(Sample)), 
                                     Y = Sample[,-nu], K.Y = K[-nu],
                                     X.variable = variables[nu], 
-                                    Y.variables = variables[-nu],
-                                    X.bounds = bounds[,nu], 
-                                    Y.bounds = bounds[,-nu])$Prob
+                                    Y.variables = variables[-nu])$Prob
         }
         
         synthetic_generator <- function(i){
@@ -275,8 +267,7 @@ m.resample <- function(fit,
             xi_vec <- cbind(xi,Sample[i,-nu])
             FX <- predict.conditional(fit,K.X = K[nu],X=xi,
                                          Y = Sample[i,-nu], K.Y = K[-nu],
-                                         X.variable = variables[nu], Y.variables = variables[-nu],
-                                         X.bounds = bounds[,nu], Y.bounds = bounds[,-nu])$Prob
+                                         X.variable = variables[nu], Y.variables = variables[-nu])$Prob
             mfX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
             fX <-  predict(fit, K= c(K[nu],K[-nu]),Sample=xi_vec,
                            variables = c(variables[nu],variables[-nu]))$Density
@@ -307,6 +298,7 @@ m.resample <- function(fit,
                     , error = function(e) {an.error.occured <<- TRUE})
           if(an.error.occured) error <- c(error,i)
         }
+        
         error <- unique(c(error,which(is.nan(Sample[,nu]))))
         
         if(length(error)> 0){
@@ -332,6 +324,6 @@ m.resample <- function(fit,
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats
   return(Synth)
-  })
+   })
 }
 

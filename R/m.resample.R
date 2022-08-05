@@ -7,7 +7,7 @@
 #' @param fit moped type variable. Outputted from `moped()`.
 #' @param K Integer vector. Maximum Polynomial Order of approximation on each 
 #'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is the K specified in `moped` object.
+#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
 #' @param variables Integer vector or character string of variable names. The 
 #'   `moped` position or column name of the variable(s) to be predicted from 
 #'   `moped` object. The default is 1:Nv or 1:NCOL(Sample) whichever smallest.
@@ -108,7 +108,7 @@ m.resample <- function(fit,
   if(is.character(variables)){
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }
-  if(is.null(variables)) variables <- 1:length(fit$KMax)
+  if(is.null(variables)) variables <- 1:fit$Nv
   if(is.null(fixed.var)) impute.vars <- 1:length(variables) else impute.vars <- (1:length(variables))[-fixed.var]
   Nv <- length(variables)
   
@@ -126,9 +126,10 @@ m.resample <- function(fit,
       bounds <- as.data.frame(fit$SampleStats$Range[,variables])
       colnames(bounds) <- variables_names
     }
-  if(is.null(K)) K <- fit$KMax[variables]
+    if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,Nv)
+    if(is.null(K)) K <- rep(fit$KMax,Nv)
   if(length(K)==1) K <- rep(K,Nv)
-  K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
+  K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
   
   OSample <- Sample
   SS <- NROW(Sample)

@@ -8,7 +8,7 @@
 #'   variables from `moped` type object.
 #' @param K Integer vector. Maximum Polynomial Order of approximation on each 
 #'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is the K specified in `moped` type object.
+#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
 #' @param variables Integer vector or character string of variable names. The 
 #'   `moped` position or column name of the variable(s) to be predicted from 
 #'   `moped` object. The default is 1:Nv (number of variables) or 1:NCOL(Sample),
@@ -79,9 +79,10 @@ polynomial <-  function(fit,
   } else {
   X <- X[,variables_names]
   if(Nv == 1) X <- as.matrix(X)
-  if(is.null(K)) K <- fit$KMax[variables]
+  if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,length(variables))
+  if(is.null(K)) K <- rep(fit$KMax,length(variables))
   if(length(K)==1) K <- rep(K,Nv)
-  K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
+  K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
   Km <- max(K) #Max Truncation
   nprobs <- NROW(X)
   #Array Definitions

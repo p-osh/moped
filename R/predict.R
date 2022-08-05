@@ -1,8 +1,9 @@
-#' Predicting the probability of an observation based on moped density estimate
+#' Predicting the density or probability of an observation based on moped 
+#' density estimate.
 #'
 #' @description
-#' `predict.moped()` is used to predict marginal density for a set of observations.
-#' When constructing partially joint density, sample and variables must be used
+#' `predict.moped()` is used to predict density and probabilities for a set of 
+#' observations. When constructing partially joint density, sample and variables must be used
 #' together. X must be a data frame and its variable length must equal to
 #' the length in var.
 #'
@@ -13,7 +14,7 @@
 #'  (number of variables) grid with density values. 
 #' @param K Integer vector. Maximum Polynomial Order of approximation on each 
 #'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is the K specified in `moped` object.
+#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
 #' @param variables Integer vector or character string of variable names. The 
 #'   `moped` position or column name of the variable(s) to be predicted from 
 #'   `moped` object. The default is 1:Nv or 1:NCOL(X) whichever smallest.
@@ -102,7 +103,7 @@ predict.moped <- function(fit,
                     ncores = NULL,
                     mps = 5000
 ){
-  if(is.null(variables)) variables <- 1:length(fit$KMax)
+  if(is.null(variables)) variables <- 1:fit$Nv
   if(is.character(variables)){
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }
@@ -129,26 +130,28 @@ predict.moped <- function(fit,
   
   test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X) 
   Sample <- X
-  X <- setNames(data.frame(X[,variables_names]),variables_names)
-  if(F){
-    return(cat("Error: Sample must be a dataframe and the number of columns must equal to the length in 'variables'"))
+  
+  if(test_names){
+    return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
   } else {
+    X <- setNames(data.frame(X[,variables_names]),variables_names)
     #Max Polynomial Order
-    if(is.null(K)) K <- fit$KMax[variables]
+    if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,length(variables))
+    if(is.null(K)) K <- rep(fit$KMax,length(variables))
     if(length(K)==1) K <- rep(K,Nv)
-    K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
+    K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
     Km <- max(K) 
     
     require(tensor)
     require(R.utils)
 
-    tK <- c(K,rep(0,length(fit$KMax) - Nv))[order(c(variables,setdiff(1:length(fit$KMax),variables)))]
+    tK <- c(K,rep(0,fit$Nv - Nv))[order(c(variables,setdiff(1:fit$Nv,variables)))]
     #Extract Related Coefficients
-    if(length(fit$KMax)==1){
+    if(fit$Nv==1){
       C <- fit$Cn[1:(Km+1)]
     }else{
-      subsetnames <- lapply(1:length(fit$KMax),function(k) return((0:tK[k])+1))
-      C <- aperm(extract.array(fit$Cn,indices = subsetnames), perm = c(variables,setdiff(1:length(fit$KMax),variables)))
+      subsetnames <- lapply(1:fit$Nv,function(k) return((0:tK[k])+1))
+      C <- aperm(extract.array(fit$Cn,indices = subsetnames), perm = c(variables,setdiff(1:fit$Nv,variables)))
     }
     #Split Grid for allocation (OVERCOME VECTOR ALLOCATION SIZE ISSUES)
     SS <- NROW(X)

@@ -4,10 +4,10 @@
 #' `predict.conditional()` is used to compute unscaled MBD conditional
 #' distribution estimate.
 #'
-#' @param fit MBDensity type variable. Outputed from `moped()`.
+#' @param fit `moped` type variable. Outputted from `moped()`.
 #' @param X Grid of probabilities to be calculated. If `NULL` (the default) than
 #'   generates nodes x Nv grid.
-#' @param K.X Truncation to be used. If `NULL`( the default). it is max in Fit.
+#' @param K.X Truncation to be used. If `NULL`( the default). it is either opt_mpo or KMax in Fit.
 #' @param Y Grid of probabilities to be calculated. If `NULL` (the default),
 #'   than generates nodes x Nv grid.
 #' @param K.Y Which variables to be predicted from Fit. If `NULL` (the default),
@@ -63,8 +63,6 @@
 
 
 
-
-
 predict.conditional <- function(fit,
                                 X = NULL,
                                 K.X=NULL,
@@ -72,15 +70,17 @@ predict.conditional <- function(fit,
                                 K.Y=NULL,
                                 X.variable = NULL,
                                 Y.variables = NULL){
-  tNv <- length(fit$KMax)
-  tKm <- max(fit$KMax)
+  tNv <- fit$Nv
+  tKm <- fit$KMax
   if(is.null(X.variable)) X.variable <- 1
   try(if(is.null(X) & fit$Distrib[X.variable] != "Uniform"){
     return(cat("Error: Non-uniform approximations require numeric values for X."))
   }else{
   if(is.null(Y.variables)) Y.variables <- setdiff(1:tNv,X.variable)
   Y.Nv <- length(Y.variables)
-  if(is.null(K.X)) K.X <- tKm
+  if(is.null(K.X)) K <- fit$opt_mpo
+  if(is.null(K.X)) K <- fit$KMax
+  if(is.null(K.Y) & !is.null(fit$opt_mpo)) K.Y <- rep(fit$opt_mpo,Y.Nv)
   if(is.null(K.Y)) K.Y <- rep(tKm,Y.Nv)
   if(length(K.Y) != Y.Nv) K.Y <- rep(K.Y[1], Y.Nv)
 

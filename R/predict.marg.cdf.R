@@ -11,7 +11,7 @@
 #'  for variables with "Uniform" reference densities to compute coefficients. 
 #' @param K integer. Maximum Polynomial Order of approximation on marginal 
 #'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is the K specified in `moped` object.
+#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
 #' @param nprobs integer. Number of probability coefficients replications to be
 #' outputted. Used when X is not specified for variables with "Uniform" 
 #' reference densities. The default value is 1.
@@ -82,7 +82,8 @@ predict.marg.cdf <- function(fit,
   try(if(is.null(X) & fit$Distrib[variable] != "Uniform"){
     return(cat("Error: Non-uniform approximations require numeric values for X."))
   }else{
-  if(is.null(K)) K <- max(fit$KMax)
+  if(is.null(K)) K <- fit$opt_mpo
+  if(is.null(K)) K <- fit$KMax
   if(!is.null(X)) nprobs <- NROW(X)
   subsetnames <- lapply(1:NCOL(fit$SampleStats$Sample),function(k)1)
   subsetnames[[variable]] <- 1:K+1

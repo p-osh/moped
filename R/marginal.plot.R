@@ -6,7 +6,8 @@
 #' each variable.
 #'
 #' @param fit A result object from `moped()`.
-#' @param k.range Range of polynomial orders K.
+#' @param k.range Range of polynomial orders K. Default is 1 to `KMax` specified 
+#'  in `moped` object.
 #' @param ncol Integer vector. Number of columns the marginal plots shown for a given variable.
 #' @param prompt Logical, whether it needs the prompt to show the next plot.
 #'   If `TRUE` (the default), press enter to show the next plot, If `FALSE`,
@@ -53,7 +54,7 @@
 
 
 marginal.plot <- function(fit,
-                          k.range = 1:min(fit$KMax),
+                          k.range = 1:fit$KMax,
                           ncol = 4,
                           prompt = TRUE
 ){

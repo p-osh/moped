@@ -19,7 +19,7 @@
 #'  position or name to be predicted from `moped` object. 
 #'   
 #'
-#' @return A list with the following components:
+#' @return `predict.marg.cdf()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.
 #'   \item `coef` - An array of coefficients of the polynomial approximation. 

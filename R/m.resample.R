@@ -59,9 +59,7 @@
 #' bounds = bounds,
 #' variance = T,
 #' recurrence = F,
-#' parallel = F,
-#' ncores = NULL,
-#' mpo = F
+#' opt.mpo = T
 #' )
 #'
 #' # Generating resampled (synthetic) observations

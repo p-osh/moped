@@ -88,7 +88,7 @@
 
 moped <- function(
     Sample, 
-    K = 15,
+    K = 10,
     Distrib = rep("Uniform",NCOL(Sample)), 
     bounds = NULL, 
     variance = TRUE,

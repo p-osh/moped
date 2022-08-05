@@ -13,7 +13,7 @@
 #'   If `TRUE` (the default), press enter to show the next plot, If `FALSE`,
 #'   it means showing all plots simultaneously.
 #'
-# @return `marginal.plot()` returns
+# @return `marginal.plot()` returns plots of each marginal variable. 
 #' @export
 #'
 #' @examples

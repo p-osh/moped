@@ -1,21 +1,38 @@
-#' Compute unscaled MBD conditional distribution estimate
+#' Computes moped estimated conditional distribution function values for X|Y1,Y2,...
 #'
 #' @description
-#' `predict.conditional()` is used to compute unscaled MBD conditional
-#' distribution estimate.
+#' `predict.conditional()` is used to compute moped estimated conditional 
+#' distribution function values for a single variable X given a data frame of 
+#' conditional Y values. 
 #'
 #' @param fit `moped` type variable. Outputted from `moped()`.
-#' @param X Grid of probabilities to be calculated. If `NULL` (the default) than
-#'   generates nodes x Nv grid.
-#' @param K.X Truncation to be used. If `NULL`( the default). it is either opt_mpo or KMax in Fit.
-#' @param Y Grid of probabilities to be calculated. If `NULL` (the default),
-#'   than generates nodes x Nv grid.
-#' @param K.Y Which variables to be predicted from Fit. If `NULL` (the default),
-#'   it is 1:Nv or 1:NCOL(X) whichever smallest.
-#' @param X.variable (?Brad)
-#' @param Y.variables (?Brad)
+#' @param X Vector of values with which to estimate conditional probabilities.
+#'  `X` must have length consistent with number of observations in `Y`. 
+#'  `X` is optional when reference density of X variable is "Uniform" and only
+#'  approximation polynomial coefficients are to be determined. 
+#' @param K.X Integer Maximum Polynomial Order of approximation on X variable. 
+#'  Must be less than or equal to the maximum MPO K specified in `moped()`.
+#'  The default is `opt_mpo` or `KMax` specified in `moped` object.
+#' @param Y A data frame in which to look for conditional (Y) variables with which
+#'  to estimate probability values. Must contain column names matching variables in 
+#'  the `moped` object. 
+#' @param K.Y  Integer vector Maximum Polynomial Order of approximation on each 
+#'   conditional variable. Must be less than or equal to the maximum MPO K specified  
+#'   in `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
+#' @param X.variable Integer or character string of variable name. The 
+#'   `moped` position or column name of the variable to be predicted from 
+#'   `moped` object. The default is 1 (first variable in fit).
+#' @param Y.variables Integer vector or character string of variable names. The 
+#'   `moped` position or column name of the variable(s) to be condited on from 
+#'   `moped` object. If `NULL` conditions on all non `X.variable` variables. 
 #'
-#' @return `predict.conditional()` returns a list object
+#' @return `predict.conditional()` returns a list with the following components:
+#' \itemize{
+#'   \item `Prob` - vector of computed probabilities when X is specified.
+#'   \item `coef` - An array of coefficients of the polynomial approximation. 
+#'                  When variable reference density is "Uniform", coefficients 
+#'                  are not specific for each value of X. 
+#' }
 #' @export
 #'
 #' @examples
@@ -40,23 +57,21 @@
 #' Fit <- moped(
 #' Data_x,
 #' K=10,
-#' Distrib = rep("Uniform", 7),
+#' Distrib = rep("Uniform", 4),
 #' bounds = bounds,
 #' variance = T,
 #' recurrence = F,
-#' parallel = F,
-#' ncores = NULL,
-#' mpo = T
+#' opt.mpo = T
 #' )
 #'
-#' # Compute MBD Conditional Distribution Estimate (unscaled)
+#' # Compute moped conditional distribution estimate 
 #' Cond.prob <- predict.conditional(Fit,
 #' X=seq(20,300,length.out=100),
 #' Y = x0[rep(1,100),-4],
 #' K.Y=rep(7,3),
-#' K.X=c(7),
-#' X.variable = 4,
-#' Y.variables = 1:3)
+#' K.X=7,
+#' X.variable = "wage",
+#' Y.variables = c("age","education","jobclass"))
 #'
 #' plot(seq(20, 300, length.out = 100), Cond.prob$Prob)
 
@@ -83,13 +98,23 @@ predict.conditional <- function(fit,
   if(is.null(K.Y) & !is.null(fit$opt_mpo)) K.Y <- rep(fit$opt_mpo,Y.Nv)
   if(is.null(K.Y)) K.Y <- rep(tKm,Y.Nv)
   if(length(K.Y) != Y.Nv) K.Y <- rep(K.Y[1], Y.Nv)
-
+  
+  if(is.character(X.variable)){
+    X.variable <-  which(colnames(fit$SampleStats$Sample) %in% X.variable)
+  }
+  if(is.character(Y.variables)){
+    Y.variables <-  which(colnames(fit$SampleStats$Sample) %in% Y.variables)
+  }
+  
   nprobs <- NROW(Y)
   tvariables <- c(c(Y.variables,X.variable),setdiff(1:tNv,c(Y.variables,X.variable)))
 
   fY <- predict(fit,X = Y,K=K.Y,normalise = F,variables = Y.variables)
   Y.poly <- polynomial(fit,X = Y,K=K.Y,variables = Y.variables)
-
+  
+  Y.variables_names <- colnames(fit$SampleStats$Sample)[Y.variables]
+  Y <- setNames(data.frame(Y[,Y.variables_names]),Y.variables_names)
+  
   Km <- max(K.Y,K.X)
   XDP <- (fit$PolyCoef[2:(K.X+1),2:(K.X+1),X.variable]/
             fit$Lambda[1:K.X,X.variable])*
@@ -128,10 +153,10 @@ predict.conditional <- function(fit,
     coef[,1] <- coef[,1] + Fnu
   }
   if(is.null(X)){
-    return(list(coef = coef, E = E))
+    return(list(coef = coef))
   }else{
     Prob <- apply(coef*(sapply(0:(K.X+1),function(k)X^k)),1,sum)
-    return(list(coef = coef, E = E,Prob = Prob))
+    return(list(Prob = Prob,coef = coef))
   }
   })
 }

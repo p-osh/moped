@@ -74,9 +74,9 @@ Computed if \code{recurrence = TRUE}.
 }
 \description{
 \code{moped()} is used to fit a multivariate orthogonal polynomial-based density
-estimate. It requires a data frame to fit on data. Categorical
-variables need to be converted into continuous variables before fitting data
-to the density estimation.
+estimate. It requires a data frame to fit on data. Categorical variables need
+to be converted into continuous variables before fitting data to the density
+estimation.
 }
 \examples{
 
@@ -107,6 +107,6 @@ recurrence = F,
 opt.mpo = T
 )
 
-Estimated optimal max polynomial order. 
+Estimated optimal max polynomial order.
 Fit$opt_mpo
 }

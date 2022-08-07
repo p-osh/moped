@@ -32,7 +32,7 @@ Data <- Data_full \%>\%
 select(age, education, jobclass, wage)
 Data_x <- make.cont(Data, catvar = 2:3)
 # Select variables by name
-Data_x <- make.cont(Data, catvar = c("education","jobclass"))
+Data_x <- make.cont(Data, catvar = c("education", "jobclass"))
 
 # Convert categorical with amalgamations
 Data <- Data_full \%>\%

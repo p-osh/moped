@@ -2,9 +2,9 @@
 #'
 #' @description
 #' `moped()` is used to fit a multivariate orthogonal polynomial-based density
-#' estimate. It requires a data frame to fit on data. Categorical
-#' variables need to be converted into continuous variables before fitting data
-#' to the density estimation.
+#' estimate. It requires a data frame to fit on data. Categorical variables need
+#' to be converted into continuous variables before fitting data to the density
+#' estimation.
 #'
 #' @param Sample A data frame.
 #' @param K Integer. Maximum possible Max Polynomial Order of approximation.
@@ -19,11 +19,11 @@
 #' @param recurrence Logical. If `TRUE` (the default), two-term recurrence
 #'   relation is not computed.
 #' @param opt.mpo Logical. If `TRUE` (the default), an optimal max polynomial order
-#' estimate is estimated using repeated k-fold cross-validation.
+#'   estimate is estimated using repeated k-fold cross-validation.
 #' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in
-#'  k-fold cross-validation. Default is 5.
+#'   k-fold cross-validation. Default is 5.
 #' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold
-#'  cross-validation is repeated. Default is 10.
+#'   cross-validation is repeated. Default is 10.
 #'
 #' @returns `moped()` returns a moped (list) object containing:
 #' \itemize{
@@ -74,7 +74,7 @@
 #'
 #' # Fitting the Data
 #' Fit <- moped(
-#' Data_x,
+#' Data,
 #' K=10,
 #' Distrib = rep("Uniform", 4),
 #' bounds = bounds,

@@ -1,17 +1,17 @@
 #' Perform repeated k-fold cross-validation to estimate optimal max polynomial order.
-#' 
+#'
 #' @description `validate.mpo()` performs repeated k-fold cross-validation to determine
-#' an unbiased estimate of the shifted Nk-Norm that when minimised provides an 
-#' estimate of the optimal max polynomial order. The coefficient estimates 
+#' an unbiased estimate of the shifted Nk-Norm that when minimised provides an
+#' estimate of the optimal max polynomial order. The coefficient estimates
 #' are also calculated as is (optional) their corresponding variance estimates.
 #'
 #' @param fit `moped` type variable. Outputted from `moped()`.
-#' @param K Integer. Maximum possible Max Polynomial Order of approximation. 
+#' @param K Integer. Maximum possible Max Polynomial Order of approximation.
 #'  Default is `KMax` specified in `moped` object.
-#' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in 
+#' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in
 #'  k-fold cross-validation. Default is 5.
-#' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold 
-#'  cross-validation is repeated. Default is 10. 
+#' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold
+#'  cross-validation is repeated. Default is 10.
 #' @param variance Logical. If `TRUE` (the default), a variance estimate of each
 #'   coefficient is calculated.
 #'
@@ -24,17 +24,18 @@
 #'   \item `opt_mpo_vec` - Estimated optimal max polynomial order where K is vector.
 #'   \item `opt_mpo` - Estimated optimal max polynomial order where K is constant.
 #' }
+#'
 #' @export
 #'
 #' @examples
-#' 
-#' 
-#' 
-#' 
+#'
+#'
+#'
+#'
 
 
 validate.mpo <- function(fit,
-                         K = fit$KMax, 
+                         K = fit$KMax,
                          nfolds = 5,
                          repeats = 10,
                          variance = T){
@@ -44,11 +45,11 @@ validate.mpo <- function(fit,
   NaTerms <- 0
 
   folds <- lapply(1:repeats,function(r) sample(1:nfolds,NS,replace=T))
-  
+
   Cn_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
   NaTerms_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
   if (variance) Cn2_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
-  
+
     for (j in 1:NS){
       TempPoly <- Poly[0:K + 1, j, 1]
       if (Nv > 1)
@@ -63,7 +64,7 @@ validate.mpo <- function(fit,
       }
       progress(100*j/NS)
     }
-  
+
   N_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
   for(r in 1:repeats)
     for(fi in 1:nfolds){
@@ -71,7 +72,7 @@ validate.mpo <- function(fit,
       Cn_folds[r,fi][[1]] <- Cn_folds[r,fi][[1]]/N_folds[r,fi][[1]]
       if (variance) Cn2_folds[r,fi][[1]] <- Cn2_folds[r,fi][[1]]/N_folds[r,fi][[1]]
     }
-  
+
   cumsumer <- function(Array){
     Nv <- length(dim(Array))
     if(Nv>1){
@@ -113,11 +114,11 @@ validate.mpo <- function(fit,
     }else{
       output <- list(Cn = Cn,varCn = NULL,opt_mpo_vec = opt_mpo_vec, opt_mpo = opt_mpo, Nk_norm = Nk_norm)
     }
-    
+
   }else{
-    Cn <- Cn_folds[1,1][[1]] 
+    Cn <- Cn_folds[1,1][[1]]
     if (variance){
-      varCn <- Cn2_folds[1,1][[1]] - Cn_folds[1,1][[1]]^2 
+      varCn <- Cn2_folds[1,1][[1]] - Cn_folds[1,1][[1]]^2
       output <- list(Cn = Cn,varCn = varCn,opt_mpo_vec = NULL, opt_mpo = NULL, Nk_norm = NULL)
     }else{
       output <- list(Cn = Cn,varCn = NULL,opt_mpo_vec = NULL, opt_mpo = NULL, Nk_norm = NULL)

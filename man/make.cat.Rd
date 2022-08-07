@@ -7,20 +7,22 @@
 make.cat(Sample)
 }
 \arguments{
-\item{Sample}{A dataframe.}
+\item{Sample}{A data frame.}
 }
 \value{
-\code{make.cat()} returns a dataframe.
+\code{make.cat()} returns a data frame.
 }
 \description{
 Convert previously continulized variables back to categorical variables.
 }
 \examples{
 Data_full <- ISLR::Wage
+
 Data <- Data_full \%>\%
 select(age, maritl, race, education, jobclass, wage)
-Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education","jobclass"),
+Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
 amalgams = list(1:2,3:4))
+
 # Convert previously continulized variables back to categorical variables.
 make.cat(Data_amal)
 }

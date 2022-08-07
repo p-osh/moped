@@ -1,39 +1,40 @@
-#' Predicting the density or probability of an observation based on moped 
+#' Predicting the density or probability of an observation based on moped
 #' density estimate.
 #'
 #' @description
-#' `predict.moped()` is used to predict density and probabilities for a set of 
+#' `predict.moped()` is used to predict density and probabilities for a set of
 #' observations. When constructing partially joint density, sample and variables must be used
 #' together. X must be a data frame and its variable length must equal to
 #' the length in var.
 #'
 #' @param fit `moped` type variable. Outputted from `moped()`.
 #' @param X An optional data frame in which to look for variables with which
-#'  to estimate density values. Must contain column names matching variables in 
-#'  the `moped` object. If `NULL` (the default) then generates a nodes^Nv 
-#'  (number of variables) grid with density values. 
-#' @param K Integer vector. Maximum Polynomial Order of approximation on each 
-#'   variable. Must be less than or equal to the maximum MPO K specified in 
+#'   to estimate density values. Must contain column names matching variables in
+#'   the `moped` object. If `NULL` (the default) then generates a nodes^Nv
+#'   (number of variables) grid with density values.
+#' @param K Integer vector. Maximum Polynomial Order of approximation on each
+#'   variable. Must be less than or equal to the maximum MPO K specified in
 #'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
-#' @param variables Integer vector or character string of variable names. The 
-#'   `moped` position or column name of the variable(s) to be predicted from 
+#' @param variables Integer vector or character string of variable names. The
+#'   `moped` position or column name of the variable(s) to be predicted from
 #'   `moped` object. The default is 1:Nv or 1:NCOL(X) whichever smallest.
 #' @param bounds A data frame. Bounds allows you to control the grid min and max.
 #'   Should be an array of 2 x number of variables. `NULL` is the default.
 #' @param type string equal to `"density"` (default) or `"distribution"`. If
 #'  `type = "density"` density values are estimated. If `type = "distribution"`
-#'  cumulative distribution function probabilities are estimated.   
-#' @param normalise Logical. If `TRUE` (the default) then scale data to correct 
+#'  cumulative distribution function probabilities are estimated.
+#' @param normalise Logical. If `TRUE` (the default) then scale data to correct
 #'   for any estimated negative values.
 #' @param nodes Integer vector. Number of grid points per dimension when grid is
 #'   calculated.
 #' @param parallel Logical. If `FALSE` (the default), parallel computing is not
 #'   used.
 #' @param ncores Integer vector. Number of cores used in parallel computing.
-#' @param mps Integer vector. Limit on maximum number of probabilities 
-#'  calculated at a time. The default is 5000.
+#' @param mps Integer vector. Limit on maximum number of probabilities
+#'   calculated at a time. The default is 5000.
 #'
 #' @return `predict.moped()` returns a data frame with estimated density values.
+#'
 #' @export
 #'
 #' @examples
@@ -116,7 +117,7 @@ predict.moped <- function(fit,
     bounds <- as.data.frame(fit$SampleStats$Range[,variables])
     colnames(bounds) <- variables_names
   }
-  
+
   # X Setup
   if(is.null(X)){
     Grid <- T
@@ -127,10 +128,10 @@ predict.moped <- function(fit,
   }else{
     Grid <- F
   }
-  
-  test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X) 
+
+  test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X)
   Sample <- X
-  
+
   if(test_names){
     return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
   } else {
@@ -140,8 +141,8 @@ predict.moped <- function(fit,
     if(is.null(K)) K <- rep(fit$KMax,length(variables))
     if(length(K)==1) K <- rep(K,Nv)
     K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
-    Km <- max(K) 
-    
+    Km <- max(K)
+
     require(tensor)
     require(R.utils)
 
@@ -195,9 +196,9 @@ predict.moped <- function(fit,
       nprobs <- length(splitindex[[j]])
       #Array Definitions
       Km <- max(K) #Max Truncation
-      XM <- list() # Array of 1, X, X^2, .... 
-      P <- list() # Polynomial Terms P_0(X), P_1(X), ...  
-      
+      XM <- list() # Array of 1, X, X^2, ....
+      P <- list() # Polynomial Terms P_0(X), P_1(X), ...
+
       for(k in 1:Nv){
         CDFk <- as.function(fit$PDFControl(variables[k])$CDF)
         PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
@@ -225,7 +226,7 @@ predict.moped <- function(fit,
       Terms <- c(Terms,tt)
       return(Terms)
     }
-    
+
     if(parallel){
       if(is.null(ncores)) ncores <- detectCores()
       if(type=="distribution"){
@@ -254,9 +255,9 @@ predict.moped <- function(fit,
       if(type=="density") norm <- sum(Probability)*prod(deltaX)
       if(type=="distribution"){
         Probability <- (Prob_old - min(Prob_old))/(max(Prob_old)-min(Prob_old))
-      } 
+      }
     }
-    
+
     if(type=="density") Sample$Density <- Probability
     if(type=="distribution") Sample$Prob <- Probability
     return(Sample)

@@ -1,3 +1,10 @@
+test_that("check output has correct class", {
+  expect_s3_class(fit, "moped")
+})
+#> Test passed!
+
+
+
 test_that("check arguments are correctly passed", {
 
   # sample data
@@ -27,9 +34,4 @@ test_that("check all components in moped object are calculated", {
 #> Test passed!
 
 
-
-test_that("check output has correct class", {
-  expect_s3_class(fit, "moped")
-})
-#> Test passed!
 

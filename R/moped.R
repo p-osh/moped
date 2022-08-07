@@ -8,22 +8,22 @@
 #'
 #' @param Sample A data frame.
 #' @param K Integer. Maximum possible Max Polynomial Order of approximation.
-#' @param Distrib Character string vector, specifying the reference distribution 
-#'   to be used for each variable (column) of Sample. Choices are 
+#' @param Distrib Character string vector, specifying the reference distribution
+#'   to be used for each variable (column) of Sample. Choices are
 #'   `"Uniform"` (default), `"Normal"`, `"Gamma"`, and `"Beta"` distributions.
 #' @param bounds A data frame. The limits to be used on bounded space. Should be an
 #'   array of 2 x number of variables with each column having the lower and
 #'   upper limit. `NULL` is the default.
 #' @param variance Logical. If `TRUE` (the default), a variance estimate of each
 #'   coefficient is calculated.
-#' @param recurrence Logical. If `TRUE` (the default), two-term recurrence 
+#' @param recurrence Logical. If `TRUE` (the default), two-term recurrence
 #'   relation is not computed.
-#' @param opt.mpo Logical. If `TRUE` (the default), an optimal max polynomial order 
-#' estimate is estimated using repeated k-fold cross-validation. 
-#' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in 
+#' @param opt.mpo Logical. If `TRUE` (the default), an optimal max polynomial order
+#' estimate is estimated using repeated k-fold cross-validation.
+#' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in
 #'  k-fold cross-validation. Default is 5.
-#' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold 
-#'  cross-validation is repeated. Default is 10. 
+#' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold
+#'  cross-validation is repeated. Default is 10.
 #'
 #' @returns `moped()` returns a moped (list) object containing:
 #' \itemize{
@@ -35,30 +35,31 @@
 #'   \item `opt_mpo_vec` - Estimated optimal max polynomial order where K is vector.
 #'   \item `opt_mpo` - Estimated optimal max polynomial order where K is constant.
 #'   \item `Cats` - List of categorical data information from Sample.
-#'   \item `Distrib` - String vector of reference densities used for each variable. 
-#'   \item `PDFControl` - List of reference density distribution functions. 
+#'   \item `Distrib` - String vector of reference densities used for each variable.
+#'   \item `PDFControl` - List of reference density distribution functions.
 #'   \item `PolyCoef` - Array of orthogonal polynomial coefficients.
-#'   \item `Poly` - Array of orthogonal polynomial values for each obs of Sample. 
-#'   \item `Sigma` - Array of polynomial coefficients of sigma terms in polynomial. 
-#'   \item `Tau` - Array of polynomial coefficients of tau terms in polynomial. 
+#'   \item `Poly` - Array of orthogonal polynomial values for each obs of Sample.
+#'   \item `Sigma` - Array of polynomial coefficients of sigma terms in polynomial.
+#'   \item `Tau` - Array of polynomial coefficients of tau terms in polynomial.
 #'   \item `Lambda` - Array of lambda terms for each variable.
 #'   \item `Limits` - Array of theoretical limits of each variable.
 #'   \item `Bounds` - Data frame of the parameter `Bounds`.
 #'   \item `LeadingTerms` - List containing leading terms of each polynomial.
-#'   \item `KMax` - Maximum max polynomial order (K) specified. 
+#'   \item `KMax` - Maximum max polynomial order (K) specified.
 #'   \item `Parameters` - Array of parameters of reference densities.
 #'   \item `SampleStats` - List containing original Sample and it's range.
 #'   \item `Recurrence` - Optional list of polynomial recurrence relationship terms.
 #'                        Computed if `recurrence = TRUE`.
 #' }
+#'
 #' @export
 #'
 #' @examples
-#' 
+#'
 #' require(sdcMicro)
 #' Data <- CASCrefmicrodata[,c(2,3,4,6)]
 #' str(Data)
-#' 
+#'
 #'# Fitting multivariate orthogonal polynomial based
 #'# density estimation function using default setting
 #'Fit <- moped(Data)
@@ -82,15 +83,15 @@
 #' opt.mpo = T
 #' )
 #'
-#' Estimated optimal max polynomial order. 
+#' Estimated optimal max polynomial order.
 #' Fit$opt_mpo
 
 
 moped <- function(
-    Sample, 
+    Sample,
     K = 10,
-    Distrib = rep("Uniform",NCOL(Sample)), 
-    bounds = NULL, 
+    Distrib = rep("Uniform",NCOL(Sample)),
+    bounds = NULL,
     variance = TRUE,
     recurrence = FALSE,
     opt.mpo = T,
@@ -275,9 +276,9 @@ moped <- function(
   #Construct Indice Array
   for (i in 0:K)
     for (k in 1:Nv){
-      A[i+1, ,k] <- c(an(k,i),rep(0,K-i)) 
+      A[i+1, ,k] <- c(an(k,i),rep(0,K-i))
     }
-    
+
   #######################################################################################
   Poly <- array(0,dim = c(K+1,NROW(Sample),Nv))
 
@@ -286,27 +287,27 @@ moped <- function(
       Poly[0:K+1,,k] <- A[0:K+1,0:K+1,k]%*%(XMk[0:K+1,])
     }
   Poly[1,,] <- array(1,dim = dim(Poly[1,,]))
-      
+
   if(opt.mpo){
     calc_cn <- validate.mpo(list(Poly=Poly),K=K,variance = variance,nfolds = nfolds,repeats = repeats)
   }else{
     calc_cn <- validate.mpo(list(Poly=Poly),K=K,variance = variance,nfolds = 1,repeats = 1)
   }
-  
+
 
   if(Nv==1)   lam <- array(lambda[-((K+1):NROW(lambda)),],dim =c(rep(K,Nv),1)) else  lam <- lambda[-((K+1):NROW(lambda)),]
 
   output <- list(Cn = calc_cn$Cn, varCn = calc_cn$varCn,Nv=Nv, Nk_norm = calc_cn$Nk_norm,
-                 opt_mpo_vec = calc_cn$opt_mpo_vec, opt_mpo = calc_cn$opt_mpo, 
+                 opt_mpo_vec = calc_cn$opt_mpo_vec, opt_mpo = calc_cn$opt_mpo,
                  Cats = Cats, Distrib = Distrib, PDFControl = PDFControl,
                  PolyCoef = A, Poly = Poly,
-                 Sigma = sigma, Tau = tau, Lambda = lam, Limits = limits, 
+                 Sigma = sigma, Tau = tau, Lambda = lam, Limits = limits,
                  LeadingTerms = list(Bn = rbind(rep(1,Nv),Bn[-(K:NROW(lambda)+1),]),
                  Kappa = Kappa, Kappa2 = Kappa2), KMax = K, Paramaters = par, Bounds = bounds,
                  SampleStats = list(Range = sapply(1:Nv,function(k) range(Sample[,k],na.rm = T)),
                                     Sample = data.frame(Sample)))
   if(recurrence){
-  output$Recurrence = list(Rn = Rn[-((K):NROW(lambda)),], 
+  output$Recurrence = list(Rn = Rn[-((K):NROW(lambda)),],
                            Sn = Sn[-((K):NROW(lambda)),],
                            Tn = Tn[-((K):NROW(lambda)),])
   }

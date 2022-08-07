@@ -4,12 +4,13 @@
 \alias{marginal.plot}
 \title{Marginal plots for each variable with a range of polynomial orders K.}
 \usage{
-marginal.plot(fit, k.range = 1:min(fit$KMax), ncol = 4, prompt = TRUE)
+marginal.plot(fit, k.range = 1:fit$KMax, ncol = 4, prompt = TRUE)
 }
 \arguments{
 \item{fit}{A result object from \code{moped()}.}
 
-\item{k.range}{Range of polynomial orders K.}
+\item{k.range}{Range of polynomial orders K. Default is 1 to \code{KMax} specified
+in \code{moped} object.}
 
 \item{ncol}{Integer vector. Number of columns the marginal plots shown for a given variable.}
 

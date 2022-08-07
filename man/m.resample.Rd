@@ -2,7 +2,7 @@
 % Please edit documentation in R/m.resample.R
 \name{m.resample}
 \alias{m.resample}
-\title{Generate synthetic samples}
+\title{Generate resampled (synthetic) samples}
 \usage{
 m.resample(
   fit,
@@ -20,41 +20,49 @@ m.resample(
 )
 }
 \arguments{
-\item{fit}{MBDensity Type Variable. Outputed from \code{moped()}.}
+\item{fit}{moped type variable. Outputted from \code{moped()}.}
 
-\item{K}{Integer vector. Maximum Truncation of Approximation on each variable.
-The default is the maximum MPO Order in \code{moped} object.}
+\item{K}{Integer vector. Maximum Polynomial Order of approximation on each
+variable. Must be less than or equal to the maximum MPO K specified in
+\code{moped()}. The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
 
-\item{variables}{Integer vector or character string. Variables to be
-predicted from \code{moped} object. The default is 1:Nv or 1:NCOL(Sample)
-whichever smallest.}
+\item{variables}{Integer vector or character string of variable names. The
+\code{moped} position or column name of the variable(s) to be predicted from
+\code{moped} object. The default is 1:Nv or 1:NCOL(Sample) whichever smallest.}
 
-\item{Sample}{A data frame defines the size of the synthetic data frame.}
+\item{Sample}{A data frame of initial values used to impute values. Must
+contain column names matching variables in the \code{moped} object. Default is
+the Sample used to fit the \code{moped} object.}
 
-\item{n}{Integer vector. The number of rows in the sample data frame.}
+\item{n}{Integer vector. The number of rows to be simulated.}
 
 \item{bounds}{A data frame. Bounds allows you to control the grid min and max.
 Should be an array of 2 x number of variables. \code{NULL} is the default.}
 
-\item{replicates}{Integer vector. The default is 1.}
+\item{replicates}{Integer vector. Number of complete Gibbs sampling passes.
+The default is 1.}
 
 \item{parallel}{Logical. If \code{FALSE} (the default), parallel computing is not
 used.}
 
-\item{ncores}{Integer vector. NCores to use in parallel computing.}
+\item{ncores}{Integer vector. Number of cores used in parallel computing.}
 
-\item{mps}{Integer vector. The default is 5000. (?Brad)}
+\item{mps}{Integer vector. Limit on maximum number of probabilities
+calculated at a time. The default is 5000.}
 
-\item{fixed.var}{The position of the variable(s) conditional upon. The
-default is \code{NULL}.}
+\item{fixed.var}{Integer vector or string of variable names. The \code{moped}
+position or column name of the variable(s) conditioned upon without
+imputation. The default is \code{NULL}.}
 
-\item{er_alert}{Logical. The default is \code{TRUE}. (?Brad)}
+\item{er_alert}{Logical. The default is \code{TRUE}. If \code{TRUE} returns error
+message when observations require re-sampling due to errors.}
 }
 \value{
-\code{m.resample()} returns a data frame.
+\code{m.resample()} returns a data frame of imputed values.
 }
 \description{
-\code{m.resample()} is used to genderate synthetic samples.
+\code{m.resample()} is used to generate synthetic samples from full, conditional,
+or marginal moped density estimate.
 }
 \examples{
 Data_full <- ISLR::Wage
@@ -78,32 +86,30 @@ wage = c(0,350)
 Fit <- moped(
 Data_x,
 K=10,
-Distrib = rep("Uniform", 7),
+Distrib = rep("Uniform", 4),
 bounds = bounds,
 variance = T,
 recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
+opt.mpo = T
 )
 
-# Generating resampled Obs
-resampled <- m.resample(Fit, K=3, Sample=Data_x, fixed.var = 1, replicates = 1)
-resampled <- m.resample(Fit, K=3, replicates = 1) # A fully resampled dataset
-resampled <- m.resample(Fit, K=3, Sample = Data_x, variables = 4, replicates = 1)
+# Generating resampled (synthetic) observations
+# Sample 100 obs from moped joint density estimate without updating "age"
+resampled <- m.resample(Fit, K=3, Sample=Data_x, n = 100, fixed.var = "age")
+# Simulate a fully resampled data set of same size as Data_x.
+resampled <- m.resample(Fit, K=3, replicates = 2) # 2 Gibbs passes used.
 
-# Marginal Synthetic
-resampled_marginal <- m.resample(Fit,
-Sample = Data_x[,3:4],
-K = c(3,4),
-variables = 3:4,
-replicates = 1
-)
-
-# Convert previously continulized variables back to categorical variables.
+# Convert previously continuised variables back to categorical variables.
 resampled <- make.cat(resampled)
 
-
+# Sample fully synthetic data set from marginal bivariate moped density 
+# estimate of "age" and "wage"
+resampled_marginal <- m.resample(Fit,
+Sample = Data_x[,c(1,4)],
+K = c(4,5),
+variables = c(1,4),
+replicates = 1
+)
 
 
 }

@@ -67,7 +67,7 @@ or marginal moped density estimate.
 \examples{
 Data_full <- ISLR::Wage
 Data <- Data_full \%>\%
-select(age, education, jobclass,wage)
+select(age, education, jobclass, wage)
 
 # Convert Categorical Data to Continuous Data
 Data_x <- make.cont(Data, catvar = 2:3)
@@ -102,7 +102,7 @@ resampled <- m.resample(Fit, K=3, replicates = 2) # 2 Gibbs passes used.
 # Convert previously continuised variables back to categorical variables.
 resampled <- make.cat(resampled)
 
-# Sample fully synthetic data set from marginal bivariate moped density 
+# Sample fully synthetic data set from marginal bivariate moped density
 # estimate of "age" and "wage"
 resampled_marginal <- m.resample(Fit,
 Sample = Data_x[,c(1,4)],

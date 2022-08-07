@@ -98,7 +98,7 @@ bounds <- data.frame(
 
 # Fitting the Data
 Fit <- moped(
-Data_x,
+Data,
 K=10,
 Distrib = rep("Uniform", 4),
 bounds = bounds,

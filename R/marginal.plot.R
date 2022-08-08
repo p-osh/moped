@@ -18,38 +18,18 @@
 #' @export
 #'
 #' @examples
-#' Data_full <- ISLR::Wage
-#' Data <- Data_full %>%
-#' select(age, education, jobclass,wage)
-#'
-#' # Convert Categorical Data to Continuous Data
-#' Data_x <- make.cont(Data, catvar = 2:3)
+#' require(sdcMicro)
+#' Data <- CASCrefmicrodata[,c(2,3,4,6)]
 #'
 #' # Fitting multivariate orthogonal polynomial based
-#' # density estimation function
-#' # Requires a data frame of bounds to fit on data.
-#' bounds <- data.frame(
-#' age  = c(18,80),
-#' education = c(0,1),
-#' jobclass = c(0,1),
-#' wage = c(0,350)
-#' )
-#'
-#' Fitting the Data
-#' Fit <- moped(
-#' Data_x,
-#' K=10,
-#' Distrib = rep("Uniform", 7),
-#' bounds = bounds,
-#' variance = T,
-#' recurrence = F,
-#' parallel = F,
-#' ncores = NULL,
-#' mpo = T
-#' )
+#' # density estimation function using default setting
+#' Fit <- moped(Data)
 #'
 #' # Check marginal densities with different polynomial K
+#' # Default setting, showing all marginal densities with prompting
 #' marginal.plot(Fit)
+#' # Marginal densities with user-specified polynomial order, number of columns
+#' # grid per plot and no prompting required
 #' marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
 
 

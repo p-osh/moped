@@ -1,34 +1,72 @@
-#' Title (?Brad)
+#' Calculate univariate marginal distribution function probabilities.
 #'
-#' @param fit MBDensity type variable. Outputed from `moped()`.
-#' @param X Grid of probabilities to be calculated. If `NULL` (the default) than
-#'   generates nodes x Nv grid.
-#' @param K Truncation to be used. If `NULL`( the default). it is max in Fit.
-#' @param nprobs (?Brad)
-#' @param variable Which variables to be predicted from Fit. The Default `NULL`
-#'   is 1:Nv or 1:NCOL(X) whichever smallest.
+#' @description
+#' `predict.marg.cdf()` is used to calculate univariate marginal cumulative
+#'  distribution function probabilities and the polynomial coefficients of the
+#'  polynomical approximation from any `moped` object.
 #'
-#' @return A data frame
+#'
+#' @param fit moped type variable outputted from `moped()`.
+#' @param X vector of values to predict the marginal probability. Not required
+#'  for variables with "Uniform" reference densities to compute coefficients.
+#' @param K integer maximum polynomial order of approximation on marginal
+#'   variable. Must be less than or equal to the maximum MPO K specified in
+#'   `moped()`.The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
+#' @param nprobs integer of number of probability coefficients replications to be
+#' outputted. Used when `X = NULL` for variables with `"Uniform"` reference densities.
+#' The default value is 1 (no replications).
+#' @param variable integer or string of variable name corresponding to which marginal
+#'  variable position or name to be predicted from `moped` object.
+#'
+#'
+#' @return `predict.marg.cdf()` returns a list with the following components:
+#' \itemize{
+#'   \item `Prob` - vector of computed probabilities when X is specified.
+#'   \item `coef` - An array of coefficients of the polynomial approximation.
+#'                  When variable reference density is "Uniform", coefficients
+#'                  are not specific for each value of X.
+#' }
 #' @export
 #'
-#' @examples (?Brad)
+#' @examples
+#' require(ISLR)
+#' Data_full <- Wage
+#' 
+#' require(tidyverse)
+#' Data <- Data_full %>%
+#' select(age, education, jobclass,wage)
+#'
+#' # Convert Categorical Data to Continuous Data
+#' Data_x <- make.cont(Data, catvar = 2:3)
+#'
+#' # Fitting multivariate orthogonal polynomial based
+#' # density estimation function
+#'
+#' # Fitting the Data
+#' Fit <- moped(Data_x)
+#'
+#' # Compute marginal distribution function probabilities of "wage"
+#' x <- seq(21,310,length.out = 100)
+#' wage_prob <- predict.marg.cdf(Fit, X = x, K = 10, variable = "wage")
 
 
 
 
-
-
-predict.marg.cdf <- function(fit, # MBDensity Type Variable (Outputed from MBDensity)
-                             X = NULL,   # Grid of Probabilities to be Calculated (If NULL than generates nodes^Nv grid)
-                             K =NULL, # Truncation to be used (Default is max in Fit)
+predict.marg.cdf <- function(fit,
+                             X = NULL,
+                             K = NULL,
                              nprobs = 1,
-                             variable = NULL # Which variables to be predicted from Fit (Default is 1:Nv or 1:NCOL(X) whichever smallest) )
+                             variable = 1
 ){
-  if(is.null(variable))  variable <- 1
+  if(is.character(variable)){
+    variable <-  which(colnames(fit$SampleStats$Sample) %in% variable)
+  }
   try(if(is.null(X) & fit$Distrib[variable] != "Uniform"){
     return(cat("Error: Non-uniform approximations require numeric values for X."))
   }else{
-  if(is.null(K)) K <- max(fit$KMax)
+  if(is.null(K)) K <- fit$opt_mpo
+  if(is.null(K)) K <- fit$KMax
   if(!is.null(X)) nprobs <- NROW(X)
   subsetnames <- lapply(1:NCOL(fit$SampleStats$Sample),function(k)1)
   subsetnames[[variable]] <- 1:K+1
@@ -51,10 +89,11 @@ predict.marg.cdf <- function(fit, # MBDensity Type Variable (Outputed from MBDen
     coef[,1] <- coef[,1] + Fnu
   }
   if(is.null(X)){
-    return(list(coef = coef, E = E))
+    return(list(coef = coef))
   }else{
     Prob <- apply(coef*(sapply(0:(K+1),function(k)X^k)),1,sum)
-    return(list(coef = coef, E = E,Prob = Prob))
+    names(Prob) <- names(X)
+    return(list(Prob = Prob,coef = coef))
   }
   })
 }

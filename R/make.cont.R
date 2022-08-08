@@ -8,29 +8,33 @@
 #' @param Sample A data frame.
 #' @param catvar Columns to convert into continuous variables. Variable names
 #'   can be used as if they were positions in the data frame.
-#' @param amalgams A list using numeric indicating the order of variables in
-#'   `"catvar"`. It is the structure of amalgamating categorical variable when
-#'   being continulized.
+#' @param amalgams A list using numeric positions indicating the order of variables in
+#'   `"catvar"`. Each list item contains a vector of positions of `"catvar"`
+#'   that are to be amalgamated into a single continuous variable.
 #'
-#' @return `make.cont()` returns a data frame.
+#' @return `make.cont()` returns a data frame with strictly continuous values.
 #' @export
 #'
 #' @examples
-#' Data_full <- ISLR::Wage
+#' require(ISLR)
+#' Data_full <- Wage
 #'
 #' # Convert Categorical Data to Continuous Data
+#' require(tidyverse)
 #' Data <- Data_full %>%
 #' select(age, education, jobclass, wage)
 #' Data_x <- make.cont(Data, catvar = 2:3)
 #' # Select variables by name
-#' Data_x <- make.cont(Data, catvar = c("education","jobclass"))
+#' Data_x <- make.cont(Data, catvar = c("education", "jobclass"))
 #'
-#' # Convert categorical with amalgamations
+#' # Convert categorical with amalgamations of subsets of variables
 #' Data <- Data_full %>%
 #' select(age, maritl, race, education, jobclass, wage)
 #' Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
-#' amalgams = list(1:2, 3:4))
-#'
+#' amalgams = list(
+#' 1:2, #maritl and race are 1st and 2nd variables in the catvar list and they are amalgamated into a single variable.
+#' 3:4 #education and jobclass are 3rd and 4th variables in the catvar list and are amalgamated into a single variable.
+#' ))
 
 
 make.cont <- function(
@@ -155,7 +159,8 @@ make.cont <- function(
     caselist = caselist, amalgamated = amalgamated,
     upperlist = upperlist, lowerlist = lowerlist,
     amalgams_names = amalgams_names,
-    variables = 1:NCOL(tSample)
+    variables = 1:NCOL(tSample),
+    catvar_names = colnames(tSample)[catvar]
   )
 
   attr(tSample,"Cats") <- Cats

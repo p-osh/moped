@@ -1,41 +1,45 @@
-#' Generate resampled (synthetic) samples
+#' Generate resampled (synthetic) samples from moped estimate.
 #'
 #' @description
-#' `m.resample()` is used to generate synthetic samples.
+#' `m.resample()` is used to generate synthetic samples from full, conditional,
+#'  or marginal moped density estimate.
 #'
-#' @param fit moped type variable. Outputted from `moped()`.
-#' @param K Integer vector. Maximum Polynomial Order of approximation on each 
-#'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is the K specified in `moped` object.
-#' @param variables Integer vector or character string of variable names. The 
-#'   `moped` position or column name of the variable(s) to be predicted from 
-#'   `moped` object. The default is 1:Nv or 1:NCOL(Sample) whichever smallest.
-#' @param Sample A data frame of initial values used to impute values. Must 
-#'   contain column names matching variables in the `moped` object. Default is 
+#' @param fit moped type variable outputted from `moped()`.
+#' @param K Integer vector of max polynomial order of approximation on each
+#'   variable. Must be less than or equal to the maximum MPO K specified in
+#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
+#' @param variables Integer vector or character string of variable names. The
+#'   `moped` position or column name of the variable(s) to be predicted from
+#'   `moped` object. The default is `1:fit$Nv`.
+#' @param Sample A data frame of initial values used to impute values. Must
+#'   contain column names matching variables in the `moped` object. Default is
 #'   the Sample used to fit the `moped` object.
-#' @param n Integer vector. The number of rows to be simulated.
-#' @param bounds A data frame. Bounds allows you to control the grid min and max.
-#'   Should be an array of 2 x number of variables. `NULL` is the default.
-#' @param replicates Integer vector. Number of complete Gibbs sampling passes.
-#'     The default is 1.
-#' @param parallel Logical. If `FALSE` (the default), parallel computing is not
-#'   used.
-#' @param ncores Integer vector. Number of cores used in parallel computing.
-#' @param mps Integer vector. Limit on maximum number of probabilities 
-#'  calculated at a time. The default is 5000.
-#' @param fixed.var Integer vector or string of variable names. The `moped` 
-#'   position or column name of the variable(s) conditioned upon without 
+#' @param n Integer vector of the number of rows to be simulated.
+#' @param bounds An optional data frame specifying the limits to be used on bounded space.
+#'   Should be an array of 2 x number of variables with each column having the
+#'   lower and upper limit.
+#' @param replicates Integer vector determining the number of complete Gibbs
+#'   sampling passes to be performed.
+#' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
+#'   values using parallel computing.
+#' @param ncores Integer vector that determines the number of cores used in parallel computing.
+#' @param mps Integer vector that places a limit on maximum number of probabilities
+#'   calculated at a time. The default is 5000.
+#' @param fixed.var Integer vector or string of variable names detailing the `moped`
+#'   position or column name of the variable(s) conditioned upon without
 #'   imputation. The default is `NULL`.
-#' @param er_alert Logical. The default is `TRUE`. If `TRUE` returns error 
-#' message when observations require re-sampling due to errors.
+#' @param er_alert Logical that if `TRUE` (default) will return an error
+#'   message when observations require re-sampling due to errors.
 #'
 #' @return `m.resample()` returns a data frame of imputed values.
+#'
 #' @export
 #'
 #' @examples
 #' Data_full <- ISLR::Wage
 #' Data <- Data_full %>%
-#' select(age, education, jobclass,wage)
+#' select(age, education, jobclass, wage)
 #'
 #' # Convert Categorical Data to Continuous Data
 #' Data_x <- make.cont(Data, catvar = 2:3)
@@ -58,9 +62,7 @@
 #' bounds = bounds,
 #' variance = T,
 #' recurrence = F,
-#' parallel = F,
-#' ncores = NULL,
-#' mpo = F
+#' opt.mpo = T
 #' )
 #'
 #' # Generating resampled (synthetic) observations
@@ -72,7 +74,7 @@
 #' # Convert previously continuised variables back to categorical variables.
 #' resampled <- make.cat(resampled)
 #'
-#' # Sample fully synthetic data set from marginal bivariate moped density 
+#' # Sample fully synthetic data set from marginal bivariate moped density
 #' # estimate of "age" and "wage"
 #' resampled_marginal <- m.resample(Fit,
 #' Sample = Data_x[,c(1,4)],
@@ -87,7 +89,7 @@
 
 m.resample <- function(fit,
                        K=NULL,
-                       variables = NULL,
+                       variables = 1:fit$Nv,
                        Sample = fit$SampleStats$Sample,
                        n = NROW(Sample),
                        bounds = NULL ,
@@ -98,10 +100,6 @@ m.resample <- function(fit,
                        fixed.var = NULL,
                        er_alert = T
 ){
-  #try(if(NCOL(Sample) == 1){
-  #  return(cat("\r Error: Sample must be a data frame with the length of variables"))
-  #} else {
-
 
   #Default Allocations
   NS <- n
@@ -111,40 +109,49 @@ m.resample <- function(fit,
   if(is.character(variables)){
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }
-  if(is.null(variables)) variables <- 1:length(fit$KMax)
   if(is.null(fixed.var)) impute.vars <- 1:length(variables) else impute.vars <- (1:length(variables))[-fixed.var]
   Nv <- length(variables)
-  
+
   variables_names <- colnames(fit$SampleStats$Sample)[variables]
-  
-  test_names <- prod(variables_names %in% colnames(Sample))
-  
-  try(if(test_names == 0){
-    return(cat("\r Error: Sample must contain columns named ",variables_names))
+
+  test_names <- prod(variables_names %in% colnames(Sample)) == 0 | !is.data.frame(Sample)
+
+  try(if(test_names){
+    return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
   } else {
-  if(is.null(bounds)) bounds <- sapply(variables, function(i) fit$SampleStats$Range[,i])
-  if(is.null(K)) K <- fit$KMax[variables]
+    tryCatch(bounds <- setNames(data.frame(bounds[,variables_names]),
+                                variables_names),
+             error = function(e) bounds <<- NULL)
+    if(is.null(bounds)){
+      bounds <- as.data.frame(fit$SampleStats$Range[,variables])
+      colnames(bounds) <- variables_names
+    }
+    if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,Nv)
+    if(is.null(K)) K <- rep(fit$KMax,Nv)
   if(length(K)==1) K <- rep(K,Nv)
-  K <- sapply(1:Nv, function(k) min(fit$KMax[variables[k]],K[k]))
-  
+  K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
+
   OSample <- Sample
   SS <- NROW(Sample)
   if(NS != SS) Sample <- Sample[sample(1:SS,NS,replace = T),]
   SS <- NS
   Sample <- as.data.frame(Sample[,variables_names])
   colnames(Sample) <- variables_names
-  
+
   nonerror <- 1:NS
   for(re in 1:replicates){
     for(nu in impute.vars){
       if(fit$Distrib[variables[nu]] == "Uniform"){
-      if(length(variables[-n])==0){
-      Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample), 
-                                variable = variables[nu])  
+      if(length(variables[-nu])==0){
+      Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample),
+                                variable = variables[nu])
       }else{
-      Condk <- predict.conditional(fit,K.X = K[nu],Y = Sample[,-nu], K.Y = K[-nu],
-                                   X.variable = variables[nu], Y.variables = variables[-nu],
-                                   X.bounds = bounds[,nu], Y.bounds = bounds[,-nu])
+      Condk <- predict.conditional(fit,
+                                   K.X = K[nu],
+                                   Y = setNames(data.frame(Sample[,-nu]),
+                                                colnames(Sample)[-nu]), K.Y = K[-nu],
+                                   X.variable = variables[nu],
+                                   Y.variables = variables[-nu])
       }
       error <- which(apply(is.nan(Condk$coef),1,sum)>0)
 
@@ -216,46 +223,47 @@ m.resample <- function(fit,
       }
       }else{
         if(length(variables[-n])==0){
-        lb <- predict.marg.cdf(fit,K = K[nu], 
+        lb <- predict.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[1,variables[nu]],
                                variable = variables[nu])$Prob
-        ub <- predict.marg.cdf(fit,K = K[nu], 
+        ub <- predict.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[2,variables[nu]],
                                variable = variables[nu])$Prob
         }else{
-          lb <- predict.conditional(fit,K.X = K[nu], 
+          lb <- predict.conditional(fit,K.X = K[nu],
                                     X= rep(fit$SampleStats$Range[1,variables[nu]],
-                                           NROW(Sample)), 
-                                    Y = Sample[,-nu], K.Y = K[-nu],
-                                    X.variable = variables[nu], 
-                                    Y.variables = variables[-nu],
-                                    X.bounds = bounds[,nu], 
-                                    Y.bounds = bounds[,-nu])$Prob
-          ub <- predict.conditional(fit,K.X = K[nu], 
+                                           NROW(Sample)),
+                                    Y = setNames(data.frame(Sample[,-nu]),
+                                                 colnames(Sample)[-nu]),
+                                    K.Y = K[-nu],
+                                    X.variable = variables[nu],
+                                    Y.variables = variables[-nu])$Prob
+          ub <- predict.conditional(fit,K.X = K[nu],
                                     X= rep(fit$SampleStats$Range[2,variables[nu]],
-                                           NROW(Sample)), 
-                                    Y = Sample[,-nu], K.Y = K[-nu],
-                                    X.variable = variables[nu], 
-                                    Y.variables = variables[-nu],
-                                    X.bounds = bounds[,nu], 
-                                    Y.bounds = bounds[,-nu])$Prob
+                                           NROW(Sample)),
+                                    setNames(data.frame(Sample[,-nu]),
+                                             colnames(Sample)[-nu]),
+                                    K.Y = K[-nu],
+                                    X.variable = variables[nu],
+                                    Y.variables = variables[-nu])$Prob
         }
-        
+
         synthetic_generator <- function(i){
-          if(length(variables[-n])==0){
-            xi<- median(fit$SampleStats$Sample[,variables[nu]])
+          if(length(variables[-nu])==0){
+            xi<- data.frame(median(fit$SampleStats$Sample[,variables[nu]]))
+            colnames(xi) <- variables_names[nu]
             x0<-xi+1
             u <- runif(1,lb,ub)
             it_cnt <- 0
             while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
             x0 <- xi
-            FX <- predict.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob 
-            fX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
+            FX <- predict.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob
+            fX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
             xi <- xi - (FX-u)/fX
             it_cnt <- it_cnt + 1
             }
-            if(is.nan(xi) | it_cnt>=100 | 
-               xi < fit$SampleStats$Range[1,variables[nu]] | 
+            if(is.nan(xi) | it_cnt>=100 |
+               xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
               fX <- predict(fit, K= K[nu],variables = variables[nu],nodes=200)
               FX_p <- cumsum(fX$Density)
@@ -264,32 +272,36 @@ m.resample <- function(fit,
               FX <- approxfun(x=FX_p,y=fX[,1])
               xi <- FX(u)
             }
-            return(xi)
+            return(unlist(xi))
           }else{
-            xi<- median(fit$SampleStats$Sample[,variables[nu]])
+            xi<- data.frame(median(fit$SampleStats$Sample[,variables[nu]]))
+            colnames(xi) <- variables_names[nu]
             x0<-xi+1
             u <- runif(1,lb[i],ub[i])
             it_cnt <- 0
             while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
             x0 <- xi
-            xi_vec <- cbind(xi,Sample[i,-nu])
+            xi_vec <- cbind(xi,setNames(data.frame(Sample[i,-nu]),colnames(Sample)[-nu]))
             FX <- predict.conditional(fit,K.X = K[nu],X=xi,
-                                         Y = Sample[i,-nu], K.Y = K[-nu],
-                                         X.variable = variables[nu], Y.variables = variables[-nu],
-                                         X.bounds = bounds[,nu], Y.bounds = bounds[,-nu])$Prob
-            mfX <- predict(fit, K= K[nu],Sample=xi,variables = variables[nu])$Density
-            fX <-  predict(fit, K= c(K[nu],K[-nu]),Sample=xi_vec,
+                                         Y = setNames(data.frame(Sample[,-nu]),
+                                                      colnames(Sample)[-nu]),
+                                         K.Y = K[-nu],
+                                         X.variable = variables[nu], Y.variables = variables[-nu])$Prob
+            mfX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
+            fX <-  predict(fit, K= c(K[nu],K[-nu]),X=xi_vec,
                            variables = c(variables[nu],variables[-nu]))$Density
             xi <- xi - mfX*(FX-u)/fX
             it_cnt <- it_cnt + 1
             }
-            if(is.nan(xi) | it_cnt>=100 | 
-               xi < fit$SampleStats$Range[1,variables[nu]] | 
+            if(is.nan(xi) | it_cnt>=100 |
+               xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
-              grid_pts <- seq(fit$SampleStats$Range[1,variables[nu]],
-                              fit$SampleStats$Range[2,variables[nu]],length.out=200)
-              grid_pts <- suppressWarnings(cbind(grid_pts,Sample[i,-nu]))
-              fX <- predict(fit, K= c(K[nu],K[-nu]),Sample=grid_pts,
+              grid_pts <- data.frame(seq(fit$SampleStats$Range[1,variables[nu]],
+                              fit$SampleStats$Range[2,variables[nu]],length.out=200))
+              colnames(grid_pts) <- variables_names[nu]
+              grid_pts <- suppressWarnings(cbind(grid_pts,setNames(data.frame(Sample[,-nu]),
+                                                                   colnames(Sample)[-nu])))
+              fX <- predict(fit, K= c(K[nu],K[-nu]),X=grid_pts,
                             variables = c(variables[nu],variables[-nu]))
               FX_p <- cumsum(fX$Density)
               FX_p <- (FX_p - min(FX_p))/(max(FX_p)- min(FX_p))
@@ -297,7 +309,7 @@ m.resample <- function(fit,
               FX <- suppressWarnings(approxfun(x=FX_p,y=fX[,1]))
               xi <- FX(u)
             }
-            return(xi)
+            return(unlist(xi))
           }
         }
         error <- c()
@@ -307,8 +319,9 @@ m.resample <- function(fit,
                     , error = function(e) {an.error.occured <<- TRUE})
           if(an.error.occured) error <- c(error,i)
         }
+
         error <- unique(c(error,which(is.nan(Sample[,nu]))))
-        
+
         if(length(error)> 0){
           Sample <- Sample[-error,]
           nonerror <- nonerror[-error]
@@ -332,6 +345,6 @@ m.resample <- function(fit,
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats
   return(Synth)
-  })
+   })
 }
 

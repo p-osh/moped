@@ -4,7 +4,7 @@
 \alias{validate.mpo}
 \title{Perform repeated k-fold cross-validation to estimate optimal max polynomial order.}
 \usage{
-\method{validate}{mpo}(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
+validate.mpo(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
 }
 \arguments{
 \item{fit}{\code{moped} type variable outputted from \code{moped()}.}
@@ -36,4 +36,15 @@ of each coefficient.}
 an unbiased estimate of the shifted Nk-Norm that when minimised provides an
 estimate of the optimal max polynomial order. The coefficient estimates
 are also calculated as is (optional) their corresponding variance estimates.
+}
+\examples{
+require(sdcMicro)
+Data <- CASCrefmicrodata[,c(2,3,4,6)]
+
+# Fitting multivariate orthogonal polynomial based
+# density estimation function using default setting
+Fit <- moped(Data)
+
+# Select the optimal polynimal order K
+validate.mpo(fit = Fit) #warning! it might take a while
 }

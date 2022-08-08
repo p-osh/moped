@@ -25,22 +25,25 @@ variables. It must done before fitting data to the density estimation
 function \code{moped()}.
 }
 \examples{
-library(tidyverse)
-Data_full <- ISLR::Wage
+require(ISLR)
+Data_full <- Wage
 
 # Convert Categorical Data to Continuous Data
+require(tidyverse)
 Data <- Data_full \%>\%
 select(age, education, jobclass, wage)
 Data_x <- make.cont(Data, catvar = 2:3)
 # Select variables by name
 Data_x <- make.cont(Data, catvar = c("education", "jobclass"))
 
-# Convert categorical with amalgamations
+# Convert categorical with amalgamations of subsets of variables
 Data <- Data_full \%>\%
 select(age, maritl, race, education, jobclass, wage)
 Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
 amalgams = list(
-1:2, #maritl and race are amalgamated into a single variable.
-3:4 #education and jobclass are amalgamated into a single variable.
+1:2, #maritl and race are 1st and 2nd variables in the catvar list
+#and they are amalgamated into a single variable.
+3:4 #education and jobclass are 3rd and 4th variables in the catvar list
+#and are amalgamated into a single variable.
 ))
 }

@@ -33,39 +33,16 @@ A list with the following components:
 type orthogonal polynomials used in the \code{moped()} function.
 }
 \examples{
-Data_full <- ISLR::Wage
-Data <- Data_full \%>\%
-select(age, education, jobclass,wage)
-
-# Convert Categorical Data to Continuous Data
-Data_x <- make.cont(Data, catvar = 2:3)
+require(sdcMicro)
+Data <- CASCrefmicrodata[,c(2,3,4,6)]
 
 # Fitting multivariate orthogonal polynomial based
-# density estimation function
-# Requires a data frame of bounds to fit on data.
-bounds <- data.frame(
-age  = c(18,80),
-education = c(0,1),
-jobclass = c(0,1),
-wage = c(0,350)
-)
+# density estimation function using default setting
+Fit <- moped(Data)
 
-# Fitting the Data
-Fit <- moped(
-Data_x,
-K=10,
-Distrib = rep("Uniform", 4),
-bounds = bounds,
-variance = T,
-recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
-)
+# Define the observations.
+x0 <- Data[1:2,]
 
-# Define the observation which the probability is desired.
-x0 <- Data_x[1:2,]
-
-# Manually Compute MBD Polynomials
+# Manually Compute MBD Polynomials.
 polynomial(Fit, X=x0, K=7)
 }

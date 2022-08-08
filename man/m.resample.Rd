@@ -2,7 +2,7 @@
 % Please edit documentation in R/m.resample.R
 \name{m.resample}
 \alias{m.resample}
-\title{Generate resampled (synthetic) samples from moped estimate.}
+\title{Generate resampled samples from 'moped' estimate.}
 \usage{
 m.resample(
   fit,

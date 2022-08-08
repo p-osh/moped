@@ -68,7 +68,10 @@ together. X must be a data frame and its variable length must equal to
 the length in var.
 }
 \examples{
-Data_full <- ISLR::Wage
+require(ISLR)
+Data_full <- Wage
+
+require(tidyverse)
 Data <- Data_full \%>\%
 select(age, education, jobclass,wage)
 
@@ -77,26 +80,9 @@ Data_x <- make.cont(Data, catvar = 2:3)
 
 # Fitting multivariate orthogonal polynomial based
 # density estimation function
-# Requires a data frame of bounds to fit on data.
-bounds <- data.frame(
-age  = c(17,80),
-education = c(0,1),
-jobclass = c(0,1),
-wage = c(0,350)
-)
 
 # Fitting the Data
-Fit <- moped(
-Data_x,
-K=10,
-Distrib = rep("Uniform", 4),
-bounds = bounds,
-variance = T,
-recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
-)
+Fit <- moped(Data_x)
 
 # Define the observation which the probability is desired
 x0 <- Data_x[1,]
@@ -104,19 +90,6 @@ pred <- predict(Fit, K= 7, X = x0)
 
 # Predicting Marginal Density for a set of observations
 # When constructing partially joint density, X and variables must be used together.
-pred <- predict(Fit, K= 7, X= Data_x[,3:4] , variables =c("jobclass", "wage"))
-pred <- predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables =c("wage"))
-pred <- predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables =4 )
-pred <- predict(Fit, K= c(2,7), X= Data_x[,3:4] , variables =c("jobclass","wage"))
-
-# Plotting marginal density
-predict(Fit, K= 7, variables =4) \%>\%
-ggplot(aes(x=wage,y=Density)) +
-geom_line()
-
-# Plotting bivariate density plot
-predict(Fit, K= c(2,7), variables =3:4) \%>\%
-ggplot(aes(x=jobclass,y=wage,fill=Density)) +
-geom_tile() +
-scale_fill_distiller(palette = "Spectral")
+predict(Fit, K= 7, X= Data_x[,3:4] , variables =c("jobclass", "wage"))
+predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables =4 )
 }

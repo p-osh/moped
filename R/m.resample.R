@@ -1,4 +1,4 @@
-#' Generate resampled (synthetic) samples from moped estimate.
+#' Generate resampled samples from 'moped' estimate.
 #'
 #' @description
 #' `m.resample()` is used to generate synthetic samples from full, conditional,

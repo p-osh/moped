@@ -22,7 +22,7 @@
 #'   not used to determine coefficient.
 #' @param parallel Logical. If `FALSE` (the default), parallel computing is not
 #'   used.
-#' @param ncores Integer vector. NCores to use in parallel computing.
+#' @param ncores Integer vector. Number of cores to use in parallel computing.
 #' @param mpo Logical. If `TRUE` (the default), an optimal MOP estimate is
 #'   calculated.
 #'

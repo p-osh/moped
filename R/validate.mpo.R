@@ -5,22 +5,21 @@
 #' estimate of the optimal max polynomial order. The coefficient estimates
 #' are also calculated as is (optional) their corresponding variance estimates.
 #'
-#' @param fit `moped` type variable. Outputted from `moped()`.
-#' @param K Integer. Maximum possible Max Polynomial Order of approximation.
-#'  Default is `KMax` specified in `moped` object.
-#' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in
-#'  k-fold cross-validation. Default is 5.
-#' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold
-#'  cross-validation is repeated. Default is 10.
-#' @param variance Logical. If `TRUE` (the default), a variance estimate of each
-#'   coefficient is calculated.
+#' @param fit `moped` type variable outputted from `moped()`.
+#' @param K Integer of the maximum possible max polynomial order of approximation.
+#'  Default is `KMax` specified in `fit`.
+#' @param nfolds Integer that determines the number of folds (k) to perform in
+#'  k-fold cross-validation.
+#' @param repeats Integer that determines the number of times k-fold cross-validation
+#'  is repeated.
+#' @param variance Logical that if `TRUE` (default), computes a variance estimate
+#'   of each coefficient.
 #'
 #' @return `moped()` returns a list containing:
 #' \itemize{
 #'   \item `Cn` - Array of estimated moment-based coefficients.
 #'   \item `varCn` - Array of variance estimates for Cn. Computed if `variance = TRUE`.
 #'   \item `Nk_norm` - Array of estimated shifted Nk Norm values.
-#'                     Computed if `opt.mpo = TRUE`.
 #'   \item `opt_mpo_vec` - Estimated optimal max polynomial order where K is vector.
 #'   \item `opt_mpo` - Estimated optimal max polynomial order where K is constant.
 #' }

@@ -1,37 +1,39 @@
 #' Computes moped estimated conditional distribution function values for X|Y1,Y2,...
 #'
 #' @description
-#' `predict.conditional()` is used to compute moped estimated conditional 
-#' distribution function values for a single variable X given a data frame of 
-#' conditional Y values. 
+#' `predict.conditional()` is used to compute moped estimated conditional
+#' distribution function values for a single variable X given a data frame of
+#' conditional Y values.
 #'
-#' @param fit `moped` type variable. Outputted from `moped()`.
+#' @param fit `moped` type variable outputted from `moped()`.
 #' @param X Vector of values with which to estimate conditional probabilities.
-#'  `X` must have length consistent with number of observations in `Y`. 
+#'  `X` must have length consistent with number of observations in `Y`.
 #'  `X` is optional when reference density of X variable is "Uniform" and only
-#'  approximation polynomial coefficients are to be determined. 
-#' @param K.X Integer Maximum Polynomial Order of approximation on X variable. 
+#'  approximation polynomial coefficients are to be determined.
+#' @param K.X Integer maximum polynomial order of approximation on X variable.
 #'  Must be less than or equal to the maximum MPO K specified in `moped()`.
-#'  The default is `opt_mpo` or `KMax` specified in `moped` object.
+#'  The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
 #' @param Y A data frame in which to look for conditional (Y) variables with which
-#'  to estimate probability values. Must contain column names matching variables in 
-#'  the `moped` object. 
-#' @param K.Y  Integer vector Maximum Polynomial Order of approximation on each 
-#'   conditional variable. Must be less than or equal to the maximum MPO K specified  
-#'   in `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
-#' @param X.variable Integer or character string of variable name. The 
-#'   `moped` position or column name of the variable to be predicted from 
-#'   `moped` object. The default is 1 (first variable in fit).
-#' @param Y.variables Integer vector or character string of variable names. The 
-#'   `moped` position or column name of the variable(s) to be condited on from 
-#'   `moped` object. If `NULL` conditions on all non `X.variable` variables. 
+#'  to estimate probability values. Must contain column names matching variables in
+#'  the `moped` object.
+#' @param K.Y  Integer vector maximum polynomial order of approximation on each
+#'   conditional variable. Must be less than or equal to the maximum MPO K specified
+#'   in `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
+#' @param X.variable Integer or character string of variable name corresponding to the
+#'   `moped` position or column name of the variable to be predicted from
+#'   `moped` object. The default is 1 (first variable in `fit`).
+#' @param Y.variables Integer vector or character string of variable names corresponding
+#'  to the `moped` position or column name of the variable(s) to be conditioned on from
+#'   `moped` object. If `NULL` conditions on all non `X.variable` variables.
 #'
 #' @return `predict.conditional()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.
-#'   \item `coef` - An array of coefficients of the polynomial approximation. 
-#'                  When variable reference density is "Uniform", coefficients 
-#'                  are not specific for each value of X. 
+#'   \item `coef` - An array of coefficients of the polynomial approximation.
+#'                  When variable reference density is "Uniform", coefficients
+#'                  are not specific for each value of X.
 #' }
 #' @export
 #'
@@ -64,7 +66,7 @@
 #' opt.mpo = T
 #' )
 #'
-#' # Compute moped conditional distribution estimate 
+#' # Compute moped conditional distribution estimate
 #' Cond.prob <- predict.conditional(Fit,
 #' X=seq(20,300,length.out=100),
 #' Y = x0[rep(1,100),-4],
@@ -98,23 +100,23 @@ predict.conditional <- function(fit,
   if(is.null(K.Y) & !is.null(fit$opt_mpo)) K.Y <- rep(fit$opt_mpo,Y.Nv)
   if(is.null(K.Y)) K.Y <- rep(tKm,Y.Nv)
   if(length(K.Y) != Y.Nv) K.Y <- rep(K.Y[1], Y.Nv)
-  
+
   if(is.character(X.variable)){
     X.variable <-  which(colnames(fit$SampleStats$Sample) %in% X.variable)
   }
   if(is.character(Y.variables)){
     Y.variables <-  which(colnames(fit$SampleStats$Sample) %in% Y.variables)
   }
-  
+
   nprobs <- NROW(Y)
   tvariables <- c(c(Y.variables,X.variable),setdiff(1:tNv,c(Y.variables,X.variable)))
 
   fY <- predict(fit,X = Y,K=K.Y,normalise = F,variables = Y.variables)
   Y.poly <- polynomial(fit,X = Y,K=K.Y,variables = Y.variables)
-  
+
   Y.variables_names <- colnames(fit$SampleStats$Sample)[Y.variables]
   Y <- setNames(data.frame(Y[,Y.variables_names]),Y.variables_names)
-  
+
   Km <- max(K.Y,K.X)
   XDP <- (fit$PolyCoef[2:(K.X+1),2:(K.X+1),X.variable]/
             fit$Lambda[1:K.X,X.variable])*
@@ -141,7 +143,7 @@ predict.conditional <- function(fit,
   if(fit$Distrib[X.variable]=="Uniform"){
     fnu <- 1/(fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
     E <- t(t(XDP)%*%tt)*Y.poly$PdfTerms*fnu/fY$Density
-    coef <- cbind(fit$Sigma[3,X.variable]*E,0,0) + cbind(0,fit$Sigma[2,X.variable]*E,0) + cbind(0,0,fit$Sigma[1,X.variable]*E) 
+    coef <- cbind(fit$Sigma[3,X.variable]*E,0,0) + cbind(0,fit$Sigma[2,X.variable]*E,0) + cbind(0,0,fit$Sigma[1,X.variable]*E)
     coef[,1] <- coef[,1]-fit$Paramaters[1,X.variable]/
       (fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
     coef[,2] <- coef[,2]+1/(fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])

@@ -1,25 +1,25 @@
 #' Computing the univariate hyper-geometric type orthogonal polynomials.
 #'
 #'@description `polynomial()` is used to calculate the univariate hyper-geometric
-#'  type orthogonal polynomials used in the `moped()` function. 
+#'  type orthogonal polynomials used in the `moped()` function.
 #'
-#' @param fit `moped` type object. Outputted from `moped()`.
-#' @param X data frame of observations with column names matching selected 
+#' @param fit `moped` type object outputted from `moped()`.
+#' @param X data frame of observations with column names matching selected
 #'   variables from `moped` type object.
-#' @param K Integer vector. Maximum Polynomial Order of approximation on each 
-#'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
-#' @param variables Integer vector or character string of variable names. The 
-#'   `moped` position or column name of the variable(s) to be predicted from 
-#'   `moped` object. The default is 1:Nv (number of variables) or 1:NCOL(Sample),
-#'    whichever smallest.
+#' @param K Integer vector of max polynomial order of approximation on each
+#'   variable. Must be less than or equal to the maximum MPO K specified in
+#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
+#' @param variables Integer vector or character string of variable names. The
+#'   `moped` position or column name of the variable(s) to be predicted from
+#'   `moped` object. The default is `1:fit$Nv`.
 #' @return A list with the following components:
 #' \itemize{
-#'   \item `P` - List of marginal hyper-geometric orthogonal polynomial values. 
-#'   \item `PdfTerms` - Vector of reference density values for each obs of X.   
+#'   \item `P` - List of marginal hyper-geometric orthogonal polynomial values.
+#'   \item `PdfTerms` - Vector of reference density values for each obs of X.
 #' }
-#' 
-#' 
+#'
+#'
 #' @export
 #'
 #' @examples
@@ -72,7 +72,7 @@ polynomial <-  function(fit,
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }
   variables_names <- colnames(fit$SampleStats$Sample)[variables]
-  test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X) 
+  test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X)
   Nv <- length(variables)
   try(if(test_names){
     return(cat("\r Error: X must be data frame and contain columns named ",variables_names))

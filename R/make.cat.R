@@ -1,11 +1,15 @@
-#' Convert previously continulized variables back to categorical variables.
+#' Convert previously continuous-transformed variables back to categorical variables.
 #'
-#' @param Sample A data frame.
+#' @param Sample A data frame outputted from `make.cont()` or `m.resample()` which
+#' originally contained categorical variables.
+#' @param fit optional `moped` type object outputted from `moped()`. Must be specified
+#' if `Sample` has lost `Cats` attribute due to subsetting or transformation.
 #'
 #' @return `make.cat()` returns a data frame.
 #' @export
 #'
 #' @examples
+#' library(tidyverse)
 #' Data_full <- ISLR::Wage
 #'
 #' Data <- Data_full %>%
@@ -13,13 +17,23 @@
 #' Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
 #' amalgams = list(1:2,3:4))
 #'
-#' # Convert previously continulized variables back to categorical variables.
+#' # Convert previously continuous-transformed variables back to categorical variables.
 #' make.cat(Data_amal)
+#'
+#' # Categorised re-sampled data.
+#' Data <- Data_full %>%
+#'   select(education, jobclass, wage)
+#' Data_numeric <- make.cont(Data, catvar = c("education","jobclass"))
+#' Fit <- moped(Data_numeric)
+#' new_Data_num <- m.resample(Fit)
+#'
+#' new_Data <- make.cat(new_Data_num)
+#'
+#' # If data has been subsetted. Fit is also required.
+#' new_subset_Data <- make.cat(new_Data_num[1:10,-3],fit=Fit)
 
-
-
-
-make.cat <- function(Sample){
+make.cat <- function(Sample,
+                     fit=NULL){
 
   indexer <- function(X,n){
     nX <- length(c(X))
@@ -53,11 +67,18 @@ make.cat <- function(Sample){
 
   Cats <- attributes(Sample)$Cats
 
-  Sample <- Sample[,order(Cats$variables)]
+  if(is.null(Cats) & !is.null(fit)) Cats <- fit$Cats
 
-  CamalSam <- Sample[,Cats$catvar]
+  if(is.null(Cats)){
+    cat('Error: Data frame must be output of make.cont() or m.resample().')
+    cat('Please specify the fitted moped object to re-categorise.')
+  }else if (prod(Cats$catvar_names %in% colnames(Sample))) {
 
-  if(NCOL(CamalSam) == 1) CamalSam <- as.matrix(CamalSam)
+  contvar_names <- setdiff(colnames(Sample),Cats$catvar_names)
+
+  CamalSam <- Sample[,Cats$catvar_names]
+
+  if(NCOL(CamalSam) == 1) CamalSam <- as.data.frame(CamalSam)
 
   amalSam <- data.frame()
 
@@ -84,7 +105,7 @@ make.cat <- function(Sample){
   amalSam <- data.frame(lapply(amalSam,factor))
   for(k in 1:NCOL(amalSam)) levels(amalSam[,k]) <- Cats$caselist[[k]]
 
-  CatSam <- Sample[,-Cats$catvar]
+  CatSam <- array(dim=c(NROW(Sample),1))
 
   for(i in length(Cats$amalgams):1){
     if(length(Cats$amalgams[[i]]) > 1){
@@ -96,10 +117,16 @@ make.cat <- function(Sample){
     colnames(amal_split) <- Cats$amalgams_names[[i]]
     CatSam <- cbind(amal_split,CatSam)
   }
+  CatSam <- CatSam[,-NCOL(CatSam)]
 
   if(!Cats$amalgamated){
-    CatSam <- CatSam[,order(c(Cats$catvar,(1:NCOL(CatSam))[-Cats$catvar]))]
+    Sample[,Cats$catvar_names] <- CatSam
+  }else{
+    Sample <- cbind(CatSam,Sample[,contvar_names])
   }
 
-  return(CatSam)
+  }else{
+    cat('Error: Sample must be a data frame containing columns ',Cats$catvar_names)
+  }
+  return(Sample)
 }

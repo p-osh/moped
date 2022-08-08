@@ -1,34 +1,35 @@
 #' Calculate univariate marginal distribution function probabilities.
 #'
-#' @description 
-#' `predict.marg.cdf()` is used to calculate univariate marginal cumulative 
-#'  distribution function probabilities and the polynomial coefficients of the 
-#'  polynomical approximation from any `moped` object. 
-#' 
-#' 
-#' @param fit moped type variable. Outputted from `moped()`.
+#' @description
+#' `predict.marg.cdf()` is used to calculate univariate marginal cumulative
+#'  distribution function probabilities and the polynomial coefficients of the
+#'  polynomical approximation from any `moped` object.
+#'
+#'
+#' @param fit moped type variable outputted from `moped()`.
 #' @param X vector of values to predict the marginal probability. Not required
-#'  for variables with "Uniform" reference densities to compute coefficients. 
-#' @param K integer. Maximum Polynomial Order of approximation on marginal 
-#'   variable. Must be less than or equal to the maximum MPO K specified in 
-#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
-#' @param nprobs integer. Number of probability coefficients replications to be
-#' outputted. Used when X is not specified for variables with "Uniform" 
-#' reference densities. The default value is 1.
-#' @param variable integer or string of variable name. Which marginal variable 
-#'  position or name to be predicted from `moped` object. 
-#'   
+#'  for variables with "Uniform" reference densities to compute coefficients.
+#' @param K integer maximum polynomial order of approximation on marginal
+#'   variable. Must be less than or equal to the maximum MPO K specified in
+#'   `moped()`.The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
+#' @param nprobs integer of number of probability coefficients replications to be
+#' outputted. Used when `X = NULL` for variables with `"Uniform"` reference densities.
+#' The default value is 1 (no replications).
+#' @param variable integer or string of variable name corresponding to which marginal
+#'  variable position or name to be predicted from `moped` object.
+#'
 #'
 #' @return `predict.marg.cdf()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.
-#'   \item `coef` - An array of coefficients of the polynomial approximation. 
-#'                  When variable reference density is "Uniform", coefficients 
-#'                  are not specific for each value of X. 
+#'   \item `coef` - An array of coefficients of the polynomial approximation.
+#'                  When variable reference density is "Uniform", coefficients
+#'                  are not specific for each value of X.
 #' }
 #' @export
 #'
-#' @examples 
+#' @examples
 #' #' Data_full <- ISLR::Wage
 #' Data <- Data_full %>%
 #' select(age, education, jobclass,wage)
@@ -58,23 +59,23 @@
 #' ncores = NULL,
 #' mpo = F
 #' )
-#' 
+#'
 #' # Compute marginal distribution function probabilities of "wage"
 #' x <- seq(21,310,length.out = 100)
-#' 
+#'
 #' wage_prob <- predict.marg.cdf(Fit, X = x, K = 10, variable = "wage")
-#' 
+#'
 #'plot(x,wage_prob$Prob,type='l', main = "moped CDF of wage",
 #'     xlab="Wage",ylab="Prob")
 
 
 
 
-predict.marg.cdf <- function(fit, 
-                             X = NULL,  
-                             K = NULL, 
+predict.marg.cdf <- function(fit,
+                             X = NULL,
+                             K = NULL,
                              nprobs = 1,
-                             variable = 1 
+                             variable = 1
 ){
   if(is.character(variable)){
     variable <-  which(colnames(fit$SampleStats$Sample) %in% variable)

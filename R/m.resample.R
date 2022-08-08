@@ -1,33 +1,35 @@
-#' Generate resampled (synthetic) samples
+#' Generate resampled (synthetic) samples from moped estimate.
 #'
 #' @description
 #' `m.resample()` is used to generate synthetic samples from full, conditional,
 #'  or marginal moped density estimate.
 #'
-#' @param fit moped type variable. Outputted from `moped()`.
-#' @param K Integer vector. Maximum Polynomial Order of approximation on each
+#' @param fit moped type variable outputted from `moped()`.
+#' @param K Integer vector of max polynomial order of approximation on each
 #'   variable. Must be less than or equal to the maximum MPO K specified in
-#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
+#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
 #' @param variables Integer vector or character string of variable names. The
 #'   `moped` position or column name of the variable(s) to be predicted from
-#'   `moped` object. The default is 1:Nv or 1:NCOL(Sample) whichever smallest.
+#'   `moped` object. The default is `1:fit$Nv`.
 #' @param Sample A data frame of initial values used to impute values. Must
 #'   contain column names matching variables in the `moped` object. Default is
 #'   the Sample used to fit the `moped` object.
-#' @param n Integer vector. The number of rows to be simulated.
-#' @param bounds A data frame. Bounds allows you to control the grid min and max.
-#'   Should be an array of 2 x number of variables. `NULL` is the default.
-#' @param replicates Integer vector. Number of complete Gibbs sampling passes.
-#'   The default is 1.
-#' @param parallel Logical. If `FALSE` (the default), parallel computing is not
-#'   used.
-#' @param ncores Integer vector. Number of cores used in parallel computing.
-#' @param mps Integer vector. Limit on maximum number of probabilities
+#' @param n Integer vector of the number of rows to be simulated.
+#' @param bounds An optional data frame specifying the limits to be used on bounded space.
+#'   Should be an array of 2 x number of variables with each column having the
+#'   lower and upper limit.
+#' @param replicates Integer vector determining the number of complete Gibbs
+#'   sampling passes to be performed.
+#' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
+#'   values using parallel computing.
+#' @param ncores Integer vector that determines the number of cores used in parallel computing.
+#' @param mps Integer vector that places a limit on maximum number of probabilities
 #'   calculated at a time. The default is 5000.
-#' @param fixed.var Integer vector or string of variable names. The `moped`
+#' @param fixed.var Integer vector or string of variable names detailing the `moped`
 #'   position or column name of the variable(s) conditioned upon without
 #'   imputation. The default is `NULL`.
-#' @param er_alert Logical. The default is `TRUE`. If `TRUE` returns error
+#' @param er_alert Logical that if `TRUE` (default) will return an error
 #'   message when observations require re-sampling due to errors.
 #'
 #' @return `m.resample()` returns a data frame of imputed values.
@@ -87,7 +89,7 @@
 
 m.resample <- function(fit,
                        K=NULL,
-                       variables = NULL,
+                       variables = 1:fit$Nv,
                        Sample = fit$SampleStats$Sample,
                        n = NROW(Sample),
                        bounds = NULL ,
@@ -107,7 +109,6 @@ m.resample <- function(fit,
   if(is.character(variables)){
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }
-  if(is.null(variables)) variables <- 1:fit$Nv
   if(is.null(fixed.var)) impute.vars <- 1:length(variables) else impute.vars <- (1:length(variables))[-fixed.var]
   Nv <- length(variables)
 

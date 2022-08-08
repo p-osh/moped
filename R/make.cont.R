@@ -8,14 +8,15 @@
 #' @param Sample A data frame.
 #' @param catvar Columns to convert into continuous variables. Variable names
 #'   can be used as if they were positions in the data frame.
-#' @param amalgams A list using numeric indicating the order of variables in
-#'   `"catvar"`. It is the structure of amalgamating categorical variable when
-#'   being continulized.
+#' @param amalgams A list using numeric positions indicating the order of variables in
+#'   `"catvar"`. Each list item contains a vector of positions of `"catvar"`
+#'   that are to be amalgamated into a single continuous variable.
 #'
-#' @return `make.cont()` returns a data frame.
+#' @return `make.cont()` returns a data frame with strictly continuous values.
 #' @export
 #'
 #' @examples
+#' library(tidyverse)
 #' Data_full <- ISLR::Wage
 #'
 #' # Convert Categorical Data to Continuous Data
@@ -29,8 +30,10 @@
 #' Data <- Data_full %>%
 #' select(age, maritl, race, education, jobclass, wage)
 #' Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
-#' amalgams = list(1:2, 3:4))
-#'
+#' amalgams = list(
+#' 1:2, #maritl and race are amalgamated into a single variable.
+#' 3:4 #education and jobclass are amalgamated into a single variable.
+#' ))
 
 
 make.cont <- function(
@@ -155,7 +158,8 @@ make.cont <- function(
     caselist = caselist, amalgamated = amalgamated,
     upperlist = upperlist, lowerlist = lowerlist,
     amalgams_names = amalgams_names,
-    variables = 1:NCOL(tSample)
+    variables = 1:NCOL(tSample),
+    catvar_names = colnames(tSample)[catvar]
   )
 
   attr(tSample,"Cats") <- Cats

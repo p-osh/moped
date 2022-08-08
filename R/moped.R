@@ -1,29 +1,31 @@
-#' Fitting multivariate orthogonal polynomial based density estimation.
+#' Performing the multivariate orthogonal polynomial-based estimation of density.
 #'
 #' @description
 #' `moped()` is used to fit a multivariate orthogonal polynomial-based density
 #' estimate. It requires a data frame to fit on data. Categorical variables need
-#' to be converted into continuous variables before fitting data to the density
-#' estimation.
+#' to be converted into continuous variables with `make.cont()` before fitting data
+#' to the density estimate.
 #'
 #' @param Sample A data frame.
-#' @param K Integer. Maximum possible Max Polynomial Order of approximation.
-#' @param Distrib Character string vector, specifying the reference distribution
-#'   to be used for each variable (column) of Sample. Choices are
-#'   `"Uniform"` (default), `"Normal"`, `"Gamma"`, and `"Beta"` distributions.
-#' @param bounds A data frame. The limits to be used on bounded space. Should be an
-#'   array of 2 x number of variables with each column having the lower and
-#'   upper limit. `NULL` is the default.
-#' @param variance Logical. If `TRUE` (the default), a variance estimate of each
-#'   coefficient is calculated.
-#' @param recurrence Logical. If `TRUE` (the default), two-term recurrence
-#'   relation is not computed.
-#' @param opt.mpo Logical. If `TRUE` (the default), an optimal max polynomial order
-#'   estimate is estimated using repeated k-fold cross-validation.
-#' @param nfolds Integer. If `opt.mpo = TRUE` number of folds (k) to perform in
-#'   k-fold cross-validation. Default is 5.
-#' @param repeats Integer. If `opt.mpo = TRUE` number of times k-fold
-#'   cross-validation is repeated. Default is 10.
+#' @param K Integer of maximum possible max polynomial order (mpo) of approximation.
+#' @param Distrib Character string vector of length `NCOL(Sample)`, specifying the
+#'  reference distribution to be used for each variable (column) of Sample. Choices
+#'  are `"Uniform"` (default), `"Normal"`, `"Gamma"`, and `"Beta"` distributions.
+#' @param bounds An optional data frame specifying the limits to be used on bounded space.
+#'   Should be an array of 2 x number of variables with each column having the
+#'   lower and upper limit. If `NULL` (default) bounds are estimated based on
+#'   range of `Sample`.
+#' @param variance Logical that if `TRUE` (default), computes a variance estimate
+#'   of each coefficient.
+#' @param recurrence Logical that if `TRUE`, computes the two-term recurrence
+#' relation of each marginal orthogonal polynomial. Terms take the form
+#' $P_{n+1}(x) = (R_nx + S_n)P_n(x) + T_nP_{n-1}(x)$.
+#' @param opt.mpo Logical that if `TRUE` (the default), determines an optimal
+#'   max polynomial order estimate  using repeated k-fold cross-validation.
+#' @param nfolds Integer that if `opt.mpo = TRUE`, determines the number of folds
+#' (k) to perform in k-fold cross-validation.
+#' @param repeats Integer that if `opt.mpo = TRUE`, determines the number of times
+#'   k-fold cross-validation is repeated.
 #'
 #' @returns `moped()` returns a moped (list) object containing:
 #' \itemize{
@@ -33,21 +35,23 @@
 #'   \item `Nk_norm` - Array of estimated shifted Nk Norm values.
 #'                     Computed if `opt.mpo = TRUE`.
 #'   \item `opt_mpo_vec` - Estimated optimal max polynomial order where K is vector.
+#'                         Computed if `opt.mpo = TRUE`.
 #'   \item `opt_mpo` - Estimated optimal max polynomial order where K is constant.
+#'                     Computed if `opt.mpo = TRUE`.
 #'   \item `Cats` - List of categorical data information from Sample.
 #'   \item `Distrib` - String vector of reference densities used for each variable.
-#'   \item `PDFControl` - List of reference density distribution functions.
+#'   \item `PDFControl` - List of reference distribution functions.
 #'   \item `PolyCoef` - Array of orthogonal polynomial coefficients.
-#'   \item `Poly` - Array of orthogonal polynomial values for each obs of Sample.
+#'   \item `Poly` - Array of orthogonal polynomial values for each observation of Sample.
 #'   \item `Sigma` - Array of polynomial coefficients of sigma terms in polynomial.
 #'   \item `Tau` - Array of polynomial coefficients of tau terms in polynomial.
-#'   \item `Lambda` - Array of lambda terms for each variable.
+#'   \item `Lambda` - Array of lambda terms (eigenvalues) for each variable.
 #'   \item `Limits` - Array of theoretical limits of each variable.
 #'   \item `Bounds` - Data frame of the parameter `Bounds`.
 #'   \item `LeadingTerms` - List containing leading terms of each polynomial.
 #'   \item `KMax` - Maximum max polynomial order (K) specified.
 #'   \item `Parameters` - Array of parameters of reference densities.
-#'   \item `SampleStats` - List containing original Sample and it's range.
+#'   \item `SampleStats` - List containing original Sample and its range.
 #'   \item `Recurrence` - Optional list of polynomial recurrence relationship terms.
 #'                        Computed if `recurrence = TRUE`.
 #' }

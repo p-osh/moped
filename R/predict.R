@@ -10,30 +10,32 @@
 #' @param fit `moped` type variable. Outputted from `moped()`.
 #' @param X An optional data frame in which to look for variables with which
 #'   to estimate density values. Must contain column names matching variables in
-#'   the `moped` object. If `NULL` (the default) then generates a nodes^Nv
-#'   (number of variables) grid with density values.
-#' @param K Integer vector. Maximum Polynomial Order of approximation on each
+#'   the `moped` object. If `NULL` (the default) then generates a `nodes`^`fit$Nv`
+#'   grid with density values.
+#' @param K Integer vector of max polynomial order of approximation on each
 #'   variable. Must be less than or equal to the maximum MPO K specified in
-#'   `moped()`. The default is `opt_mpo` or `KMax` specified in `moped` object.
+#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   in `fit`.
 #' @param variables Integer vector or character string of variable names. The
 #'   `moped` position or column name of the variable(s) to be predicted from
-#'   `moped` object. The default is 1:Nv or 1:NCOL(X) whichever smallest.
-#' @param bounds A data frame. Bounds allows you to control the grid min and max.
-#'   Should be an array of 2 x number of variables. `NULL` is the default.
+#'   `moped` object. The default is `1:fit$Nv`.
+#' @param bounds An optional data frame specifying the limits to be used on bounded space.
+#'   Should be an array of 2 x number of variables with each column having the
+#'   lower and upper limit.
 #' @param type string equal to `"density"` (default) or `"distribution"`. If
 #'  `type = "density"` density values are estimated. If `type = "distribution"`
 #'  cumulative distribution function probabilities are estimated.
-#' @param normalise Logical. If `TRUE` (the default) then scale data to correct
-#'   for any estimated negative values.
-#' @param nodes Integer vector. Number of grid points per dimension when grid is
-#'   calculated.
-#' @param parallel Logical. If `FALSE` (the default), parallel computing is not
-#'   used.
-#' @param ncores Integer vector. Number of cores used in parallel computing.
-#' @param mps Integer vector. Limit on maximum number of probabilities
+#' @param normalise Logical that if `TRUE` (the default), scales density estimate
+#'  to correct for any estimated negative values.
+#' @param nodes Integer vector that corresponds to the number of grid points per
+#'   dimension when `X = NULL` and a grid is calculated.
+#' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
+#'   values using parallel computing.
+#' @param ncores Integer vector that determines the number of cores used in parallel computing.
+#' @param mps Integer vector that places a limit on maximum number of probabilities
 #'   calculated at a time. The default is 5000.
 #'
-#' @return `predict.moped()` returns a data frame with estimated density values.
+#' @return `predict.moped()` returns a data frame with estimated density/probability values.
 #'
 #' @export
 #'
@@ -95,7 +97,7 @@
 predict.moped <- function(fit,
                     X = NULL,
                     K=NULL,
-                    variables = NULL,
+                    variables = 1:fit$Nv,
                     bounds = NULL ,
                     type = "density",
                     normalise = T,
@@ -104,7 +106,6 @@ predict.moped <- function(fit,
                     ncores = NULL,
                     mps = 5000
 ){
-  if(is.null(variables)) variables <- 1:fit$Nv
   if(is.character(variables)){
     variables <-  which(colnames(fit$SampleStats$Sample) %in% variables)
   }

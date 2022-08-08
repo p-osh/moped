@@ -1,7 +1,7 @@
 #' Computes moped estimated conditional distribution function values for X|Y1,Y2,...
 #'
 #' @description
-#' `predict.conditional()` is used to compute moped estimated conditional
+#' `estimate.conditional()` is used to compute moped estimated conditional
 #' distribution function values for a single variable X given a data frame of
 #' conditional Y values.
 #'
@@ -28,7 +28,7 @@
 #'  to the `moped` position or column name of the variable(s) to be conditioned on from
 #'   `moped` object. If `NULL` conditions on all non `X.variable` variables.
 #'
-#' @return `predict.conditional()` returns a list with the following components:
+#' @return `estimate.conditional()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.
 #'   \item `coef` - An array of coefficients of the polynomial approximation.
@@ -55,7 +55,7 @@
 #' Fit <- moped(Data_x)
 #'
 #' # Compute moped conditional distribution estimate
-#' cond_pred <- predict.conditional(Fit,
+#' cond_pred <- estimate.conditional(Fit,
 #' X=seq(20,300,length.out=100),
 #' Y = x0[rep(1,100),-4],
 #' K.Y=rep(7,3),
@@ -66,7 +66,7 @@
 
 
 
-predict.conditional <- function(fit,
+estimate.conditional <- function(fit,
                                 X = NULL,
                                 K.X=NULL,
                                 Y,

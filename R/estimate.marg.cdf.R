@@ -1,7 +1,7 @@
 #' Calculate univariate marginal distribution function probabilities.
 #'
 #' @description
-#' `predict.marg.cdf()` is used to calculate univariate marginal cumulative
+#' `estimate.marg.cdf()` is used to calculate univariate marginal cumulative
 #'  distribution function probabilities and the polynomial coefficients of the
 #'  polynomical approximation from any `moped` object.
 #'
@@ -20,7 +20,7 @@
 #'  variable position or name to be predicted from `moped` object.
 #'
 #'
-#' @return `predict.marg.cdf()` returns a list with the following components:
+#' @return `estimate.marg.cdf()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.
 #'   \item `coef` - An array of coefficients of the polynomial approximation.
@@ -48,12 +48,12 @@
 #'
 #' # Compute marginal distribution function probabilities of "wage"
 #' x <- seq(21,310,length.out = 100)
-#' wage_prob <- predict.marg.cdf(Fit, X = x, K = 10, variable = "wage")
+#' wage_prob <- estimate.marg.cdf(Fit, X = x, K = 10, variable = "wage")
 
 
 
 
-predict.marg.cdf <- function(fit,
+estimate.marg.cdf <- function(fit,
                              X = NULL,
                              K = NULL,
                              nprobs = 1,

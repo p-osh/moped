@@ -143,10 +143,10 @@ m.resample <- function(fit,
     for(nu in impute.vars){
       if(fit$Distrib[variables[nu]] == "Uniform"){
       if(length(variables[-nu])==0){
-      Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample),
+      Condk <- estimate.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample),
                                 variable = variables[nu])
       }else{
-      Condk <- predict.conditional(fit,
+      Condk <- estimate.conditional(fit,
                                    K.X = K[nu],
                                    Y = setNames(data.frame(Sample[,-nu]),
                                                 colnames(Sample)[-nu]), K.Y = K[-nu],
@@ -223,14 +223,14 @@ m.resample <- function(fit,
       }
       }else{
         if(length(variables[-n])==0){
-        lb <- predict.marg.cdf(fit,K = K[nu],
+        lb <- estimate.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[1,variables[nu]],
                                variable = variables[nu])$Prob
-        ub <- predict.marg.cdf(fit,K = K[nu],
+        ub <- estimate.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[2,variables[nu]],
                                variable = variables[nu])$Prob
         }else{
-          lb <- predict.conditional(fit,K.X = K[nu],
+          lb <- estimate.conditional(fit,K.X = K[nu],
                                     X= rep(fit$SampleStats$Range[1,variables[nu]],
                                            NROW(Sample)),
                                     Y = setNames(data.frame(Sample[,-nu]),
@@ -238,7 +238,7 @@ m.resample <- function(fit,
                                     K.Y = K[-nu],
                                     X.variable = variables[nu],
                                     Y.variables = variables[-nu])$Prob
-          ub <- predict.conditional(fit,K.X = K[nu],
+          ub <- estimate.conditional(fit,K.X = K[nu],
                                     X= rep(fit$SampleStats$Range[2,variables[nu]],
                                            NROW(Sample)),
                                     setNames(data.frame(Sample[,-nu]),
@@ -257,7 +257,7 @@ m.resample <- function(fit,
             it_cnt <- 0
             while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
             x0 <- xi
-            FX <- predict.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob
+            FX <- estimate.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob
             fX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
             xi <- xi - (FX-u)/fX
             it_cnt <- it_cnt + 1
@@ -282,7 +282,7 @@ m.resample <- function(fit,
             while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
             x0 <- xi
             xi_vec <- cbind(xi,setNames(data.frame(Sample[i,-nu]),colnames(Sample)[-nu]))
-            FX <- predict.conditional(fit,K.X = K[nu],X=xi,
+            FX <- estimate.conditional(fit,K.X = K[nu],X=xi,
                                          Y = setNames(data.frame(Sample[,-nu]),
                                                       colnames(Sample)[-nu]),
                                          K.Y = K[-nu],

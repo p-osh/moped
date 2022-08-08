@@ -9,7 +9,7 @@ density estimate.}
   fit,
   X = NULL,
   K = NULL,
-  variables = NULL,
+  variables = 1:fit$Nv,
   bounds = NULL,
   type = "density",
   normalise = T,
@@ -24,40 +24,42 @@ density estimate.}
 
 \item{X}{An optional data frame in which to look for variables with which
 to estimate density values. Must contain column names matching variables in
-the \code{moped} object. If \code{NULL} (the default) then generates a nodes^Nv
-(number of variables) grid with density values.}
+the \code{moped} object. If \code{NULL} (the default) then generates a \code{nodes}^\code{fit$Nv}
+grid with density values.}
 
-\item{K}{Integer vector. Maximum Polynomial Order of approximation on each
+\item{K}{Integer vector of max polynomial order of approximation on each
 variable. Must be less than or equal to the maximum MPO K specified in
-\code{moped()}. The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
+\code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
 \item{variables}{Integer vector or character string of variable names. The
 \code{moped} position or column name of the variable(s) to be predicted from
-\code{moped} object. The default is 1:Nv or 1:NCOL(X) whichever smallest.}
+\code{moped} object. The default is \code{1:fit$Nv}.}
 
-\item{bounds}{A data frame. Bounds allows you to control the grid min and max.
-Should be an array of 2 x number of variables. \code{NULL} is the default.}
+\item{bounds}{An optional data frame specifying the limits to be used on bounded space.
+Should be an array of 2 x number of variables with each column having the
+lower and upper limit.}
 
 \item{type}{string equal to \code{"density"} (default) or \code{"distribution"}. If
 \code{type = "density"} density values are estimated. If \code{type = "distribution"}
 cumulative distribution function probabilities are estimated.}
 
-\item{normalise}{Logical. If \code{TRUE} (the default) then scale data to correct
-for any estimated negative values.}
+\item{normalise}{Logical that if \code{TRUE} (the default), scales density estimate
+to correct for any estimated negative values.}
 
-\item{nodes}{Integer vector. Number of grid points per dimension when grid is
-calculated.}
+\item{nodes}{Integer vector that corresponds to the number of grid points per
+dimension when \code{X = NULL} and a grid is calculated.}
 
-\item{parallel}{Logical. If \code{FALSE} (the default), parallel computing is not
-used.}
+\item{parallel}{Logical that if \code{TRUE} uses the \code{parallel} package to simulate
+values using parallel computing.}
 
-\item{ncores}{Integer vector. Number of cores used in parallel computing.}
+\item{ncores}{Integer vector that determines the number of cores used in parallel computing.}
 
-\item{mps}{Integer vector. Limit on maximum number of probabilities
+\item{mps}{Integer vector that places a limit on maximum number of probabilities
 calculated at a time. The default is 5000.}
 }
 \value{
-\code{predict.moped()} returns a data frame with estimated density values.
+\code{predict.moped()} returns a data frame with estimated density/probability values.
 }
 \description{
 \code{predict.moped()} is used to predict density and probabilities for a set of

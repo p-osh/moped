@@ -7,21 +7,22 @@
 \method{predict}{marg.cdf}(fit, X = NULL, K = NULL, nprobs = 1, variable = 1)
 }
 \arguments{
-\item{fit}{moped type variable. Outputted from \code{moped()}.}
+\item{fit}{moped type variable outputted from \code{moped()}.}
 
 \item{X}{vector of values to predict the marginal probability. Not required
 for variables with "Uniform" reference densities to compute coefficients.}
 
-\item{K}{integer. Maximum Polynomial Order of approximation on marginal
+\item{K}{integer maximum polynomial order of approximation on marginal
 variable. Must be less than or equal to the maximum MPO K specified in
-\code{moped()}. The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
+\code{moped()}.The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
-\item{nprobs}{integer. Number of probability coefficients replications to be
-outputted. Used when X is not specified for variables with "Uniform"
-reference densities. The default value is 1.}
+\item{nprobs}{integer of number of probability coefficients replications to be
+outputted. Used when \code{X = NULL} for variables with \code{"Uniform"} reference densities.
+The default value is 1 (no replications).}
 
-\item{variable}{integer or string of variable name. Which marginal variable
-position or name to be predicted from \code{moped} object.}
+\item{variable}{integer or string of variable name corresponding to which marginal
+variable position or name to be predicted from \code{moped} object.}
 }
 \value{
 \code{predict.marg.cdf()} returns a list with the following components:

@@ -2,12 +2,12 @@
 % Please edit documentation in R/m.resample.R
 \name{m.resample}
 \alias{m.resample}
-\title{Generate resampled (synthetic) samples}
+\title{Generate resampled (synthetic) samples from moped estimate.}
 \usage{
 m.resample(
   fit,
   K = NULL,
-  variables = NULL,
+  variables = 1:fit$Nv,
   Sample = fit$SampleStats$Sample,
   n = NROW(Sample),
   bounds = NULL,
@@ -20,41 +20,43 @@ m.resample(
 )
 }
 \arguments{
-\item{fit}{moped type variable. Outputted from \code{moped()}.}
+\item{fit}{moped type variable outputted from \code{moped()}.}
 
-\item{K}{Integer vector. Maximum Polynomial Order of approximation on each
+\item{K}{Integer vector of max polynomial order of approximation on each
 variable. Must be less than or equal to the maximum MPO K specified in
-\code{moped()}. The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
+\code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
 \item{variables}{Integer vector or character string of variable names. The
 \code{moped} position or column name of the variable(s) to be predicted from
-\code{moped} object. The default is 1:Nv or 1:NCOL(Sample) whichever smallest.}
+\code{moped} object. The default is \code{1:fit$Nv}.}
 
 \item{Sample}{A data frame of initial values used to impute values. Must
 contain column names matching variables in the \code{moped} object. Default is
 the Sample used to fit the \code{moped} object.}
 
-\item{n}{Integer vector. The number of rows to be simulated.}
+\item{n}{Integer vector of the number of rows to be simulated.}
 
-\item{bounds}{A data frame. Bounds allows you to control the grid min and max.
-Should be an array of 2 x number of variables. \code{NULL} is the default.}
+\item{bounds}{An optional data frame specifying the limits to be used on bounded space.
+Should be an array of 2 x number of variables with each column having the
+lower and upper limit.}
 
-\item{replicates}{Integer vector. Number of complete Gibbs sampling passes.
-The default is 1.}
+\item{replicates}{Integer vector determining the number of complete Gibbs
+sampling passes to be performed.}
 
-\item{parallel}{Logical. If \code{FALSE} (the default), parallel computing is not
-used.}
+\item{parallel}{Logical that if \code{TRUE} uses the \code{parallel} package to simulate
+values using parallel computing.}
 
-\item{ncores}{Integer vector. Number of cores used in parallel computing.}
+\item{ncores}{Integer vector that determines the number of cores used in parallel computing.}
 
-\item{mps}{Integer vector. Limit on maximum number of probabilities
+\item{mps}{Integer vector that places a limit on maximum number of probabilities
 calculated at a time. The default is 5000.}
 
-\item{fixed.var}{Integer vector or string of variable names. The \code{moped}
+\item{fixed.var}{Integer vector or string of variable names detailing the \code{moped}
 position or column name of the variable(s) conditioned upon without
 imputation. The default is \code{NULL}.}
 
-\item{er_alert}{Logical. The default is \code{TRUE}. If \code{TRUE} returns error
+\item{er_alert}{Logical that if \code{TRUE} (default) will return an error
 message when observations require re-sampling due to errors.}
 }
 \value{

@@ -7,19 +7,19 @@
 \method{validate}{mpo}(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
 }
 \arguments{
-\item{fit}{\code{moped} type variable. Outputted from \code{moped()}.}
+\item{fit}{\code{moped} type variable outputted from \code{moped()}.}
 
-\item{K}{Integer. Maximum possible Max Polynomial Order of approximation.
-Default is \code{KMax} specified in \code{moped} object.}
+\item{K}{Integer of the maximum possible max polynomial order of approximation.
+Default is \code{KMax} specified in \code{fit}.}
 
-\item{nfolds}{Integer. If \code{opt.mpo = TRUE} number of folds (k) to perform in
-k-fold cross-validation. Default is 5.}
+\item{nfolds}{Integer that determines the number of folds (k) to perform in
+k-fold cross-validation.}
 
-\item{repeats}{Integer. If \code{opt.mpo = TRUE} number of times k-fold
-cross-validation is repeated. Default is 10.}
+\item{repeats}{Integer that determines the number of times k-fold cross-validation
+is repeated.}
 
-\item{variance}{Logical. If \code{TRUE} (the default), a variance estimate of each
-coefficient is calculated.}
+\item{variance}{Logical that if \code{TRUE} (default), computes a variance estimate
+of each coefficient.}
 }
 \value{
 \code{moped()} returns a list containing:
@@ -27,7 +27,6 @@ coefficient is calculated.}
 \item \code{Cn} - Array of estimated moment-based coefficients.
 \item \code{varCn} - Array of variance estimates for Cn. Computed if \code{variance = TRUE}.
 \item \code{Nk_norm} - Array of estimated shifted Nk Norm values.
-Computed if \code{opt.mpo = TRUE}.
 \item \code{opt_mpo_vec} - Estimated optimal max polynomial order where K is vector.
 \item \code{opt_mpo} - Estimated optimal max polynomial order where K is constant.
 }

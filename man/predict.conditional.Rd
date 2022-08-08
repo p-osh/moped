@@ -15,31 +15,33 @@
 )
 }
 \arguments{
-\item{fit}{\code{moped} type variable. Outputted from \code{moped()}.}
+\item{fit}{\code{moped} type variable outputted from \code{moped()}.}
 
 \item{X}{Vector of values with which to estimate conditional probabilities.
 \code{X} must have length consistent with number of observations in \code{Y}.
 \code{X} is optional when reference density of X variable is "Uniform" and only
 approximation polynomial coefficients are to be determined.}
 
-\item{K.X}{Integer Maximum Polynomial Order of approximation on X variable.
+\item{K.X}{Integer maximum polynomial order of approximation on X variable.
 Must be less than or equal to the maximum MPO K specified in \code{moped()}.
-The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
+The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
 \item{Y}{A data frame in which to look for conditional (Y) variables with which
 to estimate probability values. Must contain column names matching variables in
 the \code{moped} object.}
 
-\item{K.Y}{Integer vector Maximum Polynomial Order of approximation on each
+\item{K.Y}{Integer vector maximum polynomial order of approximation on each
 conditional variable. Must be less than or equal to the maximum MPO K specified
-in \code{moped()}. The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
+in \code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
-\item{X.variable}{Integer or character string of variable name. The
+\item{X.variable}{Integer or character string of variable name corresponding to the
 \code{moped} position or column name of the variable to be predicted from
-\code{moped} object. The default is 1 (first variable in fit).}
+\code{moped} object. The default is 1 (first variable in \code{fit}).}
 
-\item{Y.variables}{Integer vector or character string of variable names. The
-\code{moped} position or column name of the variable(s) to be condited on from
+\item{Y.variables}{Integer vector or character string of variable names corresponding
+to the \code{moped} position or column name of the variable(s) to be conditioned on from
 \code{moped} object. If \code{NULL} conditions on all non \code{X.variable} variables.}
 }
 \value{
@@ -85,7 +87,7 @@ recurrence = F,
 opt.mpo = T
 )
 
-# Compute moped conditional distribution estimate 
+# Compute moped conditional distribution estimate
 Cond.prob <- predict.conditional(Fit,
 X=seq(20,300,length.out=100),
 Y = x0[rep(1,100),-4],

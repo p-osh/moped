@@ -7,19 +7,19 @@
 polynomial(fit, X, K = NULL, variables = NULL)
 }
 \arguments{
-\item{fit}{\code{moped} type object. Outputted from \code{moped()}.}
+\item{fit}{\code{moped} type object outputted from \code{moped()}.}
 
 \item{X}{data frame of observations with column names matching selected
 variables from \code{moped} type object.}
 
-\item{K}{Integer vector. Maximum Polynomial Order of approximation on each
+\item{K}{Integer vector of max polynomial order of approximation on each
 variable. Must be less than or equal to the maximum MPO K specified in
-\code{moped()}. The default is \code{opt_mpo} or \code{KMax} specified in \code{moped} object.}
+\code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
 \item{variables}{Integer vector or character string of variable names. The
 \code{moped} position or column name of the variable(s) to be predicted from
-\code{moped} object. The default is 1:Nv (number of variables) or 1:NCOL(Sample),
-whichever smallest.}
+\code{moped} object. The default is \code{1:fit$Nv}.}
 }
 \value{
 A list with the following components:

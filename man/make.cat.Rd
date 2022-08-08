@@ -2,20 +2,25 @@
 % Please edit documentation in R/make.cat.R
 \name{make.cat}
 \alias{make.cat}
-\title{Convert previously continulized variables back to categorical variables.}
+\title{Convert previously continuous-transformed variables back to categorical variables.}
 \usage{
-make.cat(Sample)
+make.cat(Sample, fit = NULL)
 }
 \arguments{
-\item{Sample}{A data frame.}
+\item{Sample}{A data frame outputted from \code{make.cont()} or \code{m.resample()} which
+originally contained categorical variables.}
+
+\item{fit}{optional \code{moped} type object outputted from \code{moped()}. Must be specified
+if \code{Sample} has lost \code{Cats} attribute due to subsetting or transformation.}
 }
 \value{
 \code{make.cat()} returns a data frame.
 }
 \description{
-Convert previously continulized variables back to categorical variables.
+Convert previously continuous-transformed variables back to categorical variables.
 }
 \examples{
+library(tidyverse)
 Data_full <- ISLR::Wage
 
 Data <- Data_full \%>\%
@@ -23,6 +28,18 @@ select(age, maritl, race, education, jobclass, wage)
 Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
 amalgams = list(1:2,3:4))
 
-# Convert previously continulized variables back to categorical variables.
+# Convert previously continuous-transformed variables back to categorical variables.
 make.cat(Data_amal)
+
+# Categorised re-sampled data.
+Data <- Data_full \%>\%
+  select(education, jobclass, wage)
+Data_numeric <- make.cont(Data, catvar = c("education","jobclass"))
+Fit <- moped(Data_numeric)
+new_Data_num <- m.resample(Fit)
+
+new_Data <- make.cat(new_Data_num)
+
+# If data has been subsetted. Fit is also required.
+new_subset_Data <- make.cat(new_Data_num[1:10,-3],fit=Fit)
 }

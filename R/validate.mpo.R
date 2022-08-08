@@ -27,16 +27,10 @@
 #' @export
 #'
 #' @examples
-#' require(sdcMicro)
-#' Data <- CASCrefmicrodata[,c(2,3,4,6)]
-#' 
-#' # Fitting multivariate orthogonal polynomial based
-#' # density estimation function using default setting
-#' Fit <- moped(Data)
-#' 
-#' # Select the optimal polynimal order K
-#' valicate.mpo(fit = Fit)
-
+#'
+#'
+#'
+#'
 
 
 validate.mpo <- function(fit,

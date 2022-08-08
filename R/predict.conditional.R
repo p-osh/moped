@@ -38,10 +38,7 @@
 #' @export
 #'
 #' @examples
-#' require(ISLR)
-#' Data_full <- Wage
-#' 
-#' require(tidyverse)
+#' Data_full <- ISLR::Wage
 #' Data <- Data_full %>%
 #' select(age, education, jobclass,wage)
 #'
@@ -50,9 +47,24 @@
 #'
 #' # Fitting multivariate orthogonal polynomial based
 #' # density estimation function
+#' # Requires a data frame of bounds to fit on data.
+#' bounds <- data.frame(
+#' age  = c(18,80),
+#' education = c(0,1),
+#' jobclass = c(0,1),
+#' wage = c(0,350)
+#' )
 #'
 #' # Fitting the Data
-#' Fit <- moped(Data_x)
+#' Fit <- moped(
+#' Data_x,
+#' K=10,
+#' Distrib = rep("Uniform", 4),
+#' bounds = bounds,
+#' variance = T,
+#' recurrence = F,
+#' opt.mpo = T
+#' )
 #'
 #' # Compute moped conditional distribution estimate
 #' Cond.prob <- predict.conditional(Fit,

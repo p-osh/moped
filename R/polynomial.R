@@ -23,17 +23,40 @@
 #' @export
 #'
 #' @examples
-#' require(sdcMicro)
-#' Data <- CASCrefmicrodata[,c(2,3,4,6)]
-#' 
+#' Data_full <- ISLR::Wage
+#' Data <- Data_full %>%
+#' select(age, education, jobclass,wage)
+#'
+#' # Convert Categorical Data to Continuous Data
+#' Data_x <- make.cont(Data, catvar = 2:3)
+#'
 #' # Fitting multivariate orthogonal polynomial based
-#' # density estimation function using default setting
-#' Fit <- moped(Data)
+#' # density estimation function
+#' # Requires a data frame of bounds to fit on data.
+#' bounds <- data.frame(
+#' age  = c(18,80),
+#' education = c(0,1),
+#' jobclass = c(0,1),
+#' wage = c(0,350)
+#' )
 #'
-#' # Define the observations.
-#' x0 <- Data[1:2,]
+#' # Fitting the Data
+#' Fit <- moped(
+#' Data_x,
+#' K=10,
+#' Distrib = rep("Uniform", 4),
+#' bounds = bounds,
+#' variance = T,
+#' recurrence = F,
+#' parallel = F,
+#' ncores = NULL,
+#' mpo = T
+#' )
 #'
-#' # Manually Compute MBD Polynomials.
+#' # Define the observation which the probability is desired.
+#' x0 <- Data_x[1:2,]
+#'
+#' # Manually Compute MBD Polynomials
 #' polynomial(Fit, X=x0, K=7)
 
 

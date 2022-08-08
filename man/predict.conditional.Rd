@@ -2,49 +2,61 @@
 % Please edit documentation in R/predict.conditional.R
 \name{predict.conditional}
 \alias{predict.conditional}
-\title{Compute unscaled MBD conditional distribution estimate}
+\title{Computes moped estimated conditional distribution function values for X|Y1,Y2,...}
 \usage{
-predict.conditional(
+\method{predict}{conditional}(
   fit,
   X = NULL,
   K.X = NULL,
   Y,
   K.Y = NULL,
   X.variable = NULL,
-  Y.variables = NULL,
-  X.bounds = NULL,
-  Y.bounds = NULL
+  Y.variables = NULL
 )
 }
 \arguments{
-\item{fit}{MBDensity type variable. Outputed from \code{moped()}.}
+\item{fit}{\code{moped} type variable outputted from \code{moped()}.}
 
-\item{X}{Grid of probabilities to be calculated. If \code{NULL} (the default) than
-generates nodes x Nv grid.}
+\item{X}{Vector of values with which to estimate conditional probabilities.
+\code{X} must have length consistent with number of observations in \code{Y}.
+\code{X} is optional when reference density of X variable is "Uniform" and only
+approximation polynomial coefficients are to be determined.}
 
-\item{K.X}{Truncation to be used. If \code{NULL}( the default). it is max in Fit.}
+\item{K.X}{Integer maximum polynomial order of approximation on X variable.
+Must be less than or equal to the maximum MPO K specified in \code{moped()}.
+The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
-\item{Y}{Grid of probabilities to be calculated. If \code{NULL} (the default),
-than generates nodes x Nv grid.}
+\item{Y}{A data frame in which to look for conditional (Y) variables with which
+to estimate probability values. Must contain column names matching variables in
+the \code{moped} object.}
 
-\item{K.Y}{Which variables to be predicted from Fit. If \code{NULL} (the default),
-it is 1:Nv or 1:NCOL(X) whichever smallest.}
+\item{K.Y}{Integer vector maximum polynomial order of approximation on each
+conditional variable. Must be less than or equal to the maximum MPO K specified
+in \code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
-\item{X.variable}{(?Brad)}
+\item{X.variable}{Integer or character string of variable name corresponding to the
+\code{moped} position or column name of the variable to be predicted from
+\code{moped} object. The default is 1 (first variable in \code{fit}).}
 
-\item{Y.variables}{(?Brad)}
-
-\item{X.bounds}{A data frame. Bounds allows you to control the grid min and
-Should be an array of 2 x number of variables.}
-
-\item{Y.bounds}{(?Brad)}
+\item{Y.variables}{Integer vector or character string of variable names corresponding
+to the \code{moped} position or column name of the variable(s) to be conditioned on from
+\code{moped} object. If \code{NULL} conditions on all non \code{X.variable} variables.}
 }
 \value{
-\code{predict.conditional()} returns a list object
+\code{predict.conditional()} returns a list with the following components:
+\itemize{
+\item \code{Prob} - vector of computed probabilities when X is specified.
+\item \code{coef} - An array of coefficients of the polynomial approximation.
+When variable reference density is "Uniform", coefficients
+are not specific for each value of X.
+}
 }
 \description{
-\code{predict.conditional()} is used to compute unscaled MBD conditional
-distribution estimate.
+\code{predict.conditional()} is used to compute moped estimated conditional
+distribution function values for a single variable X given a data frame of
+conditional Y values.
 }
 \examples{
 Data_full <- ISLR::Wage
@@ -68,25 +80,21 @@ wage = c(0,350)
 Fit <- moped(
 Data_x,
 K=10,
-Distrib = rep("Uniform", 7),
+Distrib = rep("Uniform", 4),
 bounds = bounds,
 variance = T,
 recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
+opt.mpo = T
 )
 
-# Compute MBD Conditional Distribution Estimate (unscaled)
+# Compute moped conditional distribution estimate
 Cond.prob <- predict.conditional(Fit,
 X=seq(20,300,length.out=100),
 Y = x0[rep(1,100),-4],
 K.Y=rep(7,3),
-K.X=c(7),
-X.bounds = data.frame(wage=bounds$wage),
-Y.bounds = bounds[,-4],
-X.variable = 4,
-Y.variables = 1:3)
+K.X=7,
+X.variable = "wage",
+Y.variables = c("age","education","jobclass"))
 
 plot(seq(20, 300, length.out = 100), Cond.prob$Prob)
 }

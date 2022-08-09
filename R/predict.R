@@ -129,8 +129,16 @@ predict.moped <- function(fit,
   if(test_names){
     stop("X must be data frame and contain columns named ",paste(variables_names,collapse = " "))
   }
+  test2 <- F
+  if(type == "conditional") test2 <- prod(cond.variables_names %in% variables_names)==0
+  if(test2){
+    stop("Conditional variables must also be specified in variables")
+  }
+
   X <- setNames(data.frame(X[,variables_names]),variables_names)
   if(type == "conditional") cond.variables <- which(colnames(X) %in% cond.variables_names)
+
+
   #Max Polynomial Order
   if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,length(variables))
   if(is.null(K)) K <- rep(fit$KMax,length(variables))

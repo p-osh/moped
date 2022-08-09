@@ -222,7 +222,7 @@ m.resample <- function(fit,
         SS <- NROW(Sample)
       }
       }else{
-        if(length(variables[-n])==0){
+        if(length(variables[-nu])==0){
         lb <- estimate.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[1,variables[nu]],
                                variable = variables[nu])$Prob
@@ -255,14 +255,14 @@ m.resample <- function(fit,
             x0<-xi+1
             u <- runif(1,lb,ub)
             it_cnt <- 0
-            while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
+            while(abs(x0-xi)>0.001 &!is.nan(unlist(xi)) & it_cnt <= 100){
             x0 <- xi
             FX <- estimate.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob
             fX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
             xi <- xi - (FX-u)/fX
             it_cnt <- it_cnt + 1
             }
-            if(is.nan(xi) | it_cnt>=100 |
+            if(is.nan(unlist(xi)) | it_cnt>=100 |
                xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
               fX <- predict(fit, K= K[nu],variables = variables[nu],nodes=200)
@@ -279,7 +279,7 @@ m.resample <- function(fit,
             x0<-xi+1
             u <- runif(1,lb[i],ub[i])
             it_cnt <- 0
-            while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
+            while(abs(x0-xi)>0.001 & !is.nan(unlist(xi)) & it_cnt <= 100){
             x0 <- xi
             xi_vec <- cbind(xi,setNames(data.frame(Sample[i,-nu]),colnames(Sample)[-nu]))
             FX <- estimate.conditional(fit,K.X = K[nu],X=xi,
@@ -293,7 +293,7 @@ m.resample <- function(fit,
             xi <- xi - mfX*(FX-u)/fX
             it_cnt <- it_cnt + 1
             }
-            if(is.nan(xi) | it_cnt>=100 |
+            if(is.nan(unlist(xi)) | it_cnt>=100 |
                xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
               grid_pts <- data.frame(seq(fit$SampleStats$Range[1,variables[nu]],

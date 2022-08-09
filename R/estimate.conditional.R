@@ -134,8 +134,8 @@ estimate.conditional <- function(fit,
       (fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
     coef[,2] <- coef[,2]+1/(fit$Paramaters[2,X.variable]-fit$Paramaters[1,X.variable])
   }else{
-    fnu <- fit$PDFControl(X.variable)$PDF(X)
-    Fnu <- fit$PDFControl(X.variable)$CDF(X)
+    fnu <- fit$PDFControl(X.variable)$PDF(unlist(X))
+    Fnu <- fit$PDFControl(X.variable)$CDF(unlist(X))
     E <- t(t(XDP)%*%tt)*Y.poly$PdfTerms*fnu/fY$Density
     coef <- cbind(fit$Sigma[3,X.variable]*E,0,0) + cbind(0,fit$Sigma[2,X.variable]*E,0) + cbind(0,0,fit$Sigma[1,X.variable]*E)
     coef[,1] <- coef[,1] + Fnu
@@ -143,7 +143,7 @@ estimate.conditional <- function(fit,
   if(is.null(X)){
     return(list(coef = coef))
   }else{
-    Prob <- apply(coef*(sapply(0:(K.X+1),function(k)X^k)),1,sum)
+    Prob <- apply(coef*(sapply(0:(K.X+1),function(k)unlist(X)^k)),1,sum)
     return(list(Prob = Prob,coef = coef))
   }
   })

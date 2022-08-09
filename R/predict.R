@@ -108,8 +108,8 @@ predict.moped <- function(fit,
   Sample <- X
 
   if(test_names){
-    return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
-  } else {
+    stop("X must be data frame and contain columns named ",paste(variables_names,collapse = " "))
+  }
     X <- setNames(data.frame(X[,variables_names]),variables_names)
     #Max Polynomial Order
     if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,length(variables))
@@ -236,6 +236,4 @@ predict.moped <- function(fit,
     if(type=="density") Sample$Density <- Probability
     if(type=="distribution") Sample$Prob <- Probability
     return(Sample)
-  }
-
 }

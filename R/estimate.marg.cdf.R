@@ -62,9 +62,9 @@ estimate.marg.cdf <- function(fit,
   if(is.character(variable)){
     variable <-  which(colnames(fit$SampleStats$Sample) %in% variable)
   }
-  try(if(is.null(X) & fit$Distrib[variable] != "Uniform"){
-    return(cat("Error: Non-uniform approximations require numeric values for X."))
-  }else{
+  if(is.null(X) & fit$Distrib[variable] != "Uniform"){
+    stop("Non-uniform approximations require numeric values for X.")
+  }
   if(is.null(K)) K <- fit$opt_mpo
   if(is.null(K)) K <- fit$KMax
   if(!is.null(X)) nprobs <- NROW(X)
@@ -95,5 +95,4 @@ estimate.marg.cdf <- function(fit,
     names(Prob) <- names(X)
     return(list(Prob = Prob,coef = coef))
   }
-  })
 }

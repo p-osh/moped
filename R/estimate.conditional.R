@@ -76,9 +76,9 @@ estimate.conditional <- function(fit,
   tNv <- fit$Nv
   tKm <- fit$KMax
   if(is.null(X.variable)) X.variable <- 1
-  try(if(is.null(X) & fit$Distrib[X.variable] != "Uniform"){
-    return(cat("Error: Non-uniform approximations require numeric values for X."))
-  }else{
+  if(is.null(X) & fit$Distrib[X.variable] != "Uniform"){
+    stop("Non-uniform approximations require numeric values for X.")
+  }
   if(is.null(Y.variables)) Y.variables <- setdiff(1:tNv,X.variable)
   Y.Nv <- length(Y.variables)
   if(is.null(K.X)) K <- fit$opt_mpo
@@ -146,5 +146,4 @@ estimate.conditional <- function(fit,
     Prob <- apply(coef*(sapply(0:(K.X+1),function(k)unlist(X)^k)),1,sum)
     return(list(Prob = Prob,coef = coef))
   }
-  })
 }

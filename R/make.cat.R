@@ -70,8 +70,8 @@ make.cat <- function(Sample,
   if(is.null(Cats) & !is.null(fit)) Cats <- fit$Cats
 
   if(is.null(Cats)){
-    cat('Error: Data frame must be output of make.cont() or m.resample().')
-    cat('Please specify the fitted moped object to re-categorise.')
+    stop('Data frame must be output of make.cont() or m.resample().
+         Please specify the fitted moped object to re-categorise.')
   }else if (prod(Cats$catvar_names %in% colnames(Sample))) {
 
   contvar_names <- setdiff(colnames(Sample),Cats$catvar_names)
@@ -126,7 +126,7 @@ make.cat <- function(Sample,
   }
 
   }else{
-    cat('Error: Sample must be a data frame containing columns ',Cats$catvar_names)
+    stop('Sample must be a data frame containing columns ',paste(Cats$catvar_names,collapse=" "))
   }
   return(Sample)
 }

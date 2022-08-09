@@ -116,9 +116,9 @@ m.resample <- function(fit,
 
   test_names <- prod(variables_names %in% colnames(Sample)) == 0 | !is.data.frame(Sample)
 
-  try(if(test_names){
-    return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
-  } else {
+  if(test_names){
+    stop("Sample must be a data frame and contain columns named ",paste(variables_names,collapse = " "))
+  }
     tryCatch(bounds <- setNames(data.frame(bounds[,variables_names]),
                                 variables_names),
              error = function(e) bounds <<- NULL)
@@ -345,6 +345,5 @@ m.resample <- function(fit,
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats
   return(Synth)
-   })
 }
 

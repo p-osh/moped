@@ -46,7 +46,11 @@ make.cont <- function(
 ){
 
   if(is.character(catvar)){
-    catvar <-  which(colnames(Sample) %in% catvar)
+    catvarold <- catvar
+    catvar <-  sapply(1:length(catvar),function(k)which(colnames(Sample)==catvar[k]))
+    if(is.list(catvar)){
+      stop('Variable ',catvarold[-which(catvarold %in% colnames(Sample))]," not found in Sample")
+    }
   }
 
   indexer <- function(X,n){

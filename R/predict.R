@@ -105,6 +105,7 @@ predict.moped <- function(fit,
       cond.variables <-  which(colnames(fit$SampleStats$Sample) %in% cond.variables)
     }
     cond.variables_names <- colnames(fit$SampleStats$Sample)[cond.variables]
+    if(length(cond.variables)==0) stop('Conditional variables must be specified in cond.variables')
   }
 
   # X Setup
@@ -227,9 +228,23 @@ predict.moped <- function(fit,
     XM <- list() # Array of 1, X, X^2, ....
     P <- list() # Polynomial Terms P_0(X), P_1(X), ...
     PdfTerms <- rep(1,nprobs) # Reference PDF f_v(X)
+    fcond <- predict.moped(fit,
+                           X=setNames(data.frame(X[,cond.variables]),colnames(X)[cond.variables]),
+                           K=K[variables[cond.variables]],
+                           variables = variables[cond.variables],
+                           bounds = setNames(data.frame(bounds[,cond.variables]),colnames(bounds)[cond.variables]),
+                           type="density",
+                           normalise = F
+                           )$Density
 
     for(k in 1:Nv){
       if(k %in% cond.variables){
+        XM[[k]] <- t(sapply(0:Km, function(i) X[splitindex[[j]],k]^i))
+        if(length(splitindex[[j]])==1) XM[[k]] <- t(XM[[k]])
+        P[[k]] <- fit$PolyCoef[0:K[k]+1,0:K[k]+1,variables[k]]%*%((XM[[k]])[0:K[k]+1,])
+        PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
+        PdfTerms <- PdfTerms*PDFk(X[splitindex[[j]],k])
+      }else{
         CDFk <- as.function(fit$PDFControl(variables[k])$CDF)
         PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
         PDFkX <- PDFk(X[splitindex[[j]],k])
@@ -239,12 +254,6 @@ predict.moped <- function(fit,
         if(length(splitindex[[j]])==1) XM[[k]] <- t(XM[[k]])
         P[[k]] <- fit$PolyCoef[1:K[k]+1,1:K[k]+1,variables[k]]%*%((XM[[k]])[1:K[k],])
         P[[k]] <- rbind(CDFkX,P[[k]])/c(1,fit$Lambda[1:K[k],variables[k]])
-      }else{
-        XM[[k]] <- t(sapply(0:Km, function(i) X[splitindex[[j]],k]^i))
-        if(length(splitindex[[j]])==1) XM[[k]] <- t(XM[[k]])
-        P[[k]] <- fit$PolyCoef[0:K[k]+1,0:K[k]+1,variables[k]]%*%((XM[[k]])[0:K[k]+1,])
-        PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
-        PdfTerms <- PdfTerms*PDFk(X[splitindex[[j]],k])
       }
     }
     Terms <- c()
@@ -261,7 +270,7 @@ predict.moped <- function(fit,
       }
     }
     Terms <- c(Terms,tt)
-    return(Terms*PdfTerms)
+    return(Terms*PdfTerms/fcond)
   }
 
   if(parallel){

@@ -28,21 +28,22 @@ The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) spec
 in \code{fit}.}
 
 \item{Y}{A data frame in which to look for conditional (Y) variables with which
-to estimate probability values. Must contain column names matching variables in
-the \code{moped} object.}
+to estimate probability values. Must contain column names matching variables
+in the \code{moped} object.}
 
 \item{K.Y}{Integer vector maximum polynomial order of approximation on each
-conditional variable. Must be less than or equal to the maximum MPO K specified
-in \code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
-in \code{fit}.}
+conditional variable. Must be less than or equal to the maximum MPO K
+specified in \code{moped()}. The default is the \code{opt_mpo} or \code{KMax}
+(if \code{opt_mpo = NULL}) specified in \code{fit}.}
 
-\item{X.variable}{Integer or character string of variable name corresponding to the
-\code{moped} position or column name of the variable to be predicted from
+\item{X.variable}{Integer or character string of variable name corresponding
+to the \code{moped} position or column name of the variable to be predicted from
 \code{moped} object. The default is 1 (first variable in \code{fit}).}
 
-\item{Y.variables}{Integer vector or character string of variable names corresponding
-to the \code{moped} position or column name of the variable(s) to be conditioned on from
-\code{moped} object. If \code{NULL} conditions on all non \code{X.variable} variables.}
+\item{Y.variables}{Integer vector or character string of variable names
+corresponding to the \code{moped} position or column name of the variable(s) to
+be conditioned on from \code{moped} object. If \code{NULL} conditions on all non
+\code{X.variable} variables.}
 }
 \value{
 \code{estimate.conditional()} returns a list with the following components:

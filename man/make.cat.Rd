@@ -10,8 +10,9 @@ make.cat(Sample, fit = NULL)
 \item{Sample}{A data frame outputted from \code{make.cont()} or \code{m.resample()} which
 originally contained categorical variables.}
 
-\item{fit}{optional \code{moped} type object outputted from \code{moped()}. Must be specified
-if \code{Sample} has lost \code{Cats} attribute due to subsetting or transformation.}
+\item{fit}{optional \code{moped} type object outputted from \code{moped()}. Must be
+specified if \code{Sample} has lost \code{Cats} attribute due to subsetting or
+transformation.}
 }
 \value{
 \code{make.cat()} returns a data frame.

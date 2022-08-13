@@ -2,13 +2,13 @@
 #'
 #' @description
 #' `m.resample()` is used to generate synthetic samples from full, conditional,
-#'  or marginal moped density estimate.
+#' or marginal moped density estimate.
 #'
 #' @param fit moped type variable outputted from `moped()`.
 #' @param K Integer vector of max polynomial order of approximation on each
 #'   variable. Must be less than or equal to the maximum MPO K specified in
-#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
-#'   in `fit`.
+#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`)
+#'   specified in `fit`.
 #' @param variables Integer vector or character string of variable names. The
 #'   `moped` position or column name of the variable(s) to be predicted from
 #'   `moped` object. The default is `1:fit$Nv`.
@@ -16,18 +16,19 @@
 #'   contain column names matching variables in the `moped` object. Default is
 #'   the Sample used to fit the `moped` object.
 #' @param n Integer vector of the number of rows to be simulated.
-#' @param bounds An optional data frame specifying the limits to be used on bounded space.
-#'   Should be an array of 2 x number of variables with each column having the
-#'   lower and upper limit.
+#' @param bounds An optional data frame specifying the limits to be used on
+#'   bounded space. Should be an array of 2 x number of variables with each
+#'   column having the lower and upper limit.
 #' @param replicates Integer vector determining the number of complete Gibbs
 #'   sampling passes to be performed.
 #' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
 #'   values using parallel computing.
-#' @param ncores Integer vector that determines the number of cores used in parallel computing.
+#' @param ncores Integer vector that determines the number of cores used in
+#'   parallel computing.
 #' @param mps Integer vector that places a limit on maximum number of probabilities
 #'   calculated at a time. The default is 5000.
-#' @param fixed.var Integer vector or string of variable names detailing the `moped`
-#'   position or column name of the variable(s) conditioned upon without
+#' @param fixed.var Integer vector or string of variable names detailing the
+#'   `moped` position or column name of the variable(s) conditioned upon without
 #'   imputation. The default is `NULL`.
 #' @param er_alert Logical that if `TRUE` (default) will return an error
 #'   message when observations require re-sampling due to errors.
@@ -223,7 +224,6 @@ m.resample <- function(fit,
         }
       }else{
         if(length(variables[-nu])==0){
-<<<<<<< HEAD
         lb <- estimate.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[1,variables[nu]],
                                variable = variables[nu])$Prob

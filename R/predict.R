@@ -3,9 +3,9 @@
 #'
 #' @description
 #' `predict.moped()` is used to predict density and probabilities for a set of
-#' observations. When constructing partially joint density, sample and variables must be used
-#' together. X must be a data frame and its variable length must equal to
-#' the length in var.
+#' observations. When constructing partially joint density, sample and variables
+#' must be used together. X must be a data frame and its variable length must
+#' equal to the length in var.
 #'
 #' @param fit `moped` type variable. Outputted from `moped()`.
 #' @param X An optional data frame in which to look for variables with which
@@ -14,29 +14,31 @@
 #'   grid with density values.
 #' @param K Integer vector of max polynomial order of approximation on each
 #'   variable. Must be less than or equal to the maximum MPO K specified in
-#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
-#'   in `fit`.
+#'   `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`)
+#'   specified in `fit`.
 #' @param variables Integer vector or character string of variable names. The
 #'   `moped` position or column name of the variable(s) to be predicted from
 #'   `moped` object. The default is `1:fit$Nv`.
-#' @param bounds An optional data frame specifying the limits to be used on bounded space.
-#'   Should be an array of 2 x number of variables with each column having the
-#'   lower and upper limit.
-#' @param type string equal to `"density"` (default), `"distribution"`, or `"conditional"`.
-#'  If `type = "density"` density values are estimated. If `type = "distribution"`
-#'  cumulative distribution function probabilities are estimated. If `type = "conditional"`
-#'  conditional distribution function probabilities are estimated conditioned on
-#'  the variables chosen in `cond.variables`.
+#' @param bounds An optional data frame specifying the limits to be used on bounded
+#'   space. Should be an array of 2 x number of variables with each column having
+#'   the lower and upper limit.
+#' @param type string equal to `"density"` (default), `"distribution"`, or
+#'   `"conditional"`. If `type = "density"` density values are estimated. If
+#'   `type = "distribution"` cumulative distribution function probabilities are
+#'   estimated. If `type = "conditional"` conditional distribution function
+#'   probabilities are estimated conditioned on the variables chosen in
+#'   `cond.variables`.
 #' @param cond.variables Integer vector or character string of conditional variable
 #'   names. The `moped` position or column name of the conditional variable(s) to
 #'   be predicted from `moped` object if `type="conditional"`.
 #' @param normalise Logical that if `TRUE` (the default), scales density estimate
-#'  to correct for any estimated negative values.
+#'   to correct for any estimated negative values.
 #' @param nodes Integer vector that corresponds to the number of grid points per
 #'   dimension when `X = NULL` and a grid is calculated.
 #' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
 #'   values using parallel computing.
-#' @param ncores Integer vector that determines the number of cores used in parallel computing.
+#' @param ncores Integer vector that determines the number of cores used in
+#'   parallel computing.
 #' @param mps Integer vector that places a limit on maximum number of probabilities
 #'   calculated at a time. The default is 5000.
 #'

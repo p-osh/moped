@@ -8,9 +8,9 @@
 #' @param Sample A data frame.
 #' @param catvar Columns to convert into continuous variables. Variable names
 #'   can be used as if they were positions in the data frame.
-#' @param amalgams A list using numeric positions indicating the order of variables in
-#'   `"catvar"`. Each list item contains a vector of positions of `"catvar"`
-#'   that are to be amalgamated into a single continuous variable.
+#' @param amalgams A list using numeric positions indicating the order of
+#'   variables in `"catvar"`. Each list item contains a vector of positions of
+#'   `"catvar"` that are to be amalgamated into a single continuous variable.
 #'
 #' @return `make.cont()` returns a data frame with strictly continuous values.
 #' @export

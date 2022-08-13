@@ -11,19 +11,19 @@
 #' @param Distrib Character string vector of length `NCOL(Sample)`, specifying the
 #'  reference distribution to be used for each variable (column) of Sample. Choices
 #'  are `"Uniform"` (default), `"Normal"`, `"Gamma"`, and `"Beta"` distributions.
-#' @param bounds An optional data frame specifying the limits to be used on bounded space.
-#'   Should be an array of 2 x number of variables with each column having the
-#'   lower and upper limit. If `NULL` (default) bounds are estimated based on
+#' @param bounds An optional data frame specifying the limits to be used on bounded
+#'   space. Should be an array of 2 x number of variables with each column having
+#'   the lower and upper limit. If `NULL` (default) bounds are estimated based on
 #'   range of `Sample`.
 #' @param variance Logical that if `TRUE` (default), computes a variance estimate
 #'   of each coefficient.
 #' @param recurrence Logical that if `TRUE`, computes the two-term recurrence
-#' relation of each marginal orthogonal polynomial. Terms take the form
-#' $P_{n+1}(x) = (R_nx + S_n)P_n(x) + T_nP_{n-1}(x)$.
+#'   relation of each marginal orthogonal polynomial. Terms take the form
+#'   \eqn{P_{n+1}(x) = (R_nx + S_n)P_n(x) + T_nP_{n-1}(x)}.
 #' @param opt.mpo Logical that if `TRUE` (the default), determines an optimal
 #'   max polynomial order estimate  using repeated k-fold cross-validation.
 #' @param nfolds Integer that if `opt.mpo = TRUE`, determines the number of folds
-#' (k) to perform in k-fold cross-validation.
+#'   (k) to perform in k-fold cross-validation.
 #' @param repeats Integer that if `opt.mpo = TRUE`, determines the number of times
 #'   k-fold cross-validation is repeated.
 #'

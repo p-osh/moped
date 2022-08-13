@@ -7,9 +7,9 @@
 #'
 #' @param fit A `moped` object from `moped()`.
 #' @param k.range Range of polynomial orders K. Default is 1 to `KMax` specified
-#'  in `moped` object.
+#'   in `moped` object.
 #' @param ncol Integer vector of number of columns the marginal plots shown for
-#'  a given variable.
+#'   a given variable.
 #' @param prompt Logical, whether it needs the prompt to show the next plot.
 #'   If `TRUE` (the default), press enter to show the next plot, If `FALSE`,
 #'   outputs all plots simultaneously.

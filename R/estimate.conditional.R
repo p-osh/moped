@@ -7,26 +7,27 @@
 #'
 #' @param fit `moped` type variable outputted from `moped()`.
 #' @param X Vector of values with which to estimate conditional probabilities.
-#'  `X` must have length consistent with number of observations in `Y`.
-#'  `X` is optional when reference density of X variable is "Uniform" and only
+#'   `X` must have length consistent with number of observations in `Y`.
+#'   `X` is optional when reference density of X variable is "Uniform" and only
 #'  approximation polynomial coefficients are to be determined.
 #' @param K.X Integer maximum polynomial order of approximation on X variable.
-#'  Must be less than or equal to the maximum MPO K specified in `moped()`.
-#'  The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
+#'   Must be less than or equal to the maximum MPO K specified in `moped()`.
+#'   The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
 #'   in `fit`.
 #' @param Y A data frame in which to look for conditional (Y) variables with which
-#'  to estimate probability values. Must contain column names matching variables in
-#'  the `moped` object.
+#'   to estimate probability values. Must contain column names matching variables
+#'   in the `moped` object.
 #' @param K.Y  Integer vector maximum polynomial order of approximation on each
-#'   conditional variable. Must be less than or equal to the maximum MPO K specified
-#'   in `moped()`. The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
-#'   in `fit`.
-#' @param X.variable Integer or character string of variable name corresponding to the
-#'   `moped` position or column name of the variable to be predicted from
+#'   conditional variable. Must be less than or equal to the maximum MPO K
+#'   specified in `moped()`. The default is the `opt_mpo` or `KMax`
+#'   (if `opt_mpo = NULL`) specified in `fit`.
+#' @param X.variable Integer or character string of variable name corresponding
+#'   to the `moped` position or column name of the variable to be predicted from
 #'   `moped` object. The default is 1 (first variable in `fit`).
-#' @param Y.variables Integer vector or character string of variable names corresponding
-#'  to the `moped` position or column name of the variable(s) to be conditioned on from
-#'   `moped` object. If `NULL` conditions on all non `X.variable` variables.
+#' @param Y.variables Integer vector or character string of variable names
+#'   corresponding to the `moped` position or column name of the variable(s) to
+#'   be conditioned on from `moped` object. If `NULL` conditions on all non
+#'   `X.variable` variables.
 #'
 #' @return `estimate.conditional()` returns a list with the following components:
 #' \itemize{
@@ -35,6 +36,7 @@
 #'                  When variable reference density is "Uniform", coefficients
 #'                  are not specific for each value of X.
 #' }
+#'
 #' @export
 #'
 #' @examples

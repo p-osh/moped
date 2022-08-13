@@ -14,15 +14,15 @@ for variables with "Uniform" reference densities to compute coefficients.}
 
 \item{K}{integer maximum polynomial order of approximation on marginal
 variable. Must be less than or equal to the maximum MPO K specified in
-\code{moped()}.The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
-in \code{fit}.}
+\code{moped()}.The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL})
+specified in \code{fit}.}
 
 \item{nprobs}{integer of number of probability coefficients replications to be
-outputted. Used when \code{X = NULL} for variables with \code{"Uniform"} reference densities.
-The default value is 1 (no replications).}
+outputted. Used when \code{X = NULL} for variables with \code{"Uniform"} reference
+densities. The default value is 1 (no replications).}
 
-\item{variable}{integer or string of variable name corresponding to which marginal
-variable position or name to be predicted from \code{moped} object.}
+\item{variable}{integer or string of variable name corresponding to which
+marginal variable position or name to be predicted from \code{moped} object.}
 }
 \value{
 \code{estimate.marg.cdf()} returns a list with the following components:

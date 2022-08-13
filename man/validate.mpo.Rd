@@ -32,10 +32,11 @@ of each coefficient.}
 }
 }
 \description{
-\code{validate.mpo()} performs repeated k-fold cross-validation to determine
-an unbiased estimate of the shifted Nk-Norm that when minimised provides an
-estimate of the optimal max polynomial order. The coefficient estimates
-are also calculated as is (optional) their corresponding variance estimates.
+\code{validate.mpo()} performs repeated k-fold cross-validation to
+determine an unbiased estimate of the shifted Nk-Norm that when minimised
+provides an estimate of the optimal max polynomial order. The coefficient
+estimates are also calculated as is (optional) their corresponding variance
+estimates.
 }
 \examples{
 require(sdcMicro)

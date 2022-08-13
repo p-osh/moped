@@ -1,9 +1,10 @@
 #' Convert previously continuous-transformed variables back to categorical variables.
 #'
 #' @param Sample A data frame outputted from `make.cont()` or `m.resample()` which
-#' originally contained categorical variables.
-#' @param fit optional `moped` type object outputted from `moped()`. Must be specified
-#' if `Sample` has lost `Cats` attribute due to subsetting or transformation.
+#'   originally contained categorical variables.
+#' @param fit optional `moped` type object outputted from `moped()`. Must be
+#'   specified if `Sample` has lost `Cats` attribute due to subsetting or
+#'   transformation.
 #'
 #' @return `make.cat()` returns a data frame.
 #' @export

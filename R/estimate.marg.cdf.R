@@ -2,23 +2,22 @@
 #'
 #' @description
 #' `estimate.marg.cdf()` is used to calculate univariate marginal cumulative
-#'  distribution function probabilities and the polynomial coefficients of the
-#'  polynomical approximation from any `moped` object.
+#' distribution function probabilities and the polynomial coefficients of the
+#' polynomical approximation from any `moped` object.
 #'
 #'
 #' @param fit moped type variable outputted from `moped()`.
 #' @param X vector of values to predict the marginal probability. Not required
-#'  for variables with "Uniform" reference densities to compute coefficients.
+#'   for variables with "Uniform" reference densities to compute coefficients.
 #' @param K integer maximum polynomial order of approximation on marginal
 #'   variable. Must be less than or equal to the maximum MPO K specified in
-#'   `moped()`.The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`) specified
-#'   in `fit`.
+#'   `moped()`.The default is the `opt_mpo` or `KMax` (if `opt_mpo = NULL`)
+#'   specified in `fit`.
 #' @param nprobs integer of number of probability coefficients replications to be
-#' outputted. Used when `X = NULL` for variables with `"Uniform"` reference densities.
-#' The default value is 1 (no replications).
-#' @param variable integer or string of variable name corresponding to which marginal
-#'  variable position or name to be predicted from `moped` object.
-#'
+#'   outputted. Used when `X = NULL` for variables with `"Uniform"` reference
+#'   densities. The default value is 1 (no replications).
+#' @param variable integer or string of variable name corresponding to which
+#'   marginal variable position or name to be predicted from `moped` object.
 #'
 #' @return `estimate.marg.cdf()` returns a list with the following components:
 #' \itemize{

@@ -12,9 +12,9 @@ make.cont(Sample, catvar = 1:NCOL(Sample), amalgams = NULL)
 \item{catvar}{Columns to convert into continuous variables. Variable names
 can be used as if they were positions in the data frame.}
 
-\item{amalgams}{A list using numeric positions indicating the order of variables in
-\code{"catvar"}. Each list item contains a vector of positions of \code{"catvar"}
-that are to be amalgamated into a single continuous variable.}
+\item{amalgams}{A list using numeric positions indicating the order of
+variables in \code{"catvar"}. Each list item contains a vector of positions of
+\code{"catvar"} that are to be amalgamated into a single continuous variable.}
 }
 \value{
 \code{make.cont()} returns a data frame with strictly continuous values.

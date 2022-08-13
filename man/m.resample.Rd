@@ -24,8 +24,8 @@ m.resample(
 
 \item{K}{Integer vector of max polynomial order of approximation on each
 variable. Must be less than or equal to the maximum MPO K specified in
-\code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
-in \code{fit}.}
+\code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL})
+specified in \code{fit}.}
 
 \item{variables}{Integer vector or character string of variable names. The
 \code{moped} position or column name of the variable(s) to be predicted from
@@ -37,9 +37,9 @@ the Sample used to fit the \code{moped} object.}
 
 \item{n}{Integer vector of the number of rows to be simulated.}
 
-\item{bounds}{An optional data frame specifying the limits to be used on bounded space.
-Should be an array of 2 x number of variables with each column having the
-lower and upper limit.}
+\item{bounds}{An optional data frame specifying the limits to be used on
+bounded space. Should be an array of 2 x number of variables with each
+column having the lower and upper limit.}
 
 \item{replicates}{Integer vector determining the number of complete Gibbs
 sampling passes to be performed.}
@@ -47,13 +47,14 @@ sampling passes to be performed.}
 \item{parallel}{Logical that if \code{TRUE} uses the \code{parallel} package to simulate
 values using parallel computing.}
 
-\item{ncores}{Integer vector that determines the number of cores used in parallel computing.}
+\item{ncores}{Integer vector that determines the number of cores used in
+parallel computing.}
 
 \item{mps}{Integer vector that places a limit on maximum number of probabilities
 calculated at a time. The default is 5000.}
 
-\item{fixed.var}{Integer vector or string of variable names detailing the \code{moped}
-position or column name of the variable(s) conditioned upon without
+\item{fixed.var}{Integer vector or string of variable names detailing the
+\code{moped} position or column name of the variable(s) conditioned upon without
 imputation. The default is \code{NULL}.}
 
 \item{er_alert}{Logical that if \code{TRUE} (default) will return an error

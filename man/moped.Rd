@@ -25,9 +25,9 @@ moped(
 reference distribution to be used for each variable (column) of Sample. Choices
 are \code{"Uniform"} (default), \code{"Normal"}, \code{"Gamma"}, and \code{"Beta"} distributions.}
 
-\item{bounds}{An optional data frame specifying the limits to be used on bounded space.
-Should be an array of 2 x number of variables with each column having the
-lower and upper limit. If \code{NULL} (default) bounds are estimated based on
+\item{bounds}{An optional data frame specifying the limits to be used on bounded
+space. Should be an array of 2 x number of variables with each column having
+the lower and upper limit. If \code{NULL} (default) bounds are estimated based on
 range of \code{Sample}.}
 
 \item{variance}{Logical that if \code{TRUE} (default), computes a variance estimate
@@ -35,7 +35,7 @@ of each coefficient.}
 
 \item{recurrence}{Logical that if \code{TRUE}, computes the two-term recurrence
 relation of each marginal orthogonal polynomial. Terms take the form
-$P_{n+1}(x) = (R_nx + S_n)P_n(x) + T_nP_{n-1}(x)$.}
+\eqn{P_{n+1}(x) = (R_nx + S_n)P_n(x) + T_nP_{n-1}(x)}.}
 
 \item{opt.mpo}{Logical that if \code{TRUE} (the default), determines an optimal
 max polynomial order estimate  using repeated k-fold cross-validation.}

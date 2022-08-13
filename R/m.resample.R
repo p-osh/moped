@@ -155,74 +155,75 @@ m.resample <- function(fit,
       }
       error <- which(apply(is.nan(Condk$coef),1,sum)>0)
 
-      if(length(error)> 0){
-        Sample <- Sample[-error,]
-        Condk$coef <- Condk$coef[-error,]
-        nonerror <- nonerror[-error]
-        SS <- NROW(Sample)
-      }
-      synthetic_generator <- function(i){
-        U <- c()
-        coefi <- Condk$coef[i, ]
-        cnt <- 0
-        boundsi <- bounds[, nu]
-        endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
-        dproot <- polyroot(coefi[-1] * (1:(K[nu]+1)))
-        dzeros <- sort(Re(dproot)[round(Im(dproot), 2) == 0 &
-                                    Re(dproot) > boundsi[1] & Re(dproot) < boundsi[2]])
-        if (length(dzeros) > 0) {
-          rootmean <- (c(boundsi[1], dzeros) - c(dzeros, boundsi[2])) / 2
-          rmi <- sapply(0:(K[nu]), function(k) (dzeros + rootmean[-length(rootmean)])^k)
-          dsign <- sign( rmi %*% (coefi[-1] * (0:K[nu]+1)))
-          statpoints <- sapply(0:(K[nu] + 1), function(k) dzeros ^ k) %*% coefi
-
-          ### Trimming
-          if (dsign[1] == -1) boundsi[1] <- dzeros[1] else if (statpoints[1] < 0.05) boundsi[1] <- dzeros[2]
-          if (dsign[length(dsign)] == 1) boundsi[2] <- dzeros[length(dzeros)] else if
-          (statpoints[length(statpoints)] > 1 - 0.05) boundsi[2] <- dzeros[length(dzeros) - 1]
-          dsign <- dsign[dzeros > boundsi[1] & dzeros < boundsi[2]]
-          statpoints <- statpoints[dzeros > boundsi[1] & dzeros < boundsi[2]]
-          dzeros <- dzeros[dzeros > boundsi[1] & dzeros < boundsi[2]]
-          ##########################
-
-          endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
-          nadjs <- length(statpoints)
-          if (nadjs > 0) cdfadj <-statpoints[seq(1, nadjs, 2)] - statpoints[seq(2, nadjs, 2)] else cdfadj <- 0
-
-          U[1] <- runif(1, endpoints[1], endpoints[2] + sum(cdfadj))
-
-          if (nadjs > 0) {
-            uregion <- which( U[1] < c(statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj) , endpoints[2] + sum(cdfadj))
-                              & U[1] > c(endpoints[1] , statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj)) )
-            boundsi[2] <- c(dzeros[seq(1, length(statpoints), 2)]  , boundsi[2] )[uregion]
-            boundsi[1] <- c(boundsi[1] , dzeros[seq(2, length(statpoints), 2)] )[uregion]
-            coefi[1] <- Condk$coef[i, 1] + c(0,cumsum(cdfadj))[uregion]
-          }
-        } else{
-          U[1] <- runif(1, endpoints[1], endpoints[2])
+        if(length(error)> 0){
+          Sample <- Sample[-error,]
+          Condk$coef <- Condk$coef[-error,]
+          nonerror <- nonerror[-error]
+          SS <- NROW(Sample)
         }
-        coefi[1] <- coefi[1]- U[1]
-        proot <- polyroot(coefi)
-        sim <-(Re(proot)[round(Im(proot), 2) == 0 &
-                           Re(proot) >= boundsi[1] & Re(proot) <= boundsi[2]])
-        return(sim)
-      }
+        synthetic_generator <- function(i){
+          U <- c()
+          coefi <- Condk$coef[i, ]
+          cnt <- 0
+          boundsi <- bounds[, nu]
+          endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
+          dproot <- polyroot(coefi[-1] * (1:(K[nu]+1)))
+          dzeros <- sort(Re(dproot)[round(Im(dproot), 2) == 0 &
+                                      Re(dproot) > boundsi[1] & Re(dproot) < boundsi[2]])
+          if (length(dzeros) > 0) {
+            rootmean <- (c(boundsi[1], dzeros) - c(dzeros, boundsi[2])) / 2
+            rmi <- sapply(0:(K[nu]), function(k) (dzeros + rootmean[-length(rootmean)])^k)
+            dsign <- sign( rmi %*% (coefi[-1] * (0:K[nu]+1)))
+            statpoints <- sapply(0:(K[nu] + 1), function(k) dzeros ^ k) %*% coefi
 
-      for(i in 1:SS){
-        an.error.occured <- FALSE
-        tryCatch( { Sample[i,nu] <- synthetic_generator(i) }
-                  , error = function(e) {an.error.occured <<- TRUE})
-        if(an.error.occured) error <- c(error,i)
-      }
+            ### Trimming
+            if (dsign[1] == -1) boundsi[1] <- dzeros[1] else if (statpoints[1] < 0.05) boundsi[1] <- dzeros[2]
+            if (dsign[length(dsign)] == 1) boundsi[2] <- dzeros[length(dzeros)] else if
+            (statpoints[length(statpoints)] > 1 - 0.05) boundsi[2] <- dzeros[length(dzeros) - 1]
+            dsign <- dsign[dzeros > boundsi[1] & dzeros < boundsi[2]]
+            statpoints <- statpoints[dzeros > boundsi[1] & dzeros < boundsi[2]]
+            dzeros <- dzeros[dzeros > boundsi[1] & dzeros < boundsi[2]]
+            ##########################
 
-      if(length(error)> 0){
-        Sample <- Sample[-error,]
-        Condk$coef <- Condk$coef[-error,]
-        nonerror <- nonerror[-error]
-        SS <- NROW(Sample)
-      }
+            endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
+            nadjs <- length(statpoints)
+            if (nadjs > 0) cdfadj <-statpoints[seq(1, nadjs, 2)] - statpoints[seq(2, nadjs, 2)] else cdfadj <- 0
+
+            U[1] <- runif(1, endpoints[1], endpoints[2] + sum(cdfadj))
+
+            if (nadjs > 0) {
+              uregion <- which( U[1] < c(statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj) , endpoints[2] + sum(cdfadj))
+                                & U[1] > c(endpoints[1] , statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj)) )
+              boundsi[2] <- c(dzeros[seq(1, length(statpoints), 2)]  , boundsi[2] )[uregion]
+              boundsi[1] <- c(boundsi[1] , dzeros[seq(2, length(statpoints), 2)] )[uregion]
+              coefi[1] <- Condk$coef[i, 1] + c(0,cumsum(cdfadj))[uregion]
+            }
+          } else{
+            U[1] <- runif(1, endpoints[1], endpoints[2])
+          }
+          coefi[1] <- coefi[1]- U[1]
+          proot <- polyroot(coefi)
+          sim <-(Re(proot)[round(Im(proot), 2) == 0 &
+                             Re(proot) >= boundsi[1] & Re(proot) <= boundsi[2]])
+          return(sim)
+        }
+
+        for(i in 1:SS){
+          an.error.occured <- FALSE
+          tryCatch( { Sample[i,nu] <- synthetic_generator(i) }
+                    , error = function(e) {an.error.occured <<- TRUE})
+          if(an.error.occured) error <- c(error,i)
+        }
+
+        if(length(error)> 0){
+          Sample <- Sample[-error,]
+          Condk$coef <- Condk$coef[-error,]
+          nonerror <- nonerror[-error]
+          SS <- NROW(Sample)
+        }
       }else{
         if(length(variables[-nu])==0){
+<<<<<<< HEAD
         lb <- estimate.marg.cdf(fit,K = K[nu],
                                X= fit$SampleStats$Range[1,variables[nu]],
                                variable = variables[nu])$Prob
@@ -287,17 +288,17 @@ m.resample <- function(fit,
                                                       colnames(Sample)[-nu]),
                                          K.Y = K[-nu],
                                          X.variable = variables[nu], Y.variables = variables[-nu])$Prob
-            mfX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
-            fX <-  predict(fit, K= c(K[nu],K[-nu]),X=xi_vec,
-                           variables = c(variables[nu],variables[-nu]))$Density
-            xi <- xi - mfX*(FX-u)/fX
-            it_cnt <- it_cnt + 1
+              mfX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
+              fX <-  predict(fit, K= c(K[nu],K[-nu]),X=xi_vec,
+                             variables = c(variables[nu],variables[-nu]))$Density
+              xi <- xi - mfX*(FX-u)/fX
+              it_cnt <- it_cnt + 1
             }
             if(is.nan(unlist(xi)) | it_cnt>=100 |
                xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
               grid_pts <- data.frame(seq(fit$SampleStats$Range[1,variables[nu]],
-                              fit$SampleStats$Range[2,variables[nu]],length.out=200))
+                                         fit$SampleStats$Range[2,variables[nu]],length.out=200))
               colnames(grid_pts) <- variables_names[nu]
               grid_pts <- suppressWarnings(cbind(grid_pts,setNames(data.frame(Sample[,-nu]),
                                                                    colnames(Sample)[-nu])))

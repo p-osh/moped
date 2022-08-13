@@ -314,6 +314,7 @@ moped <- function(
   output$Recurrence = list(Rn = Rn[-((K):NROW(lambda)),],
                            Sn = Sn[-((K):NROW(lambda)),],
                            Tn = Tn[-((K):NROW(lambda)),])
+
   }
   class(output) <- "moped"
   return(output)

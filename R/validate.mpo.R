@@ -54,20 +54,20 @@ validate.mpo <- function(fit,
   NaTerms_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
   if (variance) Cn2_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
 
-    for (j in 1:NS){
-      TempPoly <- Poly[0:K + 1, j, 1]
-      if (Nv > 1)
-        for (k in 2:Nv)
-          TempPoly <- TempPoly %o% Poly[0:K + 1, j, k]
-      isNaTerm <- is.na(TempPoly)
-      TempPoly[isNaTerm] <- 0
-      for(r in 1:repeats){
-        Cn_folds[r,folds[[r]][j]][[1]] <- unlist(Cn_folds[r,folds[[r]][j]]) + TempPoly
-        NaTerms_folds[r,folds[[r]][j]][[1]] <- unlist(NaTerms_folds[r,folds[[r]][j]]) + isNaTerm
-        if (variance) Cn2_folds[r,folds[[r]][j]][[1]] <- unlist(Cn2_folds[r,folds[[r]][j]]) + TempPoly^2
-      }
-      progress(100*j/NS)
+  for (j in 1:NS){
+    TempPoly <- Poly[0:K + 1, j, 1]
+    if (Nv > 1)
+      for (k in 2:Nv)
+        TempPoly <- TempPoly %o% Poly[0:K + 1, j, k]
+    isNaTerm <- is.na(TempPoly)
+    TempPoly[isNaTerm] <- 0
+    for(r in 1:repeats){
+      Cn_folds[r,folds[[r]][j]][[1]] <- unlist(Cn_folds[r,folds[[r]][j]]) + TempPoly
+      NaTerms_folds[r,folds[[r]][j]][[1]] <- unlist(NaTerms_folds[r,folds[[r]][j]]) + isNaTerm
+      if (variance) Cn2_folds[r,folds[[r]][j]][[1]] <- unlist(Cn2_folds[r,folds[[r]][j]]) + TempPoly^2
     }
+    progress(100*j/NS)
+  }
 
   N_folds <- array(lapply(1:(repeats*nfolds),function(i)array(0,dim=c(rep(K+1,Nv)))),dim = c(repeats,nfolds))
   for(r in 1:repeats)
@@ -93,23 +93,23 @@ validate.mpo <- function(fit,
   Cn <- 0
   varCn <- 0
   if(nfolds > 1){
-  for(r in 1:repeats)
-    for(fi in 1:nfolds){
-  N_coef <- apply(array(unlist(N_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1)),1:Nv,sum)
-  Cn_fi <- apply(
-              array(unlist(N_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))*
-              array(unlist(Cn_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))
-                  ,1:Nv,sum)/N_coef
-  Cn <- Cn + Cn_fi/(repeats*nfolds)
-  Nk_norm <- Nk_norm + cumsumer(Cn_fi^2 - 2*Cn_fi*Cn_folds[r,fi][[1]])/(repeats*nfolds)
-  if(variance){
-       Cn2_fi <- apply(
-                array(unlist(N_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))*
-                  array(unlist(Cn2_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))
-                 ,1:Nv,sum)/N_coef
-       varCn <- varCn + (Cn2_fi - Cn_fi^2)/(repeats*nfolds)
+    for(r in 1:repeats)
+      for(fi in 1:nfolds){
+        N_coef <- apply(array(unlist(N_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1)),1:Nv,sum)
+        Cn_fi <- apply(
+          array(unlist(N_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))*
+            array(unlist(Cn_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))
+          ,1:Nv,sum)/N_coef
+        Cn <- Cn + Cn_fi/(repeats*nfolds)
+        Nk_norm <- Nk_norm + cumsumer(Cn_fi^2 - 2*Cn_fi*Cn_folds[r,fi][[1]])/(repeats*nfolds)
+        if(variance){
+          Cn2_fi <- apply(
+            array(unlist(N_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))*
+              array(unlist(Cn2_folds[r,(1:nfolds)[-fi]]),dim=c(rep(K+1,Nv),nfolds-1))
+            ,1:Nv,sum)/N_coef
+          varCn <- varCn + (Cn2_fi - Cn_fi^2)/(repeats*nfolds)
+        }
       }
-    }
     Nk_vec <- Nk_norm[sapply(1:Nv, function(k) 0:K+1)]
     opt_mpo_vec <- which(Nk_norm == min(Nk_norm),arr.ind = T)-1
     opt_mpo <- which(Nk_vec == min(Nk_vec),arr.ind = T)-1

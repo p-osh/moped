@@ -73,14 +73,14 @@ estimate.marg.cdf <- function(fit,
   C <- c(extract.array(fit$Cn,indices = subsetnames))%o%array(1,dim=c(nprobs))
 
   XDP <- (fit$PolyCoef[2:(K+1),2:(K+1),variable]/fit$Lambda[1:K,variable])*
-          t(array(1:K,dim = rep(K,2)))
+    t(array(1:K,dim = rep(K,2)))
   if(fit$Distrib[variable]=="Uniform"){
-  fnu <- 1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
-  E <- t(t(XDP)%*%C)*fnu
-  coef <- cbind(fit$Sigma[3,variable]*E,0,0) + cbind(0,fit$Sigma[2,variable]*E,0) + cbind(0,0,fit$Sigma[1,variable]*E)
-  coef[,1] <- coef[,1]-fit$Paramaters[1,variable]/
-    (fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
-  coef[,2] <- coef[,2]+1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
+    fnu <- 1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
+    E <- t(t(XDP)%*%C)*fnu
+    coef <- cbind(fit$Sigma[3,variable]*E,0,0) + cbind(0,fit$Sigma[2,variable]*E,0) + cbind(0,0,fit$Sigma[1,variable]*E)
+    coef[,1] <- coef[,1]-fit$Paramaters[1,variable]/
+      (fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
+    coef[,2] <- coef[,2]+1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
   }else{
     fnu <- fit$PDFControl(variable)$PDF(X)
     Fnu <- fit$PDFControl(variable)$CDF(X)

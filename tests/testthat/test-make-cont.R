@@ -36,7 +36,7 @@ test_that("check amalgamated variables are continulized", {
   expect_equal(
     stringr::str_sort(colnames(make.cat(Data_amal))),
     stringr::str_sort(colnames(Data))
-      )
+  )
 
 })
 

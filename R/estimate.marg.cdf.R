@@ -1,7 +1,7 @@
 #' Calculate univariate marginal distribution function probabilities.
 #'
 #' @description
-#' `predict.marg.cdf()` is used to calculate univariate marginal cumulative
+#' `estimate.marg.cdf()` is used to calculate univariate marginal cumulative
 #'  distribution function probabilities and the polynomial coefficients of the
 #'  polynomical approximation from any `moped` object.
 #'
@@ -20,7 +20,7 @@
 #'  variable position or name to be predicted from `moped` object.
 #'
 #'
-#' @return `predict.marg.cdf()` returns a list with the following components:
+#' @return `estimate.marg.cdf()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.
 #'   \item `coef` - An array of coefficients of the polynomial approximation.
@@ -32,7 +32,7 @@
 #' @examples
 #' require(ISLR)
 #' Data_full <- Wage
-#' 
+#'
 #' require(tidyverse)
 #' Data <- Data_full %>%
 #' select(age, education, jobclass,wage)
@@ -48,23 +48,23 @@
 #'
 #' # Compute marginal distribution function probabilities of "wage"
 #' x <- seq(21,310,length.out = 100)
-#' wage_prob <- predict.marg.cdf(Fit, X = x, K = 10, variable = "wage")
+#' wage_prob <- estimate.marg.cdf(Fit, X = x, K = 10, variable = "wage")
 
 
 
 
-predict.marg.cdf <- function(fit,
-                             X = NULL,
-                             K = NULL,
-                             nprobs = 1,
-                             variable = 1
+estimate.marg.cdf <- function(fit,
+                              X = NULL,
+                              K = NULL,
+                              nprobs = 1,
+                              variable = 1
 ){
   if(is.character(variable)){
     variable <-  which(colnames(fit$SampleStats$Sample) %in% variable)
   }
-  try(if(is.null(X) & fit$Distrib[variable] != "Uniform"){
-    return(cat("Error: Non-uniform approximations require numeric values for X."))
-  }else{
+  if(is.null(X) & fit$Distrib[variable] != "Uniform"){
+    stop("Non-uniform approximations require numeric values for X.")
+  }
   if(is.null(K)) K <- fit$opt_mpo
   if(is.null(K)) K <- fit$KMax
   if(!is.null(X)) nprobs <- NROW(X)
@@ -73,14 +73,14 @@ predict.marg.cdf <- function(fit,
   C <- c(extract.array(fit$Cn,indices = subsetnames))%o%array(1,dim=c(nprobs))
 
   XDP <- (fit$PolyCoef[2:(K+1),2:(K+1),variable]/fit$Lambda[1:K,variable])*
-          t(array(1:K,dim = rep(K,2)))
+    t(array(1:K,dim = rep(K,2)))
   if(fit$Distrib[variable]=="Uniform"){
-  fnu <- 1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
-  E <- t(t(XDP)%*%C)*fnu
-  coef <- cbind(fit$Sigma[3,variable]*E,0,0) + cbind(0,fit$Sigma[2,variable]*E,0) + cbind(0,0,fit$Sigma[1,variable]*E)
-  coef[,1] <- coef[,1]-fit$Paramaters[1,variable]/
-    (fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
-  coef[,2] <- coef[,2]+1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
+    fnu <- 1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
+    E <- t(t(XDP)%*%C)*fnu
+    coef <- cbind(fit$Sigma[3,variable]*E,0,0) + cbind(0,fit$Sigma[2,variable]*E,0) + cbind(0,0,fit$Sigma[1,variable]*E)
+    coef[,1] <- coef[,1]-fit$Paramaters[1,variable]/
+      (fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
+    coef[,2] <- coef[,2]+1/(fit$Paramaters[2,variable]-fit$Paramaters[1,variable])
   }else{
     fnu <- fit$PDFControl(variable)$PDF(X)
     Fnu <- fit$PDFControl(variable)$CDF(X)
@@ -95,5 +95,4 @@ predict.marg.cdf <- function(fit,
     names(Prob) <- names(X)
     return(list(Prob = Prob,coef = coef))
   }
-  })
 }

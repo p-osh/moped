@@ -11,7 +11,7 @@
 #' @examples
 #' require(ISLR)
 #' Data_full <- Wage
-#' 
+#'
 #' require(tidyverse)
 #' Data <- Data_full %>%
 #' select(age, maritl, race, education, jobclass, wage)
@@ -70,63 +70,63 @@ make.cat <- function(Sample,
   if(is.null(Cats) & !is.null(fit)) Cats <- fit$Cats
 
   if(is.null(Cats)){
-    cat('Error: Data frame must be output of make.cont() or m.resample().')
-    cat('Please specify the fitted moped object to re-categorise.')
+    stop('Data frame must be output of make.cont() or m.resample().
+         Please specify the fitted moped object to re-categorise.')
   }else if (prod(Cats$catvar_names %in% colnames(Sample))) {
 
-  contvar_names <- setdiff(colnames(Sample),Cats$catvar_names)
+    contvar_names <- setdiff(colnames(Sample),Cats$catvar_names)
 
-  CamalSam <- Sample[,Cats$catvar_names]
+    CamalSam <- Sample[,Cats$catvar_names]
 
-  if(NCOL(CamalSam) == 1) CamalSam <- as.data.frame(CamalSam)
+    if(NCOL(CamalSam) == 1) CamalSam <- as.data.frame(CamalSam)
 
-  amalSam <- data.frame()
+    amalSam <- data.frame()
 
-  inv.sel.bound <- function(i,j){
-    if(i ==1){
-      case <- which(Cats$lowerlist[[1]] < CamalSam[j,1] &
-                      Cats$upperlist[[1]] > CamalSam[j,1])
+    inv.sel.bound <- function(i,j){
+      if(i ==1){
+        case <- which(Cats$lowerlist[[1]] < CamalSam[j,1] &
+                        Cats$upperlist[[1]] > CamalSam[j,1])
+      }else{
+        case <- which(indexer(
+          polyinv(aperm(Cats$lowerlist[[i]],perm = c(i,1:(i-1)))),
+          unlist(amalSam[j,1:(i-1)])) < CamalSam[j,i] &
+            indexer(polyinv(
+              aperm(Cats$upperlist[[i]],perm = c(i,1:(i-1)))),
+              unlist(amalSam[j,1:(i-1)])) > CamalSam[j,i])
+      }
+      return(case)
+    }
+
+    for(k in 1:NCOL(CamalSam)){
+      for(j in 1:NROW(CamalSam)){
+        amalSam[j,k] <- inv.sel.bound(k,j)
+      }
+    }
+    amalSam <- data.frame(lapply(amalSam,factor))
+    for(k in 1:NCOL(amalSam)) levels(amalSam[,k]) <- Cats$caselist[[k]]
+
+    CatSam <- array(dim=c(NROW(Sample),1))
+
+    for(i in length(Cats$amalgams):1){
+      if(length(Cats$amalgams[[i]]) > 1){
+        amal_split <- data.frame(matrix(unlist(strsplit(as.character(amalSam[,i]),"_;_",fixed=T)),ncol=2,byrow=T))
+        amal_split <- data.frame(lapply(amal_split,factor))
+      }else{
+        amal_split <- data.frame(factor(amalSam[,i]))
+      }
+      colnames(amal_split) <- Cats$amalgams_names[[i]]
+      CatSam <- cbind(amal_split,CatSam)
+    }
+    CatSam <- CatSam[,-NCOL(CatSam)]
+
+    if(!Cats$amalgamated){
+      Sample[,Cats$catvar_names] <- CatSam
     }else{
-      case <- which(indexer(
-        polyinv(aperm(Cats$lowerlist[[i]],perm = c(i,1:(i-1)))),
-        unlist(amalSam[j,1:(i-1)])) < CamalSam[j,i] &
-          indexer(polyinv(
-            aperm(Cats$upperlist[[i]],perm = c(i,1:(i-1)))),
-            unlist(amalSam[j,1:(i-1)])) > CamalSam[j,i])
+      Sample <- cbind(CatSam,Sample[,contvar_names])
     }
-    return(case)
-  }
-
-  for(k in 1:NCOL(CamalSam)){
-    for(j in 1:NROW(CamalSam)){
-      amalSam[j,k] <- inv.sel.bound(k,j)
-    }
-  }
-  amalSam <- data.frame(lapply(amalSam,factor))
-  for(k in 1:NCOL(amalSam)) levels(amalSam[,k]) <- Cats$caselist[[k]]
-
-  CatSam <- array(dim=c(NROW(Sample),1))
-
-  for(i in length(Cats$amalgams):1){
-    if(length(Cats$amalgams[[i]]) > 1){
-      amal_split <- data.frame(matrix(unlist(strsplit(as.character(amalSam[,i]),"_;_",fixed=T)),ncol=2,byrow=T))
-      amal_split <- data.frame(lapply(amal_split,factor))
-    }else{
-      amal_split <- data.frame(factor(amalSam[,i]))
-    }
-    colnames(amal_split) <- Cats$amalgams_names[[i]]
-    CatSam <- cbind(amal_split,CatSam)
-  }
-  CatSam <- CatSam[,-NCOL(CatSam)]
-
-  if(!Cats$amalgamated){
-    Sample[,Cats$catvar_names] <- CatSam
-  }else{
-    Sample <- cbind(CatSam,Sample[,contvar_names])
-  }
 
   }else{
-    cat('Error: Sample must be a data frame containing columns ',Cats$catvar_names)
+    stop('Sample must be a data frame containing columns ',paste(Cats$catvar_names,collapse=" "))
   }
   return(Sample)
 }

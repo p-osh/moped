@@ -1,4 +1,4 @@
-#' Generate resampled (synthetic) samples from moped estimate.
+#' Generate resampled samples from 'moped' estimate.
 #'
 #' @description
 #' `m.resample()` is used to generate synthetic samples from full, conditional,
@@ -116,18 +116,18 @@ m.resample <- function(fit,
 
   test_names <- prod(variables_names %in% colnames(Sample)) == 0 | !is.data.frame(Sample)
 
-  try(if(test_names){
-    return(cat("\r Error: Sample must be a data frame and contain columns named ",variables_names))
-  } else {
-    tryCatch(bounds <- setNames(data.frame(bounds[,variables_names]),
-                                variables_names),
-             error = function(e) bounds <<- NULL)
-    if(is.null(bounds)){
-      bounds <- as.data.frame(fit$SampleStats$Range[,variables])
-      colnames(bounds) <- variables_names
-    }
-    if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,Nv)
-    if(is.null(K)) K <- rep(fit$KMax,Nv)
+  if(test_names){
+    stop("Sample must be a data frame and contain columns named ",paste(variables_names,collapse = " "))
+  }
+  tryCatch(bounds <- setNames(data.frame(bounds[,variables_names]),
+                              variables_names),
+           error = function(e) bounds <<- NULL)
+  if(is.null(bounds)){
+    bounds <- as.data.frame(fit$SampleStats$Range[,variables])
+    colnames(bounds) <- variables_names
+  }
+  if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,Nv)
+  if(is.null(K)) K <- rep(fit$KMax,Nv)
   if(length(K)==1) K <- rep(K,Nv)
   K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
 
@@ -142,110 +142,110 @@ m.resample <- function(fit,
   for(re in 1:replicates){
     for(nu in impute.vars){
       if(fit$Distrib[variables[nu]] == "Uniform"){
-      if(length(variables[-nu])==0){
-      Condk <- predict.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample),
-                                variable = variables[nu])
-      }else{
-      Condk <- predict.conditional(fit,
-                                   K.X = K[nu],
-                                   Y = setNames(data.frame(Sample[,-nu]),
-                                                colnames(Sample)[-nu]), K.Y = K[-nu],
-                                   X.variable = variables[nu],
-                                   Y.variables = variables[-nu])
-      }
-      error <- which(apply(is.nan(Condk$coef),1,sum)>0)
-
-      if(length(error)> 0){
-        Sample <- Sample[-error,]
-        Condk$coef <- Condk$coef[-error,]
-        nonerror <- nonerror[-error]
-        SS <- NROW(Sample)
-      }
-      synthetic_generator <- function(i){
-        U <- c()
-        coefi <- Condk$coef[i, ]
-        cnt <- 0
-        boundsi <- bounds[, nu]
-        endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
-        dproot <- polyroot(coefi[-1] * (1:(K[nu]+1)))
-        dzeros <- sort(Re(dproot)[round(Im(dproot), 2) == 0 &
-                                    Re(dproot) > boundsi[1] & Re(dproot) < boundsi[2]])
-        if (length(dzeros) > 0) {
-          rootmean <- (c(boundsi[1], dzeros) - c(dzeros, boundsi[2])) / 2
-          rmi <- sapply(0:(K[nu]), function(k) (dzeros + rootmean[-length(rootmean)])^k)
-          dsign <- sign( rmi %*% (coefi[-1] * (0:K[nu]+1)))
-          statpoints <- sapply(0:(K[nu] + 1), function(k) dzeros ^ k) %*% coefi
-
-          ### Trimming
-          if (dsign[1] == -1) boundsi[1] <- dzeros[1] else if (statpoints[1] < 0.05) boundsi[1] <- dzeros[2]
-          if (dsign[length(dsign)] == 1) boundsi[2] <- dzeros[length(dzeros)] else if
-          (statpoints[length(statpoints)] > 1 - 0.05) boundsi[2] <- dzeros[length(dzeros) - 1]
-          dsign <- dsign[dzeros > boundsi[1] & dzeros < boundsi[2]]
-          statpoints <- statpoints[dzeros > boundsi[1] & dzeros < boundsi[2]]
-          dzeros <- dzeros[dzeros > boundsi[1] & dzeros < boundsi[2]]
-          ##########################
-
-          endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
-          nadjs <- length(statpoints)
-          if (nadjs > 0) cdfadj <-statpoints[seq(1, nadjs, 2)] - statpoints[seq(2, nadjs, 2)] else cdfadj <- 0
-
-          U[1] <- runif(1, endpoints[1], endpoints[2] + sum(cdfadj))
-
-          if (nadjs > 0) {
-            uregion <- which( U[1] < c(statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj) , endpoints[2] + sum(cdfadj))
-                              & U[1] > c(endpoints[1] , statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj)) )
-            boundsi[2] <- c(dzeros[seq(1, length(statpoints), 2)]  , boundsi[2] )[uregion]
-            boundsi[1] <- c(boundsi[1] , dzeros[seq(2, length(statpoints), 2)] )[uregion]
-            coefi[1] <- Condk$coef[i, 1] + c(0,cumsum(cdfadj))[uregion]
-          }
-        } else{
-          U[1] <- runif(1, endpoints[1], endpoints[2])
-        }
-        coefi[1] <- coefi[1]- U[1]
-        proot <- polyroot(coefi)
-        sim <-(Re(proot)[round(Im(proot), 2) == 0 &
-                           Re(proot) >= boundsi[1] & Re(proot) <= boundsi[2]])
-        return(sim)
-      }
-
-      for(i in 1:SS){
-        an.error.occured <- FALSE
-        tryCatch( { Sample[i,nu] <- synthetic_generator(i) }
-                  , error = function(e) {an.error.occured <<- TRUE})
-        if(an.error.occured) error <- c(error,i)
-      }
-
-      if(length(error)> 0){
-        Sample <- Sample[-error,]
-        Condk$coef <- Condk$coef[-error,]
-        nonerror <- nonerror[-error]
-        SS <- NROW(Sample)
-      }
-      }else{
-        if(length(variables[-n])==0){
-        lb <- predict.marg.cdf(fit,K = K[nu],
-                               X= fit$SampleStats$Range[1,variables[nu]],
-                               variable = variables[nu])$Prob
-        ub <- predict.marg.cdf(fit,K = K[nu],
-                               X= fit$SampleStats$Range[2,variables[nu]],
-                               variable = variables[nu])$Prob
+        if(length(variables[-nu])==0){
+          Condk <- estimate.marg.cdf(fit,K = K[nu],nprobs = NROW(Sample),
+                                     variable = variables[nu])
         }else{
-          lb <- predict.conditional(fit,K.X = K[nu],
-                                    X= rep(fit$SampleStats$Range[1,variables[nu]],
-                                           NROW(Sample)),
-                                    Y = setNames(data.frame(Sample[,-nu]),
-                                                 colnames(Sample)[-nu]),
-                                    K.Y = K[-nu],
-                                    X.variable = variables[nu],
-                                    Y.variables = variables[-nu])$Prob
-          ub <- predict.conditional(fit,K.X = K[nu],
-                                    X= rep(fit$SampleStats$Range[2,variables[nu]],
-                                           NROW(Sample)),
-                                    setNames(data.frame(Sample[,-nu]),
-                                             colnames(Sample)[-nu]),
-                                    K.Y = K[-nu],
-                                    X.variable = variables[nu],
-                                    Y.variables = variables[-nu])$Prob
+          Condk <- estimate.conditional(fit,
+                                        K.X = K[nu],
+                                        Y = setNames(data.frame(Sample[,-nu]),
+                                                     colnames(Sample)[-nu]), K.Y = K[-nu],
+                                        X.variable = variables[nu],
+                                        Y.variables = variables[-nu])
+        }
+        error <- which(apply(is.nan(Condk$coef),1,sum)>0)
+
+        if(length(error)> 0){
+          Sample <- Sample[-error,]
+          Condk$coef <- Condk$coef[-error,]
+          nonerror <- nonerror[-error]
+          SS <- NROW(Sample)
+        }
+        synthetic_generator <- function(i){
+          U <- c()
+          coefi <- Condk$coef[i, ]
+          cnt <- 0
+          boundsi <- bounds[, nu]
+          endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
+          dproot <- polyroot(coefi[-1] * (1:(K[nu]+1)))
+          dzeros <- sort(Re(dproot)[round(Im(dproot), 2) == 0 &
+                                      Re(dproot) > boundsi[1] & Re(dproot) < boundsi[2]])
+          if (length(dzeros) > 0) {
+            rootmean <- (c(boundsi[1], dzeros) - c(dzeros, boundsi[2])) / 2
+            rmi <- sapply(0:(K[nu]), function(k) (dzeros + rootmean[-length(rootmean)])^k)
+            dsign <- sign( rmi %*% (coefi[-1] * (0:K[nu]+1)))
+            statpoints <- sapply(0:(K[nu] + 1), function(k) dzeros ^ k) %*% coefi
+
+            ### Trimming
+            if (dsign[1] == -1) boundsi[1] <- dzeros[1] else if (statpoints[1] < 0.05) boundsi[1] <- dzeros[2]
+            if (dsign[length(dsign)] == 1) boundsi[2] <- dzeros[length(dzeros)] else if
+            (statpoints[length(statpoints)] > 1 - 0.05) boundsi[2] <- dzeros[length(dzeros) - 1]
+            dsign <- dsign[dzeros > boundsi[1] & dzeros < boundsi[2]]
+            statpoints <- statpoints[dzeros > boundsi[1] & dzeros < boundsi[2]]
+            dzeros <- dzeros[dzeros > boundsi[1] & dzeros < boundsi[2]]
+            ##########################
+
+            endpoints <-  sapply(0:(K[nu] + 1), function(k) boundsi ^ k) %*% coefi
+            nadjs <- length(statpoints)
+            if (nadjs > 0) cdfadj <-statpoints[seq(1, nadjs, 2)] - statpoints[seq(2, nadjs, 2)] else cdfadj <- 0
+
+            U[1] <- runif(1, endpoints[1], endpoints[2] + sum(cdfadj))
+
+            if (nadjs > 0) {
+              uregion <- which( U[1] < c(statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj) , endpoints[2] + sum(cdfadj))
+                                & U[1] > c(endpoints[1] , statpoints[seq(2, length(statpoints), 2)] + cumsum(cdfadj)) )
+              boundsi[2] <- c(dzeros[seq(1, length(statpoints), 2)]  , boundsi[2] )[uregion]
+              boundsi[1] <- c(boundsi[1] , dzeros[seq(2, length(statpoints), 2)] )[uregion]
+              coefi[1] <- Condk$coef[i, 1] + c(0,cumsum(cdfadj))[uregion]
+            }
+          } else{
+            U[1] <- runif(1, endpoints[1], endpoints[2])
+          }
+          coefi[1] <- coefi[1]- U[1]
+          proot <- polyroot(coefi)
+          sim <-(Re(proot)[round(Im(proot), 2) == 0 &
+                             Re(proot) >= boundsi[1] & Re(proot) <= boundsi[2]])
+          return(sim)
+        }
+
+        for(i in 1:SS){
+          an.error.occured <- FALSE
+          tryCatch( { Sample[i,nu] <- synthetic_generator(i) }
+                    , error = function(e) {an.error.occured <<- TRUE})
+          if(an.error.occured) error <- c(error,i)
+        }
+
+        if(length(error)> 0){
+          Sample <- Sample[-error,]
+          Condk$coef <- Condk$coef[-error,]
+          nonerror <- nonerror[-error]
+          SS <- NROW(Sample)
+        }
+      }else{
+        if(length(variables[-nu])==0){
+          lb <- estimate.marg.cdf(fit,K = K[nu],
+                                  X= fit$SampleStats$Range[1,variables[nu]],
+                                  variable = variables[nu])$Prob
+          ub <- estimate.marg.cdf(fit,K = K[nu],
+                                  X= fit$SampleStats$Range[2,variables[nu]],
+                                  variable = variables[nu])$Prob
+        }else{
+          lb <- estimate.conditional(fit,K.X = K[nu],
+                                     X= rep(fit$SampleStats$Range[1,variables[nu]],
+                                            NROW(Sample)),
+                                     Y = setNames(data.frame(Sample[,-nu]),
+                                                  colnames(Sample)[-nu]),
+                                     K.Y = K[-nu],
+                                     X.variable = variables[nu],
+                                     Y.variables = variables[-nu])$Prob
+          ub <- estimate.conditional(fit,K.X = K[nu],
+                                     X= rep(fit$SampleStats$Range[2,variables[nu]],
+                                            NROW(Sample)),
+                                     setNames(data.frame(Sample[,-nu]),
+                                              colnames(Sample)[-nu]),
+                                     K.Y = K[-nu],
+                                     X.variable = variables[nu],
+                                     Y.variables = variables[-nu])$Prob
         }
 
         synthetic_generator <- function(i){
@@ -255,14 +255,14 @@ m.resample <- function(fit,
             x0<-xi+1
             u <- runif(1,lb,ub)
             it_cnt <- 0
-            while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
-            x0 <- xi
-            FX <- predict.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob
-            fX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
-            xi <- xi - (FX-u)/fX
-            it_cnt <- it_cnt + 1
+            while(abs(x0-xi)>0.001 &!is.nan(unlist(xi)) & it_cnt <= 100){
+              x0 <- xi
+              FX <- estimate.marg.cdf(fit,K = K[nu], X= xi,variable = variables[nu])$Prob
+              fX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
+              xi <- xi - (FX-u)/fX
+              it_cnt <- it_cnt + 1
             }
-            if(is.nan(xi) | it_cnt>=100 |
+            if(is.nan(unlist(xi)) | it_cnt>=100 |
                xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
               fX <- predict(fit, K= K[nu],variables = variables[nu],nodes=200)
@@ -279,25 +279,25 @@ m.resample <- function(fit,
             x0<-xi+1
             u <- runif(1,lb[i],ub[i])
             it_cnt <- 0
-            while(abs(x0-xi)>0.001 &!is.nan(xi) & it_cnt <= 100){
-            x0 <- xi
-            xi_vec <- cbind(xi,setNames(data.frame(Sample[i,-nu]),colnames(Sample)[-nu]))
-            FX <- predict.conditional(fit,K.X = K[nu],X=xi,
+            while(abs(x0-xi)>0.001 & !is.nan(unlist(xi)) & it_cnt <= 100){
+              x0 <- xi
+              xi_vec <- cbind(xi,setNames(data.frame(Sample[i,-nu]),colnames(Sample)[-nu]))
+              FX <- estimate.conditional(fit,K.X = K[nu],X=xi,
                                          Y = setNames(data.frame(Sample[,-nu]),
                                                       colnames(Sample)[-nu]),
                                          K.Y = K[-nu],
                                          X.variable = variables[nu], Y.variables = variables[-nu])$Prob
-            mfX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
-            fX <-  predict(fit, K= c(K[nu],K[-nu]),X=xi_vec,
-                           variables = c(variables[nu],variables[-nu]))$Density
-            xi <- xi - mfX*(FX-u)/fX
-            it_cnt <- it_cnt + 1
+              mfX <- predict(fit, K= K[nu],X=xi,variables = variables[nu])$Density
+              fX <-  predict(fit, K= c(K[nu],K[-nu]),X=xi_vec,
+                             variables = c(variables[nu],variables[-nu]))$Density
+              xi <- xi - mfX*(FX-u)/fX
+              it_cnt <- it_cnt + 1
             }
-            if(is.nan(xi) | it_cnt>=100 |
+            if(is.nan(unlist(xi)) | it_cnt>=100 |
                xi < fit$SampleStats$Range[1,variables[nu]] |
                xi > fit$SampleStats$Range[2,variables[nu]]){
               grid_pts <- data.frame(seq(fit$SampleStats$Range[1,variables[nu]],
-                              fit$SampleStats$Range[2,variables[nu]],length.out=200))
+                                         fit$SampleStats$Range[2,variables[nu]],length.out=200))
               colnames(grid_pts) <- variables_names[nu]
               grid_pts <- suppressWarnings(cbind(grid_pts,setNames(data.frame(Sample[,-nu]),
                                                                    colnames(Sample)[-nu])))
@@ -345,6 +345,5 @@ m.resample <- function(fit,
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats
   return(Synth)
-   })
 }
 

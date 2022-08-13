@@ -4,18 +4,23 @@
 \alias{marginal.plot}
 \title{Marginal plots for each variable with a range of polynomial orders K.}
 \usage{
-marginal.plot(fit, k.range = 1:min(fit$KMax), ncol = 4, prompt = TRUE)
+marginal.plot(fit, k.range = 1:fit$KMax, ncol = 4, prompt = TRUE)
 }
 \arguments{
-\item{fit}{A result object from \code{moped()}.}
+\item{fit}{A \code{moped} object from \code{moped()}.}
 
-\item{k.range}{Range of polynomial orders K.}
+\item{k.range}{Range of polynomial orders K. Default is 1 to \code{KMax} specified
+in \code{moped} object.}
 
-\item{ncol}{Integer vector. Number of columns the marginal plots shown for a given variable.}
+\item{ncol}{Integer vector of number of columns the marginal plots shown for
+a given variable.}
 
 \item{prompt}{Logical, whether it needs the prompt to show the next plot.
 If \code{TRUE} (the default), press enter to show the next plot, If \code{FALSE},
-it means showing all plots simultaneously.}
+outputs all plots simultaneously.}
+}
+\value{
+\code{marginal.plot()} returns plots of each marginal variable.
 }
 \description{
 \code{marginal.plot()} is used to Marginal plots for each variable with a range of
@@ -23,37 +28,17 @@ polynomial orders K. Optimal bin width using the Freedman-Diaconis rule for
 each variable.
 }
 \examples{
-Data_full <- ISLR::Wage
-Data <- Data_full \%>\%
-select(age, education, jobclass,wage)
-
-# Convert Categorical Data to Continuous Data
-Data_x <- make.cont(Data, catvar = 2:3)
+require(sdcMicro)
+Data <- CASCrefmicrodata[,c(2,3,4,6)]
 
 # Fitting multivariate orthogonal polynomial based
-# density estimation function
-# Requires a data frame of bounds to fit on data.
-bounds <- data.frame(
-age  = c(18,80),
-education = c(0,1),
-jobclass = c(0,1),
-wage = c(0,350)
-)
-
-Fitting the Data
-Fit <- moped(
-Data_x,
-K=10,
-Distrib = rep("Uniform", 7),
-bounds = bounds,
-variance = T,
-recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
-)
+# density estimation function using default setting
+Fit <- moped(Data)
 
 # Check marginal densities with different polynomial K
+# Default setting, showing all marginal densities with prompting
 marginal.plot(Fit)
+# Marginal densities with user-specified polynomial order, number of columns
+# grid per plot and no prompting required
 marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
 }

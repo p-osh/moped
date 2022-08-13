@@ -1,7 +1,7 @@
-#' Plotting marginal distributions for each variable with a range of polynomial orders K.
+#' Marginal plots for each variable with a range of polynomial orders K.
 #'
 #' @description
-#' `marginal.plot()` is used to marginally plot the densities for each variable with a range of
+#' `marginal.plot()` is used to Marginal plots for each variable with a range of
 #' polynomial orders K. Optimal bin width using the Freedman-Diaconis rule for
 #' each variable.
 #'
@@ -28,7 +28,7 @@
 #' # Check marginal densities with different polynomial K
 #' # Default setting, showing all marginal densities with prompting
 #' marginal.plot(Fit)
-#' # Marginal densities with user-specified polynomial order, number of columns 
+#' # Marginal densities with user-specified polynomial order, number of columns
 #' # grid per plot and no prompting required
 #' marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
 

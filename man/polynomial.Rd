@@ -2,66 +2,47 @@
 % Please edit documentation in R/polynomial.R
 \name{polynomial}
 \alias{polynomial}
-\title{Computing MBD polynomials.}
+\title{Computing the univariate hyper-geometric type orthogonal polynomials.}
 \usage{
-polynomial(fit, X = NULL, K = NULL, variables = NULL, bounds = NULL)
+polynomial(fit, X, K = NULL, variables = NULL)
 }
 \arguments{
-\item{fit}{MBDensity type variable. Outputed from \code{moped()}.}
+\item{fit}{\code{moped} type object outputted from \code{moped()}.}
 
-\item{X}{Grid of probabilities to be calculated. If \code{NULL} (the default) than
-generates nodes x Nv grid.}
+\item{X}{data frame of observations with column names matching selected
+variables from \code{moped} type object.}
 
-\item{K}{K Integer vector. Maximum Truncation of Approximation on each
-variable. The default is the maximum MPO Order in \code{moped} object.}
+\item{K}{Integer vector of max polynomial order of approximation on each
+variable. Must be less than or equal to the maximum MPO K specified in
+\code{moped()}. The default is the \code{opt_mpo} or \code{KMax} (if \code{opt_mpo = NULL}) specified
+in \code{fit}.}
 
-\item{variables}{Integer vector or character string. Variables to be
-predicted from \code{moped} object. The default is 1:Nv or 1:NCOL(Sample)
-whichever smallest.}
-
-\item{bounds}{A data frame. Bounds allows you to control the grid min and max.
-Should be an array of 2 x number of variables. \code{NULL} is the default.}
+\item{variables}{Integer vector or character string of variable names. The
+\code{moped} position or column name of the variable(s) to be predicted from
+\code{moped} object. The default is \code{1:fit$Nv}.}
 }
 \value{
-MBD polynomials from MBDensity type object.
+A list with the following components:
+\itemize{
+\item \code{P} - List of marginal hyper-geometric orthogonal polynomial values.
+\item \code{PdfTerms} - Vector of reference density values for each obs of X.
+}
 }
 \description{
-Computing MBD polynomials.
+\code{polynomial()} is used to calculate the univariate hyper-geometric
+type orthogonal polynomials used in the \code{moped()} function.
 }
 \examples{
-Data_full <- ISLR::Wage
-Data <- Data_full \%>\%
-select(age, education, jobclass,wage)
-
-# Convert Categorical Data to Continuous Data
-Data_x <- make.cont(Data, catvar = 2:3)
+require(sdcMicro)
+Data <- CASCrefmicrodata[,c(2,3,4,6)]
 
 # Fitting multivariate orthogonal polynomial based
-# density estimation function
-# Requires a data frame of bounds to fit on data.
-bounds <- data.frame(
-age  = c(18,80),
-education = c(0,1),
-jobclass = c(0,1),
-wage = c(0,350)
-)
+# density estimation function using default setting
+Fit <- moped(Data)
 
-# Fitting the Data
-Fit <- moped(
-Data_x,
-K=10,
-Distrib = rep("Uniform", 7),
-bounds = bounds,
-variance = T,
-recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
-)
+# Define the observations.
+x0 <- Data[1:2,]
 
-# define the observation which the probability is desired.
-x0 <- Data_x[1,]
-
-# Manually Compute MBD Polynomials
+# Manually Compute MBD Polynomials.
 polynomial(Fit, X=x0, K=7)
 }

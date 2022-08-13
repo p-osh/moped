@@ -12,12 +12,12 @@ make.cont(Sample, catvar = 1:NCOL(Sample), amalgams = NULL)
 \item{catvar}{Columns to convert into continuous variables. Variable names
 can be used as if they were positions in the data frame.}
 
-\item{amalgams}{A list using numeric indicating the order of variables in
-\code{"catvar"}. It is the structure of amalgamating categorical variable when
-being continulized.}
+\item{amalgams}{A list using numeric positions indicating the order of variables in
+\code{"catvar"}. Each list item contains a vector of positions of \code{"catvar"}
+that are to be amalgamated into a single continuous variable.}
 }
 \value{
-\code{make.cont()} returns a data frame.
+\code{make.cont()} returns a data frame with strictly continuous values.
 }
 \description{
 \code{make.cont()} is used to converting categorical variables into continuous
@@ -25,19 +25,25 @@ variables. It must done before fitting data to the density estimation
 function \code{moped()}.
 }
 \examples{
-Data_full <- ISLR::Wage
+require(ISLR)
+Data_full <- Wage
 
 # Convert Categorical Data to Continuous Data
+require(tidyverse)
 Data <- Data_full \%>\%
 select(age, education, jobclass, wage)
 Data_x <- make.cont(Data, catvar = 2:3)
 # Select variables by name
-Data_x <- make.cont(Data, catvar = c("education","jobclass"))
+Data_x <- make.cont(Data, catvar = c("education", "jobclass"))
 
-# Convert categorical with amalgamations
+# Convert categorical with amalgamations of subsets of variables
 Data <- Data_full \%>\%
 select(age, maritl, race, education, jobclass, wage)
 Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
-amalgams = list(1:2, 3:4))
-
+amalgams = list(
+1:2, #maritl and race are 1st and 2nd variables in the catvar list
+#and they are amalgamated into a single variable.
+3:4 #education and jobclass are 3rd and 4th variables in the catvar list
+#and are amalgamated into a single variable.
+))
 }

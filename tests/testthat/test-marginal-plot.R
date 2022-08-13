@@ -4,7 +4,8 @@ test_that("check plot is printed", {
   expect_error(print(p), NA)
 })
 
+#> Test passed!
 
-# marginal.plot(fit, k.range = 3:8, ncol =3, prompt = FALSE)
-#
-# marginal.plot(fit)
+
+
+

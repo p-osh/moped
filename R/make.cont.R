@@ -32,8 +32,10 @@
 #' select(age, maritl, race, education, jobclass, wage)
 #' Data_amal <- make.cont(Data,catvar = c("maritl", "race", "education", "jobclass"),
 #' amalgams = list(
-#' 1:2, #maritl and race are 1st and 2nd variables in the catvar list and they are amalgamated into a single variable.
-#' 3:4 #education and jobclass are 3rd and 4th variables in the catvar list and are amalgamated into a single variable.
+#' 1:2, #maritl and race are 1st and 2nd variables in the catvar list
+#' #and they are amalgamated into a single variable.
+#' 3:4 #education and jobclass are 3rd and 4th variables in the catvar list
+#' #and are amalgamated into a single variable.
 #' ))
 
 
@@ -44,7 +46,11 @@ make.cont <- function(
 ){
 
   if(is.character(catvar)){
-    catvar <-  which(colnames(Sample) %in% catvar)
+    catvarold <- catvar
+    catvar <-  sapply(1:length(catvar),function(k)which(colnames(Sample)==catvar[k]))
+    if(is.list(catvar)){
+      stop('Variable ',catvarold[-which(catvarold %in% colnames(Sample))]," not found in Sample")
+    }
   }
 
   indexer <- function(X,n){

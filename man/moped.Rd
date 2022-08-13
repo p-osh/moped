@@ -2,91 +2,115 @@
 % Please edit documentation in R/moped.R
 \name{moped}
 \alias{moped}
-\title{Fitting multivariate orthogonal polynomial based density estimation.}
+\title{Performing the multivariate orthogonal polynomial-based estimation of density.}
 \usage{
 moped(
   Sample,
-  K = rep(15, NCOL(Sample)),
+  K = 10,
   Distrib = rep("Uniform", NCOL(Sample)),
   bounds = NULL,
-  ListP = FALSE,
   variance = TRUE,
   recurrence = FALSE,
-  parallel = FALSE,
-  ncores = NULL,
-  mpo = TRUE
+  opt.mpo = T,
+  nfolds = 5,
+  repeats = 10
 )
 }
 \arguments{
 \item{Sample}{A data frame.}
 
-\item{K}{Integer vector. Maximum Truncation of Approximation on each variable.}
+\item{K}{Integer of maximum possible max polynomial order (mpo) of approximation.}
 
-\item{Distrib}{Character string, specifying the reference distribution to be
-used. Choices are \code{"uniform"}, \code{"normal"}, \code{"gamma"} and \code{"beta"}
-distributions.}
+\item{Distrib}{Character string vector of length \code{NCOL(Sample)}, specifying the
+reference distribution to be used for each variable (column) of Sample. Choices
+are \code{"Uniform"} (default), \code{"Normal"}, \code{"Gamma"}, and \code{"Beta"} distributions.}
 
-\item{bounds}{A data frame. The limits on the compact space. Should be an
-array of 2 x number of variables with each column having the lower and
-upper limit. \code{NULL} is the default.}
+\item{bounds}{An optional data frame specifying the limits to be used on bounded space.
+Should be an array of 2 x number of variables with each column having the
+lower and upper limit. If \code{NULL} (default) bounds are estimated based on
+range of \code{Sample}.}
 
-\item{ListP}{Logical. If \code{FALSE} (the default), the Pn-Array is calculated
-for Coefficient Variance Calculations.}
+\item{variance}{Logical that if \code{TRUE} (default), computes a variance estimate
+of each coefficient.}
 
-\item{variance}{Logical. If \code{TRUE} (the default), a variance estimate of each
-coefficient is calculated.}
+\item{recurrence}{Logical that if \code{TRUE}, computes the two-term recurrence
+relation of each marginal orthogonal polynomial. Terms take the form
+$P_{n+1}(x) = (R_nx + S_n)P_n(x) + T_nP_{n-1}(x)$.}
 
-\item{recurrence}{Logical. If \code{FALSE} (the default), recurrence relation is
-not used to determine coefficient.}
+\item{opt.mpo}{Logical that if \code{TRUE} (the default), determines an optimal
+max polynomial order estimate  using repeated k-fold cross-validation.}
 
-\item{parallel}{Logical. If \code{FALSE} (the default), parallel computing is not
-used.}
+\item{nfolds}{Integer that if \code{opt.mpo = TRUE}, determines the number of folds
+(k) to perform in k-fold cross-validation.}
 
-\item{ncores}{Integer vector. NCores to use in parallel computing.}
-
-\item{mpo}{Logical. If \code{TRUE} (the default), an optimal MOP estimate is
-calculated.}
+\item{repeats}{Integer that if \code{opt.mpo = TRUE}, determines the number of times
+k-fold cross-validation is repeated.}
 }
 \value{
-\code{moped()} returns a list object.
+\code{moped()} returns a moped (list) object containing:
+\itemize{
+\item \code{Cn} - Array of estimated moment-based coefficients.
+\item \code{varCn} - Array of variance estimates for Cn. Computed if \code{variance = TRUE}.
+\item \code{Nv} - Dimension (number of variables) of joint density estimate.
+\item \code{Nk_norm} - Array of estimated shifted Nk Norm values.
+Computed if \code{opt.mpo = TRUE}.
+\item \code{opt_mpo_vec} - Estimated optimal max polynomial order where K is vector.
+Computed if \code{opt.mpo = TRUE}.
+\item \code{opt_mpo} - Estimated optimal max polynomial order where K is constant.
+Computed if \code{opt.mpo = TRUE}.
+\item \code{Cats} - List of categorical data information from Sample.
+\item \code{Distrib} - String vector of reference densities used for each variable.
+\item \code{PDFControl} - List of reference distribution functions.
+\item \code{PolyCoef} - Array of orthogonal polynomial coefficients.
+\item \code{Poly} - Array of orthogonal polynomial values for each observation of Sample.
+\item \code{Sigma} - Array of polynomial coefficients of sigma terms in polynomial.
+\item \code{Tau} - Array of polynomial coefficients of tau terms in polynomial.
+\item \code{Lambda} - Array of lambda terms (eigenvalues) for each variable.
+\item \code{Limits} - Array of theoretical limits of each variable.
+\item \code{Bounds} - Data frame of the parameter \code{Bounds}.
+\item \code{LeadingTerms} - List containing leading terms of each polynomial.
+\item \code{KMax} - Maximum max polynomial order (K) specified.
+\item \code{Parameters} - Array of parameters of reference densities.
+\item \code{SampleStats} - List containing original Sample and its range.
+\item \code{Recurrence} - Optional list of polynomial recurrence relationship terms.
+Computed if \code{recurrence = TRUE}.
+}
 }
 \description{
-\code{moped()} is used to fit multivariate orthogonal polynomial based density
-estimation. It requires a data frame of bounds to fit on data. Categorical
-variables need to be converted into continuous variables before fitting data
-to the density estimation.
+\code{moped()} is used to fit a multivariate orthogonal polynomial-based density
+estimate. It requires a data frame to fit on data. Categorical variables need
+to be converted into continuous variables with \code{make.cont()} before fitting data
+to the density estimate.
 }
 \examples{
-Data_full <- ISLR::Wage
-Data <- Data_full \%>\%
-select(age, education, jobclass,wage)
 
-# Convert Categorical Data to Continuous Data
-Data_x <- make.cont(Data, catvar = 2:3)
+require(sdcMicro)
+Data <- CASCrefmicrodata[,c(2,3,4,6)]
+str(Data)
 
 # Fitting multivariate orthogonal polynomial based
-# density estimation function
+# density estimation function using default setting
+Fit <- moped(Data)
+
 # Requires a data frame of bounds to fit on data.
 bounds <- data.frame(
-age  = c(18,80),
-education = c(0,1),
-jobclass = c(0,1),
-wage = c(0,350)
+ AGI  = c(7192, 109883),
+ EMCONTRB = c(17, 7800),
+ FEDTAX = c(1, 23386),
+ STATETAX = c(2,12628)
 )
 
 # Fitting the Data
 Fit <- moped(
-Data_x,
+Data,
 K=10,
-Distrib = rep("Uniform", 7),
+Distrib = rep("Uniform", 4),
 bounds = bounds,
 variance = T,
 recurrence = F,
-parallel = F,
-ncores = NULL,
-mpo = T
+opt.mpo = T
 )
 
-Maximum optimal MPO
-Fit$MPO$opt.mpo
+Estimated optimal max polynomial order.
+Fit$opt_mpo
 }

@@ -25,7 +25,7 @@
 #' @examples
 #' require(sdcMicro)
 #' Data <- CASCrefmicrodata[,c(2,3,4,6)]
-#' 
+#'
 #' # Fitting multivariate orthogonal polynomial based
 #' # density estimation function using default setting
 #' Fit <- moped(Data)
@@ -51,9 +51,9 @@ polynomial <-  function(fit,
   variables_names <- colnames(fit$SampleStats$Sample)[variables]
   test_names <- prod(variables_names %in% colnames(X)) == 0 | !is.data.frame(X)
   Nv <- length(variables)
-  try(if(test_names){
-    return(cat("\r Error: X must be data frame and contain columns named ",variables_names))
-  } else {
+  if(test_names){
+    stop("X must be data frame and contain columns named ",paste(variables_names,collapse = " "))
+  }
   X <- X[,variables_names]
   if(Nv == 1) X <- as.matrix(X)
   if(is.null(K) & !is.null(fit$opt_mpo)) K <- rep(fit$opt_mpo,length(variables))
@@ -80,5 +80,4 @@ polynomial <-  function(fit,
   names(P) <- variables_names
   output <- list(P = P, PdfTerms = PdfTerms)
   return(output)
-   })
 }

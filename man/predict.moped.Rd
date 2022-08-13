@@ -12,6 +12,7 @@ density estimate.}
   variables = 1:fit$Nv,
   bounds = NULL,
   type = "density",
+  cond.variables = NULL,
   normalise = T,
   nodes = 100,
   parallel = F,
@@ -40,9 +41,15 @@ in \code{fit}.}
 Should be an array of 2 x number of variables with each column having the
 lower and upper limit.}
 
-\item{type}{string equal to \code{"density"} (default) or \code{"distribution"}. If
-\code{type = "density"} density values are estimated. If \code{type = "distribution"}
-cumulative distribution function probabilities are estimated.}
+\item{type}{string equal to \code{"density"} (default), \code{"distribution"}, or \code{"conditional"}.
+If \code{type = "density"} density values are estimated. If \code{type = "distribution"}
+cumulative distribution function probabilities are estimated. If \code{type = "conditional"}
+conditional distribution function probabilities are estimated conditioned on
+the variables chosen in \code{cond.variables}.}
+
+\item{cond.variables}{Integer vector or character string of conditional variable
+names. The \code{moped} position or column name of the conditional variable(s) to
+be predicted from \code{moped} object if \code{type="conditional"}.}
 
 \item{normalise}{Logical that if \code{TRUE} (the default), scales density estimate
 to correct for any estimated negative values.}

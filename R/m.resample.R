@@ -44,6 +44,11 @@
 #' Fit <- moped(Data)
 #'
 #' # Generating resampled (synthetic) observations
+#' # Sample 100 obs from moped joint density estimate without updating "age"
+#' resampled <- m.resample(Fit, K = 3, Sample = Data_x, n = 100, fixed.var = "age")
+#'
+#' # Simulate a fully resampled data set of same size as Data_x.
+#' resampled <- m.resample(Fit, K = 3, replicates = 2) # 2 Gibbs passes used.
 #'
 #' # Simulate a fully resampled data set of same size as Data.
 #' m.resample(Fit, K=3, replicates = 2) # 2 Gibbs passes used.

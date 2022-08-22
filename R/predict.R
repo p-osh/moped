@@ -71,7 +71,7 @@
 #' # When constructing partially joint density, X and variables must be used together.
 #  # X must be a data frame and its variable length must equal to the length in var.
 #' predict(Fit, K= 7, X= Data_x[,3:4] , variables =c("jobclass", "wage"))
-#' predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables =4 )
+#' predict(Fit, K= 7, X= data.frame(wage=Data_x$wage) , variables = 4 )
 
 
 

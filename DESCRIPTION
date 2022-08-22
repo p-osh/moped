@@ -1,14 +1,19 @@
 Package: moped
-Title: Multivariate Orthogonal Polynomial Based Estimation of Density.
-Version: 0.0.0.9000
-Authors@R: c(
-    person("Bradley", "Wakefiled", "bradleyw@uow.edu.au", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID")),
-    person("Pauline", "O'Shaughnessy", "poshaugh@uow.edu.au", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID")),
-    person("Mengyun", "Yang", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))          
-           )
+Title: Multivariate Orthogonal Polynomial Based Estimation of Density
+Version: 0.1.0
+Authors@R: 
+    c(person(given = "Bradley", 
+             family = "Wakefiled", 
+             email = "bradleyw@uow.edu.au", 
+             role = c("aut", "cre")),
+      person(given = "Pauline", 
+             family = "O'Shaughnessy", 
+             email = "poshaugh@uow.edu.au", 
+             role = "aut"),
+      person(given = "Mengyun", 
+             family = "Yang", 
+             email = "myan0065@student.monash.edu", 
+             role = "ctb"))          
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -16,6 +21,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Depends:
     R (>= 2.10)
+Imports:
+    tensor,
+    R.utils,
+    svMisc,
+    parallel,
+    ggplot2,
+    patchwork
 URL: https://github.com/p-osh/moped
 BugReports: https://github.com/p-osh/moped/issues
 Suggests: 

@@ -28,6 +28,7 @@
 #' # Check marginal densities with different polynomial K
 #' # Default setting, showing all marginal densities with prompting
 #' marginal.plot(Fit)
+#'
 #' # Marginal densities with user-specified polynomial order, number of columns
 #' # grid per plot and no prompting required
 #' marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)

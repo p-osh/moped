@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  eval = FALSE
 )
 ```
 
@@ -58,7 +59,7 @@ Data_x <- make.cont(Data, catvar = 2:3)
 
 #### Convert categorical with amalgamations
 
-```{r, eval=FALSE}
+```{r}
 Data <- Data_full %>% select(age, maritl, race, education, jobclass, wage)
 
 Data_amal <- make.cont(Data, catvar = c("maritl", "race", "education", "jobclass"),
@@ -108,14 +109,14 @@ x0 <- Data_x[2,]
 pred_1 <- predict(Fit, 
                   K = 7, 
                   X = x0, 
-                  type="distribution")
+                  type = "distribution")
 
 
-# when constructing partically joint density, sample and varaibles must be used together.
+# when constructing partially joint density, sample and variables must be used together.
 pred_2 <- predict(Fit, 
-                  K= 7, 
-                  X= Data_x[,3:4], 
-                  variables =c("jobclass", "wage"))
+                  K = 7, 
+                  X = Data_x[,3:4], 
+                  variables = c("jobclass", "wage"))
 
 ```
 

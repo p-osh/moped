@@ -318,8 +318,10 @@ m.resample <- function(fit,
     Sample <- rbind(Sample,ErrorSample)
 
   }
-  Synth <- OSample[1:NS,]
-  Synth[,variables_names] <- as.data.frame(Sample)[1:NS,]
+
+  Synth <- as.data.frame(OSample[1:NS,])
+  colnames(Synth) <- colnames(OSample)
+  Synth[,variables_names] <- as.data.frame(as.data.frame(Sample)[1:NS,])
   Cats <- fit$Cats
   Cats$variables <- variables
   attr(Synth,"Cats") <- Cats

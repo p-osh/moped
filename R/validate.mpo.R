@@ -113,7 +113,8 @@ validate.mpo <- function(fit,
         }
       }
     Nk_vec <- Nk_norm[sapply(1:Nv, function(k) 0:K+1)]
-    opt_mpo_vec <- which(Nk_norm == min(Nk_norm),arr.ind = T)-1
+    opt_mpo_vec <- c(which(Nk_norm == min(Nk_norm),arr.ind = T)-1)
+    names(opt_mpo_vec) <- dimnames(Poly)[[3]]
     opt_mpo <- which(Nk_vec == min(Nk_vec),arr.ind = T)-1
     if (variance){
       output <- list(Cn = Cn,varCn = varCn,opt_mpo_vec = opt_mpo_vec, opt_mpo = opt_mpo, Nk_norm = Nk_norm)

@@ -4,7 +4,7 @@
 \alias{validate.mpo}
 \title{Perform repeated k-fold cross-validation to estimate optimal max polynomial order.}
 \usage{
-validate.mpo(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
+\method{validate}{mpo}(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
 }
 \arguments{
 \item{fit}{\code{moped} type variable outputted from \code{moped()}.}
@@ -46,6 +46,7 @@ Data <- CASCrefmicrodata[,c(2,3,4,6)]
 # density estimation function using default setting
 Fit <- moped(Data)
 
-# Select the optimal polynimal order K
-validate.mpo(fit = Fit) #warning! it might take a while
+# Select the optimal polynomial order K
+val <- validate.mpo(fit = Fit) #warning! it might take a while
+val$opt_mpo_vec #show the vector of optimal polynomial orders
 }

@@ -68,52 +68,29 @@ message when observations require re-sampling due to errors.}
 or marginal moped density estimate.
 }
 \examples{
-Data_full <- ISLR::Wage
-Data <- Data_full \%>\%
-select(age, education, jobclass, wage)
+require(sdcMicro)
+Data <- CASCrefmicrodata[,c(2,3,4,6)]
 
-# Convert Categorical Data to Continuous Data
-Data_x <- make.cont(Data, catvar = 2:3)
-
-# Fitting multivariate orthogonal polynomial based
-# density estimation function
-# Requires a data frame of bounds to fit on data.
-bounds <- data.frame(
-age  = c(18,80),
-education = c(0,1),
-jobclass = c(0,1),
-wage = c(0,350)
-)
-
-# Fitting the Data
-Fit <- moped(
-Data_x,
-K=10,
-Distrib = rep("Uniform", 4),
-bounds = bounds,
-variance = T,
-recurrence = F,
-opt.mpo = T
-)
+Fit <- moped(Data)
 
 # Generating resampled (synthetic) observations
 # Sample 100 obs from moped joint density estimate without updating "age"
-resampled <- m.resample(Fit, K = 3, Sample = Data_x, n = 100, fixed.var = "age")
+m.resample(Fit, K = 3, Sample = Data_x, n = 100, fixed.var = "age")
 
 # Simulate a fully resampled data set of same size as Data_x.
-resampled <- m.resample(Fit, K = 3, replicates = 2) # 2 Gibbs passes used.
+m.resample(Fit, K = 3, replicates = 2) # 2 Gibbs passes used.
 
-# Convert previously continuised variables back to categorical variables.
-resampled <- make.cat(resampled)
+# Simulate a fully resampled data set of same size as Data.
+m.resample(Fit, K=3, replicates = 2) # 2 Gibbs passes used.
+
+# Sample 100 obs from moped joint density estimate without updating "AGI"
+m.resample(Fit, K=3, Sample=Data, n = 100, fixed.var = "AGI")
+
+# Sample values for "AGI" conditional on other three variables from Data
+m.resample(Fit, variables =1)
 
 # Sample fully synthetic data set from marginal bivariate moped density
-# estimate of "age" and "wage"
-resampled_marginal <- m.resample(Fit,
-Sample = Data_x[,c(1,4)],
-K = c(4,5),
-variables = c(1,4),
-replicates = 1
-)
-
-
+# estimate of "AGI" and "STATETAX"
+m.resample(Fit, Sample = Data[,c(1,4)], K = c(4,5), variables = c(1,4),
+           replicates = 1)
 }

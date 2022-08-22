@@ -63,6 +63,10 @@
 #' # estimate of "AGI" and "STATETAX"
 #' m.resample(Fit, Sample = Data[,c(1,4)], K = c(4,5), variables = c(1,4),
 #'            replicates = 1)
+#'
+#' # Sample 10 synthetic samples for AGI from it marginal moped density
+#' m.resample(Fit, Sample = data.frame(AGI=Data[1:10,1]), K = 4, variables = 1)
+
 
 
 

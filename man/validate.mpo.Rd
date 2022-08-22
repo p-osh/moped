@@ -4,7 +4,7 @@
 \alias{validate.mpo}
 \title{Perform repeated k-fold cross-validation to estimate optimal max polynomial order.}
 \usage{
-validate.mpo(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
+\method{validate}{mpo}(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
 }
 \arguments{
 \item{fit}{\code{moped} type variable outputted from \code{moped()}.}

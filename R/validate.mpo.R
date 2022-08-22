@@ -35,8 +35,9 @@
 #' # density estimation function using default setting
 #' Fit <- moped(Data)
 #'
-#' # Select the optimal polynimal order K
-#' validate.mpo(fit = Fit) #warning! it might take a while
+#' # Select the optimal polynomial order K
+#' val <- validate.mpo(fit = Fit) #warning! it might take a while
+#' val$opt_mpo_vec #show the vector of optimal polynomial orders
 
 
 validate.mpo <- function(fit,

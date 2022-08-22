@@ -285,7 +285,7 @@ moped <- function(
 
   #######################################################################################
   Poly <- array(0,dim = c(K+1,NROW(Sample),Nv))
-
+  dimnames(Poly) <- list(paste0("K=",0:K),rownames(Sample),colnames(Sample))
   for(k in 1:Nv){
       XMk <- t(sapply(0:K, function(i) Sample[,k]^i))
       Poly[0:K+1,,k] <- A[0:K+1,0:K+1,k]%*%(XMk[0:K+1,])

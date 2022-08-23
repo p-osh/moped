@@ -19,7 +19,7 @@
 #' @param bounds An optional data frame specifying the limits to be used on
 #'   bounded space. Should be an array of 2 x number of variables with each
 #'   column having the lower and upper limit.
-#' @param replicates Integer vector determining the number of complete Gibbs
+#' @param passes Integer vector determining the number of complete Gibbs
 #'   sampling passes to be performed.
 #' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
 #'   values using parallel computing.
@@ -48,10 +48,10 @@
 #' m.resample(Fit, K = 3, Sample = Data_x, n = 100, fixed.var = "age")
 #'
 #' # Simulate a fully resampled data set of same size as Data_x.
-#' m.resample(Fit, K = 3, replicates = 2) # 2 Gibbs passes used.
+#' m.resample(Fit, K = 3, passes = 2) # 2 Gibbs passes used.
 #'
 #' # Simulate a fully resampled data set of same size as Data.
-#' m.resample(Fit, K=3, replicates = 2) # 2 Gibbs passes used.
+#' m.resample(Fit, K=3, passes = 2) # 2 Gibbs passes used.
 #'
 #' # Sample 100 obs from moped joint density estimate without updating "AGI"
 #' m.resample(Fit, K=3, Sample=Data, n = 100, fixed.var = "AGI")
@@ -62,7 +62,7 @@
 #' # Sample fully synthetic data set from marginal bivariate moped density
 #' # estimate of "AGI" and "STATETAX"
 #' m.resample(Fit, Sample = Data[,c(1,4)], K = c(4,5), variables = c(1,4),
-#'            replicates = 1)
+#'            passes = 1)
 #'
 #' # Sample 10 synthetic samples for AGI from it marginal moped density
 #' m.resample(Fit, Sample = data.frame(AGI=Data[1:10,1]), K = 4, variables = 1)
@@ -76,7 +76,7 @@ m.resample <- function(fit,
                        Sample = fit$SampleStats$Sample,
                        n = NROW(Sample),
                        bounds = NULL ,
-                       replicates = 1,
+                       passes = 1,
                        parallel = F,
                        ncores = NULL,
                        mps = 5000,
@@ -122,7 +122,7 @@ m.resample <- function(fit,
   colnames(Sample) <- variables_names
 
   nonerror <- 1:NS
-  for(re in 1:replicates){
+  for(re in 1:passes){
     for(nu in impute.vars){
       if(fit$Distrib[variables[nu]] == "Uniform"){
       if(length(variables[-nu])==0){
@@ -317,7 +317,7 @@ m.resample <- function(fit,
     ErrorSample <- m.resample(fit = fit,K=K,variables = variables,n = NS-SS+1,
                               fixed.var = fixed.var,
                               Sample = OSample[nonerror,],
-                              bounds= bounds, replicates = replicates ,parallel = parallel,
+                              bounds= bounds, passes = passes ,parallel = parallel,
                               ncores = ncores,mps = mps,er_alert = F)
     Sample <- rbind(Sample,ErrorSample)
 

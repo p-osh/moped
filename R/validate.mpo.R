@@ -16,7 +16,7 @@
 #' @param variance Logical that if `TRUE` (default), computes a variance estimate
 #'   of each coefficient.
 #'
-#' @return `moped()` returns a list containing:
+#' @return `validate.mpo()` returns a list containing:
 #' \itemize{
 #'   \item `Cn` - Array of estimated moment-based coefficients.
 #'   \item `varCn` - Array of variance estimates for Cn. Computed if `variance = TRUE`.
@@ -25,7 +25,7 @@
 #'   \item `opt_mpo` - Estimated optimal max polynomial order where K is constant.
 #' }
 #'
-#' @export
+#' @export validate.mpo
 #'
 #' @examples
 #' require(sdcMicro)

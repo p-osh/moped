@@ -22,7 +22,7 @@ is repeated.}
 of each coefficient.}
 }
 \value{
-\code{moped()} returns a list containing:
+\code{validate.mpo()} returns a list containing:
 \itemize{
 \item \code{Cn} - Array of estimated moment-based coefficients.
 \item \code{varCn} - Array of variance estimates for Cn. Computed if \code{variance = TRUE}.

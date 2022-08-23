@@ -146,14 +146,14 @@ resampled <- m.resample(Fit,
                         K = 3,
                         Sample = Data_x,
                         fixed.var = 1,
-                        replicates = 1)
+                        passes = 1)
 
 # marginal synthetic sample
 resampled_marginal <- m.resample(Fit,
                                  Sample=Data_x[,3:4],
                                  K=c(4,4),
                                  variables = 3:4,
-                                 replicates = 1)
+                                 passes = 1)
 ```
 
 

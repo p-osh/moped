@@ -11,7 +11,7 @@ m.resample(
   Sample = fit$SampleStats$Sample,
   n = NROW(Sample),
   bounds = NULL,
-  replicates = 1,
+  passes = 1,
   parallel = F,
   ncores = NULL,
   mps = 5000,
@@ -41,7 +41,7 @@ the Sample used to fit the \code{moped} object.}
 bounded space. Should be an array of 2 x number of variables with each
 column having the lower and upper limit.}
 
-\item{replicates}{Integer vector determining the number of complete Gibbs
+\item{passes}{Integer vector determining the number of complete Gibbs
 sampling passes to be performed.}
 
 \item{parallel}{Logical that if \code{TRUE} uses the \code{parallel} package to simulate
@@ -78,10 +78,10 @@ Fit <- moped(Data)
 m.resample(Fit, K = 3, Sample = Data_x, n = 100, fixed.var = "age")
 
 # Simulate a fully resampled data set of same size as Data_x.
-m.resample(Fit, K = 3, replicates = 2) # 2 Gibbs passes used.
+m.resample(Fit, K = 3, passes = 2) # 2 Gibbs passes used.
 
 # Simulate a fully resampled data set of same size as Data.
-m.resample(Fit, K=3, replicates = 2) # 2 Gibbs passes used.
+m.resample(Fit, K=3, passes = 2) # 2 Gibbs passes used.
 
 # Sample 100 obs from moped joint density estimate without updating "AGI"
 m.resample(Fit, K=3, Sample=Data, n = 100, fixed.var = "AGI")
@@ -92,7 +92,7 @@ m.resample(Fit, variables =1)
 # Sample fully synthetic data set from marginal bivariate moped density
 # estimate of "AGI" and "STATETAX"
 m.resample(Fit, Sample = Data[,c(1,4)], K = c(4,5), variables = c(1,4),
-           replicates = 1)
+           passes = 1)
 
 # Sample 10 synthetic samples for AGI from it marginal moped density
 m.resample(Fit, Sample = data.frame(AGI=Data[1:10,1]), K = 4, variables = 1)

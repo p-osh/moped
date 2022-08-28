@@ -27,6 +27,10 @@
 #' @param repeats Integer that if `opt.mpo = TRUE`, determines the number of times
 #'   k-fold cross-validation is repeated.
 #'
+#' @import tensor
+#' @import R.utils
+#' @import svMisc
+#'
 #' @returns `moped()` returns a moped (list) object containing:
 #' \itemize{
 #'   \item `Cn` - Array of estimated moment-based coefficients.

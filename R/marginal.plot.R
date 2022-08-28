@@ -14,6 +14,9 @@
 #'   If `TRUE` (the default), press enter to show the next plot, If `FALSE`,
 #'   outputs all plots simultaneously.
 #'
+#' @import ggplot2
+#' @import patchwork
+#'
 #' @return `marginal.plot()` returns plots of each marginal variable.
 #' @export
 #'

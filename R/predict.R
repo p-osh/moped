@@ -42,6 +42,10 @@
 #' @param mps Integer vector that places a limit on maximum number of probabilities
 #'   calculated at a time. The default is 5000.
 #'
+#' @import tensor
+#' @import R.utils
+#' @import parallel
+#'
 #' @return `predict.moped()` returns a data frame with estimated density/probability values.
 #'
 #' @export

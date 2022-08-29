@@ -2,8 +2,7 @@
 % Please edit documentation in R/predict.R
 \name{predict.moped}
 \alias{predict.moped}
-\title{Predicting the density or probability of an observation based on moped
-density estimate.}
+\title{Predict the density or probability of an observation}
 \usage{
 \method{predict}{moped}(
   fit,
@@ -71,10 +70,10 @@ calculated at a time. The default is 5000.}
 \code{predict.moped()} returns a data frame with estimated density/probability values.
 }
 \description{
-\code{predict.moped()} is used to predict density and probabilities for a set of
-observations. When constructing partially joint density, sample and variables
-must be used together. X must be a data frame and its variable length must
-equal to the length in var.
+\code{predict.moped()} predicts density and probabilities for a set of observations.
+When constructing partially joint density, sample and variables must be used
+together. X must be a data frame and its variable length must equal to the
+length in \code{var}.
 }
 \examples{
 require(ISLR)

@@ -1,9 +1,9 @@
-#' Computes moped estimated conditional distribution function values for X|Y1,Y2,...
+#' Compute probabilities for X|Y1,Y2,.. from the estimated conditional distribution
 #'
 #' @description
-#' `estimate.conditional()` is used to compute moped estimated conditional
-#' distribution function values for a single variable X given a data frame of
-#' conditional Y values.
+#' `estimate.conditional()` computes probabilities and coefficients of the
+#' polynomial approximation for a single variable X given a data frame of
+#' conditional Y values `moped` estimated conditional distribution function.
 #'
 #' @param fit `moped` type variable outputted from `moped()`.
 #' @param X Vector of values with which to estimate conditional probabilities.
@@ -48,21 +48,18 @@
 #'
 #' require(tidyverse)
 #' Data <- Data_full %>%
-#' select(age, education, jobclass,wage)
+#' select(age, education, jobclass, wage)
 #'
 #' # Convert Categorical Data to Continuous Data
 #' Data_x <- make.cont(Data, catvar = 2:3)
 #'
-#' # Fitting multivariate orthogonal polynomial based
-#' # density estimation function
-#'
-#' # Fitting the Data
+#' # Fitting multivariate orthogonal polynomial based distribution from data
 #' Fit <- moped(Data_x)
 #'
-#' # Compute moped conditional distribution estimate
-#' cond_pred <- estimate.conditional(Fit,
+#' # Compute conditional distribution estimates
+#' cond_prob <- estimate.conditional(Fit,
 #' X=seq(20,300,length.out=100),
-#' Y = x0[rep(1,100),-4],
+#' Y = Data_x[rep(1,100),-4],
 #' K.Y=rep(7,3),
 #' K.X=7,
 #' X.variable = "wage",

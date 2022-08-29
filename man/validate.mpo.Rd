@@ -2,7 +2,7 @@
 % Please edit documentation in R/validate.mpo.R
 \name{validate.mpo}
 \alias{validate.mpo}
-\title{Perform repeated k-fold cross-validation to estimate optimal max polynomial order.}
+\title{Estimate optimal max polynomial order with repeated k-fold cross-validation}
 \usage{
 \method{validate}{mpo}(fit, K = fit$KMax, nfolds = 5, repeats = 10, variance = T)
 }
@@ -33,10 +33,10 @@ of each coefficient.}
 }
 \description{
 \code{validate.mpo()} performs repeated k-fold cross-validation to
-determine an unbiased estimate of the shifted Nk-Norm that when minimised
+determine an unbiased estimate of the shifted \code{Nk}-Norm that when minimised, it
 provides an estimate of the optimal max polynomial order. The coefficient
-estimates are also calculated as is (optional) their corresponding variance
-estimates.
+estimates are also calculated as well as  their corresponding variance
+estimates (optional).
 }
 \examples{
 require(sdcMicro)

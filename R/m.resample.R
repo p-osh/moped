@@ -1,8 +1,8 @@
 #' Generate resampled samples from 'moped' estimate.
 #'
 #' @description
-#' `m.resample()` is used to generate synthetic samples from full, conditional,
-#' or marginal moped density estimate.
+#' `m.resample()` generates synthetic samples from a full, conditional or marginal
+#'  density estimate.
 #'
 #' @param fit moped type variable outputted from `moped()`.
 #' @param K Integer vector of max polynomial order of approximation on each
@@ -46,12 +46,6 @@
 #' Fit <- moped(Data)
 #'
 #' # Generating resampled (synthetic) observations
-#' # Sample 100 obs from moped joint density estimate without updating "age"
-#' m.resample(Fit, K = 3, Sample = Data_x, n = 100, fixed.var = "age")
-#'
-#' # Simulate a fully resampled data set of same size as Data_x.
-#' m.resample(Fit, K = 3, passes = 2) # 2 Gibbs passes used.
-#'
 #' # Simulate a fully resampled data set of same size as Data.
 #' m.resample(Fit, K=3, passes = 2) # 2 Gibbs passes used.
 #'

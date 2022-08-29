@@ -2,7 +2,7 @@
 % Please edit documentation in R/marginal.plot.R
 \name{marginal.plot}
 \alias{marginal.plot}
-\title{Marginal plots for each variable with a range of polynomial orders K.}
+\title{Generate marginal plots for each variable with a range of polynomial orders K}
 \usage{
 marginal.plot(fit, k.range = 1:fit$KMax, ncol = 4, prompt = TRUE)
 }
@@ -23,8 +23,8 @@ outputs all plots simultaneously.}
 \code{marginal.plot()} returns plots of each marginal variable.
 }
 \description{
-\code{marginal.plot()} is used to Marginal plots for each variable with a range of
-polynomial orders K. Optimal bin width using the Freedman-Diaconis rule for
+\code{marginal.plot()} produces marginal plots for each variable with a range of
+polynomial orders K. Optimal bin width uses the Freedman-Diaconis rule for
 each variable.
 }
 \examples{

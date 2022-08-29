@@ -1,7 +1,7 @@
-#' Computing the univariate hyper-geometric type orthogonal polynomials.
+#' Compute the univariate hyper-geometric type orthogonal polynomials.
 #'
-#'@description `polynomial()` is used to calculate the univariate hyper-geometric
-#'  type orthogonal polynomials used in the `moped()` function.
+#'@description `polynomial()` calculates the univariate hyper-geometric type
+#'orthogonal polynomials used in the `moped()` function.
 #'
 #' @param fit `moped` type object outputted from `moped()`.
 #' @param X data frame of observations with column names matching selected

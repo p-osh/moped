@@ -2,7 +2,7 @@
 % Please edit documentation in R/moped.R
 \name{moped}
 \alias{moped}
-\title{Performing the multivariate orthogonal polynomial-based estimation of density.}
+\title{Fit the multivariate orthogonal polynomial-based estimation of density}
 \usage{
 moped(
   Sample,
@@ -77,10 +77,9 @@ Computed if \code{recurrence = TRUE}.
 }
 }
 \description{
-\code{moped()} is used to fit a multivariate orthogonal polynomial-based density
-estimate. It requires a data frame to fit on data. Categorical variables need
-to be converted into continuous variables with \code{make.cont()} before fitting data
-to the density estimate.
+\code{moped()} fits a multivariate orthogonal polynomial-based density
+estimation to a dataframe. Categorical variables need to be converted to
+continuous with \code{make.cont()} before fitting.
 }
 \examples{
 
@@ -110,7 +109,4 @@ variance = T,
 recurrence = F,
 opt.mpo = T
 )
-
-Estimated optimal max polynomial order.
-Fit$opt_mpo
 }

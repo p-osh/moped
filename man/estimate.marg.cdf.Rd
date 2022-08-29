@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimate.marg.cdf.R
 \name{estimate.marg.cdf}
 \alias{estimate.marg.cdf}
-\title{Calculate univariate marginal distribution function probabilities.}
+\title{Calculate univariate marginal probabilities}
 \usage{
 estimate.marg.cdf(fit, X = NULL, K = NULL, nprobs = 1, variable = 1)
 }
@@ -34,9 +34,8 @@ are not specific for each value of X.
 }
 }
 \description{
-\code{estimate.marg.cdf()} is used to calculate univariate marginal cumulative
-distribution function probabilities and the polynomial coefficients of the
-polynomical approximation from any \code{moped} object.
+\code{estimate.marg.cdf()} calculates univariate marginal cumulative probabilities
+and the coefficients of the polynomial approximation from a \code{moped} object.
 }
 \examples{
 require(ISLR)

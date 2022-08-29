@@ -2,7 +2,7 @@
 % Please edit documentation in R/polynomial.R
 \name{polynomial}
 \alias{polynomial}
-\title{Computing the univariate hyper-geometric type orthogonal polynomials.}
+\title{Compute the univariate hyper-geometric type orthogonal polynomials.}
 \usage{
 polynomial(fit, X, K = NULL, variables = NULL)
 }
@@ -29,8 +29,8 @@ A list with the following components:
 }
 }
 \description{
-\code{polynomial()} is used to calculate the univariate hyper-geometric
-type orthogonal polynomials used in the \code{moped()} function.
+\code{polynomial()} calculates the univariate hyper-geometric type
+orthogonal polynomials used in the \code{moped()} function.
 }
 \examples{
 require(sdcMicro)

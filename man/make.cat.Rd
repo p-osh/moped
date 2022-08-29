@@ -2,7 +2,7 @@
 % Please edit documentation in R/make.cat.R
 \name{make.cat}
 \alias{make.cat}
-\title{Convert previously continuous-transformed variables back to categorical variables.}
+\title{Convert previously continuous-transformed variables back to categorical variables}
 \usage{
 make.cat(Sample, fit = NULL)
 }
@@ -18,7 +18,7 @@ transformation.}
 \code{make.cat()} returns a data frame.
 }
 \description{
-Convert previously continuous-transformed variables back to categorical variables.
+Convert previously continuous-transformed variables back to categorical variables
 }
 \examples{
 require(ISLR)

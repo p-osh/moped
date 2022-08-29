@@ -33,6 +33,8 @@
 #' @param er_alert Logical that if `TRUE` (default) will return an error
 #'   message when observations require re-sampling due to errors.
 #'
+#' @import stats
+#'
 #' @return `m.resample()` returns a data frame of imputed values.
 #'
 #' @export

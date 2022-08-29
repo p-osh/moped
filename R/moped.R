@@ -30,6 +30,7 @@
 #' @import tensor
 #' @import R.utils
 #' @import svMisc
+#' @import stats
 #'
 #' @returns `moped()` returns a moped (list) object containing:
 #' \itemize{

@@ -27,7 +27,9 @@ Imports:
     svMisc,
     parallel,
     ggplot2,
-    patchwork
+    patchwork,
+    stats,
+    rlang
 URL: https://github.com/p-osh/moped
 BugReports: https://github.com/p-osh/moped/issues
 Suggests: 

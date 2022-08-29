@@ -45,6 +45,7 @@
 #' @import tensor
 #' @import R.utils
 #' @import parallel
+#' @import stats
 #'
 #' @return `predict.moped()` returns a data frame with estimated density/probability values.
 #'

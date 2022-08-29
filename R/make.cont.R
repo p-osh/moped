@@ -12,6 +12,8 @@
 #'   variables in `"catvar"`. Each list item contains a vector of positions of
 #'   `"catvar"` that are to be amalgamated into a single continuous variable.
 #'
+#' @import stats
+#'
 #' @return `make.cont()` returns a data frame with strictly continuous values.
 #' @export
 #'

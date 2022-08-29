@@ -15,7 +15,10 @@
 #'   outputs all plots simultaneously.
 #'
 #' @import ggplot2
-#' @import patchwork
+#' @importFrom patchwork wrap_plots
+#' @importFrom patchwork plot_annotation
+#' @importFrom graphics par
+#' @importFrom rlang .data
 #'
 #' @return `marginal.plot()` returns plots of each marginal variable.
 #' @export
@@ -38,6 +41,7 @@
 
 
 
+
 marginal.plot <- function(fit,
                           k.range = 1:fit$KMax,
                           ncol = 4,
@@ -45,6 +49,8 @@ marginal.plot <- function(fit,
 ){
   requireNamespace(ggplot2)
   requireNamespace(patchwork)
+
+
   ###############################################
   if (prompt == "TRUE") {
     par(ask=TRUE)

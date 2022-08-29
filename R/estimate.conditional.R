@@ -29,6 +29,9 @@
 #'   be conditioned on from `moped` object. If `NULL` conditions on all non
 #'   `X.variable` variables.
 #'
+#' @import stats
+#'
+#'
 #' @return `estimate.conditional()` returns a list with the following components:
 #' \itemize{
 #'   \item `Prob` - vector of computed probabilities when X is specified.

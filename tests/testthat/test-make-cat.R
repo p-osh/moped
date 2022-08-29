@@ -1,12 +1,10 @@
-test_that("check continulized variables are converted back to categorical.", {
-  Data_full <- ISLR::Wage
-  Data <- Data_full %>%
-    dplyr::select(age, education, jobclass, wage)
-  Data_x <- make.cont(Data, catvar = 2:3)
-  Data_y <- make.cat(Data_x)
 
-  expect_equal(class(Data_y$education), "factor")
-  expect_equal(class(Data_y$jobclass), "factor")
+test_that("check continulized variables are converted back to categorical.", {
+
+  df_cat <- make.cat(df_cont)
+
+  expect_equal(class(df_cat$cut), "factor")
+  expect_equal(class(df_cat$clarity), "factor")
 })
 
 #> Test passed!

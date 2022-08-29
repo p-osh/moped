@@ -152,8 +152,8 @@ predict.moped <- function(fit,
   K <- sapply(1:Nv, function(k) min(fit$KMax,K[k]))
   Km <- max(K)
 
-  require(tensor)
-  require(R.utils)
+  requireNamespace(tensor)
+  requireNamespace(R.utils)
 
   tK <- c(K,rep(0,fit$Nv - Nv))[order(c(variables,setdiff(1:fit$Nv,variables)))]
   #Extract Related Coefficients

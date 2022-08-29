@@ -107,9 +107,9 @@ moped <- function(
     repeats = 10
 ) {
 
-  require(tensor)
-  require(R.utils)
-  require(svMisc)
+  requireNamespace(tensor)
+  requireNamespace(R.utils)
+  requireNamespace(svMisc)
 
   ###################################
   Cats <- attributes(Sample)$Cats

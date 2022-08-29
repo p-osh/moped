@@ -47,8 +47,8 @@ marginal.plot <- function(fit,
                           ncol = 4,
                           prompt = TRUE
 ){
-  requireNamespace(ggplot2)
-  requireNamespace(patchwork)
+  requireNamespace("ggplot2")
+  requireNamespace("patchwork")
 
 
   ###############################################

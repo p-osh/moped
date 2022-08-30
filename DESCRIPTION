@@ -24,8 +24,6 @@ Depends:
 Imports:
     tensor,
     R.utils,
-    svMisc,
-    parallel,
     ggplot2,
     patchwork,
     stats,
@@ -35,7 +33,12 @@ BugReports: https://github.com/p-osh/moped/issues
 Suggests: 
     knitr,
     rmarkdown,
+    tidyverse,
     testthat (>= 3.0.0),
-    dplyr
+    dplyr,
+    ISLR,
+    sdcMicro,
+    svMisc, 
+    parallel    
 VignetteBuilder: knitr
 Config/testthat/edition: 3

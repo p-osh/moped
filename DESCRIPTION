@@ -24,6 +24,7 @@ Depends:
 Imports:
     tensor,
     R.utils,
+    svMisc,
     ggplot2,
     patchwork,
     stats,
@@ -38,7 +39,6 @@ Suggests:
     dplyr,
     ISLR,
     sdcMicro,
-    svMisc, 
     parallel    
 VignetteBuilder: knitr
 Config/testthat/edition: 3

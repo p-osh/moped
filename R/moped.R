@@ -86,9 +86,9 @@
 #' K=10,
 #' Distrib = rep("Uniform", 4),
 #' bounds = bounds,
-#' variance = T,
-#' recurrence = F,
-#' opt.mpo = T
+#' variance = TRUE,
+#' recurrence = FALSE,
+#' opt.mpo = TRUE
 #' )
 
 
@@ -99,7 +99,7 @@ moped <- function(
     bounds = NULL,
     variance = TRUE,
     recurrence = FALSE,
-    opt.mpo = T,
+    opt.mpo = TRUE,
     nfolds = 5,
     repeats = 10
 ) {

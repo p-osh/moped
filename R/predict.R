@@ -155,8 +155,8 @@ predict.moped <- function(fit,
   requireNamespace("tensor")
   requireNamespace("R.utils")
 
-  tK <- c(K,rep(0,fit$Nv - Nv))[order(c(variables,setdiff(1:fit$Nv,variables)))]
   #Extract Related Coefficients
+  tK <- c(K,rep(0,fit$Nv - Nv))[order(c(variables,setdiff(1:fit$Nv,variables)))]
   if(fit$Nv==1){
     C <- fit$Cn[1:(Km+1)]
   }else{
@@ -185,7 +185,7 @@ predict.moped <- function(fit,
       PDFk <- as.function(fit$PDFControl(variables[k])$PDF)
       PdfTerms <- PdfTerms*PDFk(X[splitindex[[j]],k])
     }
-    Terms <- c()
+
     tt <- tensor(C,P[[1]],1,1)
     if(Nv > 1) {
       for(k in 2:Nv){
@@ -198,8 +198,7 @@ predict.moped <- function(fit,
         tt <- apply(tt,2:length(dim(tt)),sum)
       }
     }
-    Terms <- c(Terms,tt)
-    return(Terms*PdfTerms)
+    return(c(tt)*PdfTerms)
   }
   Tgen_cdf <- function(j){
     nprobs <- length(splitindex[[j]])
@@ -219,7 +218,6 @@ predict.moped <- function(fit,
       P[[k]] <- fit$PolyCoef[1:K[k]+1,1:K[k]+1,variables[k]]%*%((XM[[k]])[1:K[k],])
       P[[k]] <- rbind(CDFkX,P[[k]])/c(1,fit$Lambda[1:K[k],variables[k]])
     }
-    Terms <- c()
     tt <- tensor(C,P[[1]],1,1)
     if(Nv > 1) {
       for(k in 2:Nv){
@@ -232,8 +230,7 @@ predict.moped <- function(fit,
         tt <- apply(tt,2:length(dim(tt)),sum)
       }
     }
-    Terms <- c(Terms,tt)
-    return(Terms)
+    return(c(tt))
   }
   Tgen_cond <- function(j){
     nprobs <- length(splitindex[[j]])
@@ -270,7 +267,7 @@ predict.moped <- function(fit,
         P[[k]] <- rbind(CDFkX,P[[k]])/c(1,fit$Lambda[1:K[k],variables[k]])
       }
     }
-    Terms <- c()
+
     tt <- tensor(C,P[[1]],1,1)
     if(Nv > 1) {
       for(k in 2:Nv){
@@ -283,8 +280,7 @@ predict.moped <- function(fit,
         tt <- apply(tt,2:length(dim(tt)),sum)
       }
     }
-    Terms <- c(Terms,tt)
-    return(Terms*PdfTerms/fcond)
+    return(c(tt)*PdfTerms/fcond)
   }
 
   if(parallel){
@@ -316,15 +312,16 @@ predict.moped <- function(fit,
   }else{
     norm <- 1
   }
-  if(Grid == T & normalise ==T){
+  if(Grid & normalise){
     if(type=="density") norm <- sum(Probability)*prod(deltaX)
     if(type=="distribution"){
       Probability <- (Prob_old - min(Prob_old))/(max(Prob_old)-min(Prob_old))
+      norm <- 1
     }
   }
 
-  if(type=="density") Sample$Density <- Probability
-  if(type=="distribution") Sample$Prob <- Probability
-  if(type=="conditional")  Sample$Prob <- Probability
+  if(type=="density") Sample$Density <- Probability/norm
+  if(type=="distribution") Sample$Prob <- Probability/norm
+  if(type=="conditional")  Sample$Prob <- Probability/norm
   return(Sample)
 }

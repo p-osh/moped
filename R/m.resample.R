@@ -21,10 +21,6 @@
 #'   column having the lower and upper limit.
 #' @param passes Integer vector determining the number of complete Gibbs
 #'   sampling passes to be performed.
-#' @param parallel Logical that if `TRUE` uses the `parallel` package to simulate
-#'   values using parallel computing.
-#' @param ncores Integer vector that determines the number of cores used in
-#'   parallel computing.
 #' @param mps Integer vector that places a limit on maximum number of probabilities
 #'   calculated at a time. The default is 5000.
 #' @param fixed.var Integer vector or string of variable names detailing the
@@ -73,8 +69,6 @@ m.resample <- function(fit,
                        n = NROW(Sample),
                        bounds = NULL ,
                        passes = 1,
-                       parallel = F,
-                       ncores = NULL,
                        mps = 5000,
                        fixed.var = NULL,
                        er_alert = T
@@ -313,8 +307,8 @@ m.resample <- function(fit,
     ErrorSample <- m.resample(fit = fit,K=K,variables = variables,n = NS-SS+1,
                               fixed.var = fixed.var,
                               Sample = OSample[nonerror,],
-                              bounds= bounds, passes = passes ,parallel = parallel,
-                              ncores = ncores,mps = mps,er_alert = F)
+                              bounds= bounds, passes = passes,
+                              mps = mps,er_alert = F)
     Sample <- rbind(Sample,ErrorSample)
 
   }

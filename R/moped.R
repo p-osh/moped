@@ -130,39 +130,32 @@ moped <- function(
       }else{
         par[,k] <- bounds[,k]
       }
-
       parnames[,k] <- c("UniformMin","UniformMax")
 
-      sigma[,k] = c(1,-sum(par[,k]), prod(par[,k]))
-      tau[,k] = c(2, -sum(par[,k]))
-      limits[,k] = par[,k]
+      sigma[,k] <- c(1,-sum(par[,k]), prod(par[,k]))
+      tau[,k] <- c(2, -sum(par[,k]))
+      limits[,k] <- par[,k]
 
-      PDFControl <- function(k) list(PDF = function(x) dunif(x, par[1,k],par[2,k]),
-                                     CDF = function(x) punif(x, par[1,k],par[2,k]))
     } else if (Distrib[k]=="Normal") {
       par[1,k] <- mean(Sample[,k],na.rm=T)
       par[2,k] <- var(Sample[,k],na.rm=T)
       parnames[,k] <- c("NormalMean","NormalVar")
 
-      sigma[,k] = c(0,0,-par[2,k])
-      tau[,k] = c(1, -par[1,k])
-      limits[,k] = c(-Inf,Inf)
+      sigma[,k] <- c(0,0,-par[2,k])
+      tau[,k] <- c(1, -par[1,k])
+      limits[,k] <- c(-Inf,Inf)
 
-      PDFControl = function(k) list(PDF = function(x) dnorm(x, mean = par[1,k], sd = sqrt(par[2,k])),
-                                    CDF = function(x) pnorm(x, mean = par[1,k], sd = sqrt(par[2,k])))
     } else if (Distrib[k]=="Gamma") {
-      xbar = mean(Sample[,k],na.rm=T)
-      sx2  = var(Sample[,k],na.rm=T)
+      xbar <- mean(Sample[,k],na.rm=T)
+      sx2  <- var(Sample[,k],na.rm=T)
       par[2,k] <-  xbar/sx2
       par[1,k] <-  xbar*par[2,k]
       parnames[,k] <- c("GammaShape","GammaRate")
 
-      sigma[,k] = c(0,1,0)
-      tau[,k] = c(-par[2,k], par[1,k])
-      limits[,k] = c(0,Inf)
+      sigma[,k] <- c(0,1,0)
+      tau[,k] <- c(-par[2,k], par[1,k])
+      limits[,k] <- c(0,Inf)
 
-      PDFControl = function(k) list(PDF = function(x) dgamma(x, shape = par[1,k], rate = par[2,k]),
-                                    CDF = function(x) pgamma(x, shape = par[1,k], rate = par[2,k]))
     } else if (Distrib[k]=="Beta"){
       xbar  <- mean(Sample[,k],na.rm=T)
       sx2   <- var(Sample[,k],na.rm=T)
@@ -170,12 +163,10 @@ moped <- function(
       par[2,k] <- (par[1,k]/xbar) - par[1,k]
       parnames[,k] <- c("BetaShape1","BetaShape2")
 
-      sigma[,k] = c(-1,1,0)
-      tau[,k] = c(-(par[1,k]+par[2,k]), par[1,k])
-      limits[,k] = c(0,1)
+      sigma[,k] <- c(-1,1,0)
+      tau[,k] <- c(-(par[1,k]+par[2,k]), par[1,k])
+      limits[,k] <- c(0,1)
 
-      PDFControl = function(k) list(PDF = function(x) dbeta(x, shape1 = par[1,k], shape2 = par[2,k]),
-                                    CDF = function(x) pbeta(x, shape1 = par[1,k], shape2 = par[2,k]))
     }
   }
 
@@ -184,11 +175,11 @@ moped <- function(
       return(list(PDF = function(x) dunif(x, par[1,k],par[2,k]),
                   CDF = function(x) punif(x, par[1,k],par[2,k]),
                   norm = function(n) ((-1)^n)*((par[2,k]-par[1,k])^(2*n))*beta(n+1,n+1)))
-    } else if (Distrib[k]=="Normal") {
+    } else if (Distrib[k]=="Normal"){
       return(list(PDF = function(x) dnorm(x, mean = par[1,k], sd = sqrt(par[2,k])),
                   CDF = function(x) pnorm(x, mean = par[1,k], sd = sqrt(par[2,k])),
                   norm = function(n) ((-par[2,k])^n)))
-    } else if (Distrib[k]=="Gamma") {
+    } else if (Distrib[k]=="Gamma"){
       return(list(PDF = function(x) dgamma(x, shape = par[1,k], rate = par[2,k]),
                   CDF = function(x) pgamma(x, shape = par[1,k], rate = par[2,k]),
                   norm = function(n) (par[2,k]^(-n))*gamma(par[1,k]+n)/gamma(par[1,k]) ))
@@ -261,7 +252,6 @@ moped <- function(
                                                   2*sigma[1,k]*(tau[2,k]^2 - ((n-1)^2)*sigma[2,k]^2 + 4*(n-1)*sigma[3,k]*(tau[1,k] + sigma[1,k]*(n-1)))))
     }
     }
-   # K[which(sapply(1:Nv, function(k) Bn[n,k] == 0 && Bn[n-1,k] != 0 ))] <- n
     if(K < n) break
   }
 

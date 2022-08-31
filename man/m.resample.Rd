@@ -12,8 +12,6 @@ m.resample(
   n = NROW(Sample),
   bounds = NULL,
   passes = 1,
-  parallel = F,
-  ncores = NULL,
   mps = 5000,
   fixed.var = NULL,
   er_alert = T
@@ -43,12 +41,6 @@ column having the lower and upper limit.}
 
 \item{passes}{Integer vector determining the number of complete Gibbs
 sampling passes to be performed.}
-
-\item{parallel}{Logical that if \code{TRUE} uses the \code{parallel} package to simulate
-values using parallel computing.}
-
-\item{ncores}{Integer vector that determines the number of cores used in
-parallel computing.}
 
 \item{mps}{Integer vector that places a limit on maximum number of probabilities
 calculated at a time. The default is 5000.}

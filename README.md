@@ -106,7 +106,7 @@ marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
 
 ``` r
 # estimate the optimal K
-val <- validate.mpo(Fit, k.range = 2:8, ncol =3, prompt = FALSE)
+val <- validate.mpo(Fit, K = 8, nfolds = 5, repeats = 10)
 # Show the optimal K for each variable
 val$opt_mpo_vec
 ```

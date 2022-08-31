@@ -19,5 +19,4 @@ fit <- moped(df_cont,
              bounds = bounds,
              variance = T,
              recurrence = F,
-             opt.mpo = T
-)
+             opt.mpo = T)

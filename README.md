@@ -1,23 +1,26 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# moped
+# moped <br> <font size="5"> **R** package for Multivariate Orthogonal Polynomial based Estimation of Density </font>
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of moped package is to apply multivariate orthogonal polynomial
-based estimation of density.
+**moped** package estimates the multivariate orthogonal polynomial based
+density function from sample moments (add reference of Brad’s paper here
+and a link). Subsequently, probabilities and density of joint and
+marginal distribution can be computed, and resampled values from the
+estimated joint and marginal density can be generated.
 
 ## Installation
 
-You can install the **moped** version from [CRAN](https://github.com/):
+Install the **moped** version from [CRAN](https://github.com/):
 
 ``` r
 install.packages("moped")
 ```
 
-You can install the **development** version of moped from
+Or install the **development** version of moped from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -27,7 +30,8 @@ remotes::install_github("p-osh/moped")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Here we show an example demonstrating the capability of the **moped**
+package.
 
 ``` r
 library(moped)
@@ -35,20 +39,31 @@ library(tidyverse)
 library(ISLR)
 ```
 
-### Pre-processing
-
-#### Convert categorical data to Continuous Data
+### 1. Data exploration and pre-processing
 
 ``` r
+# Wage data from ISLR package
 Data_full <- ISLR::Wage
-
 # Must be a dataframe - Categorical Data should be factors
 Data <- Data_full %>% select(age, education, jobclass, wage)
-
-Data_x <- make.cont(Data, catvar = 2:3)
+# Show structure of the dataset
+str(Data)
+# Scatter plot matrix of the Data
+pairs(Data)
 ```
 
-#### Convert categorical with amalgamations
+#### Converting categorical data to continuous data
+
+``` r
+Data_x <- make.cont(Data, catvar = 2:3)
+
+# check the structure of continuous-converted data
+str(Data_x)
+# Conversion retrains the original categorical information
+all.equal(make.cat(Data_x), Data)
+```
+
+#### (optional) Converting categorical with amalgamations
 
 ``` r
 Data <- Data_full %>% select(age, maritl, race, education, jobclass, wage)
@@ -56,11 +71,11 @@ Data <- Data_full %>% select(age, maritl, race, education, jobclass, wage)
 Data_amal <- make.cont(Data, catvar = c("maritl", "race", "education", "jobclass"),
                        amalgams = list(1:2, 3:4))
 
-# revert contimous variable back to categorical
+# revert continuous variable back to categorical
 make.cat(Data_amal)
 ```
 
-### Fitting MBD Function
+### 2. Fitting data to estimate the multivariate density function
 
 ``` r
 # define bounds of Data
@@ -79,26 +94,31 @@ Fit <- moped(Data_x,
              variance = T,
              recurrence = F,
              opt.mpo = T)
-
-# extraact maximum optimal MPO
-
-Fit$opt_mpo
 ```
 
-#### check marginal densities with different polynomial K
+#### Checking the marginal fit with different polynomial K for all variables
 
 ``` r
 marginal.plot(Fit, k.range = 3:8, ncol =3, prompt = FALSE)
 ```
 
-### Applying the MBD Estimate
+#### Determining the optimal polynomial orders with repeated k-fold cross-validation
+
+``` r
+# estimate the optimal K
+val <- validate.mpo(Fit, k.range = 2:8, ncol =3, prompt = FALSE)
+# Show the optimal K for each variable
+val$opt_mpo_vec
+```
+
+### 3. Generating probablites and density from the estimated density
 
 ``` r
 # define the observation which the probability is desired
 x0 <- Data_x[2,]
 
 pred_1 <- predict(Fit, 
-                  K = 7, 
+                  K = val$opt_mpo_vec, 
                   X = x0, 
                   type = "distribution")
 
@@ -110,7 +130,7 @@ pred_2 <- predict(Fit,
                   variables = c("jobclass", "wage"))
 ```
 
-### Plotting Density Estimate
+### Plotting density estimate
 
 ``` r
 # marginal density
@@ -127,19 +147,29 @@ predict(Fit, K = c(2,7), variables = 3:4) %>%
   scale_fill_distiller(palette = "Spectral")
 ```
 
-### Generating resampled Obs
+### 4. Generating resampled (synthetic) observations
 
 ``` r
-resampled <- m.resample(Fit,
+# resample a full sample of synthetic observations
+resampled_full <- m.resample(Fit,
                         K = 3,
                         Sample = Data_x,
-                        fixed.var = 1,
-                        replicates = 1)
+                        passes = 1)
 
-# marginal synthetic sample
+# resample marginal synthetic observations
 resampled_marginal <- m.resample(Fit,
                                  Sample=Data_x[,3:4],
                                  K=c(4,4),
                                  variables = 3:4,
-                                 replicates = 1)
+                                 passes = 1)
+```
+
+!!!!!!!add here a histograms for both original data and synthetic data
+
+#### (Optional) Invert the continous-converted variables back to it orginal categorical formate
+
+``` r
+resample_c <- make.cat(resample_full)
+str(resample_c)
+head(resample_c)
 ```

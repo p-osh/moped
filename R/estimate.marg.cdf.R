@@ -1,9 +1,8 @@
-#' Calculate univariate marginal distribution function probabilities.
+#' Calculate univariate marginal probabilities
 #'
 #' @description
-#' `estimate.marg.cdf()` is used to calculate univariate marginal cumulative
-#' distribution function probabilities and the polynomial coefficients of the
-#' polynomical approximation from any `moped` object.
+#' `estimate.marg.cdf()` calculates univariate marginal cumulative probabilities
+#' and the coefficients of the polynomial approximation from a `moped` object.
 #'
 #'
 #' @param fit moped type variable outputted from `moped()`.

@@ -1,10 +1,9 @@
-#' Performing the multivariate orthogonal polynomial-based estimation of density.
+#' Fit the multivariate orthogonal polynomial-based estimation of density
 #'
 #' @description
-#' `moped()` is used to fit a multivariate orthogonal polynomial-based density
-#' estimate. It requires a data frame to fit on data. Categorical variables need
-#' to be converted into continuous variables with `make.cont()` before fitting data
-#' to the density estimate.
+#' `moped()` fits a multivariate orthogonal polynomial-based density
+#' estimation to a dataframe. Categorical variables need to be converted to
+#' continuous with `make.cont()` before fitting.
 #'
 #' @param Sample A data frame.
 #' @param K Integer of maximum possible max polynomial order (mpo) of approximation.
@@ -87,13 +86,10 @@
 #' K=10,
 #' Distrib = rep("Uniform", 4),
 #' bounds = bounds,
-#' variance = T,
-#' recurrence = F,
-#' opt.mpo = T
+#' variance = TRUE,
+#' recurrence = FALSE,
+#' opt.mpo = TRUE
 #' )
-#'
-#' Estimated optimal max polynomial order.
-#' Fit$opt_mpo
 
 
 moped <- function(
@@ -103,7 +99,7 @@ moped <- function(
     bounds = NULL,
     variance = TRUE,
     recurrence = FALSE,
-    opt.mpo = T,
+    opt.mpo = TRUE,
     nfolds = 5,
     repeats = 10
 ) {

@@ -20,9 +20,8 @@ variables in \code{"catvar"}. Each list item contains a vector of positions of
 \code{make.cont()} returns a data frame with strictly continuous values.
 }
 \description{
-\code{make.cont()} is used to converting categorical variables into continuous
-variables. It must done before fitting data to the density estimation
-function \code{moped()}.
+\code{make.cont()} converts categorical variables into continuous variables. It
+must be done before fitting data to the density estimation function \code{moped()}.
 }
 \examples{
 require(ISLR)

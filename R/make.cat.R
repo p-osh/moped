@@ -1,4 +1,4 @@
-#' Convert previously continuous-transformed variables back to categorical variables.
+#' Convert previously continuous-transformed variables back to categorical variables
 #'
 #' @param Sample A data frame outputted from `make.cont()` or `m.resample()` which
 #'   originally contained categorical variables.

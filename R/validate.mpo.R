@@ -1,10 +1,10 @@
-#' Perform repeated k-fold cross-validation to estimate optimal max polynomial order.
+#' Estimate optimal max polynomial order with repeated k-fold cross-validation
 #'
 #' @description `validate.mpo()` performs repeated k-fold cross-validation to
-#' determine an unbiased estimate of the shifted Nk-Norm that when minimised
+#' determine an unbiased estimate of the shifted `Nk`-Norm that when minimised, it
 #' provides an estimate of the optimal max polynomial order. The coefficient
-#' estimates are also calculated as is (optional) their corresponding variance
-#' estimates.
+#' estimates are also calculated as well as  their corresponding variance
+#' estimates (optional).
 #'
 #' @param fit `moped` type variable outputted from `moped()`.
 #' @param K Integer of the maximum possible max polynomial order of approximation.

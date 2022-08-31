@@ -1,8 +1,8 @@
-#' Marginal plots for each variable with a range of polynomial orders K.
+#' Generate marginal plots for each variable with a range of polynomial orders K
 #'
 #' @description
-#' `marginal.plot()` is used to Marginal plots for each variable with a range of
-#' polynomial orders K. Optimal bin width using the Freedman-Diaconis rule for
+#' `marginal.plot()` produces marginal plots for each variable with a range of
+#' polynomial orders K. Optimal bin width uses the Freedman-Diaconis rule for
 #' each variable.
 #'
 #' @param fit A `moped` object from `moped()`.

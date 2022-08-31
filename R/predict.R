@@ -1,11 +1,10 @@
-#' Predicting the density or probability of an observation based on moped
-#' density estimate.
+#' Predict the density or probability of an observation
 #'
 #' @description
-#' `predict.moped()` is used to predict density and probabilities for a set of
-#' observations. When constructing partially joint density, sample and variables
-#' must be used together. X must be a data frame and its variable length must
-#' equal to the length in var.
+#' `predict.moped()` predicts density and probabilities for a set of observations.
+#' When constructing partially joint density, sample and variables must be used
+#' together. X must be a data frame and its variable length must equal to the
+#' length in `var`.
 #'
 #' @param fit `moped` type variable. Outputted from `moped()`.
 #' @param X An optional data frame in which to look for variables with which

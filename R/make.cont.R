@@ -1,9 +1,8 @@
 #' Convert categorical variables into continuous.
 #'
 #' @description
-#' `make.cont()` is used to converting categorical variables into continuous
-#' variables. It must done before fitting data to the density estimation
-#' function `moped()`.
+#' `make.cont()` converts categorical variables into continuous variables. It
+#' must be done before fitting data to the density estimation function `moped()`.
 #'
 #' @param Sample A data frame.
 #' @param catvar Columns to convert into continuous variables. Variable names

@@ -135,7 +135,7 @@ $$
 
 where $C_{n_1,\dots,n_N} = \mathbb{E}_{\mathbf{X}}\left[P_{n_1,\dots,n_N}(\mathbf{X}) \right] = \sum_{i_1=0}^{n_1}\dots\sum_{i_N=0}^{n_N}\left[\prod_{k=1}^N a_{k,n_k,i_k}\right]\mathbb{E}_\mathbf{X}\left[X_1^{i_1}\dots X_N^{i_N}\right]$.
 
-This expression forms the central justification for the `moped` estimate, which instead is based on sample moment data has with finite polynomial order in the summation.
+This expression forms the central justification for the `moped` estimate, which instead is based on sample moment data and has finite polynomial order in the summation.
 
 #### The moped estimate
 
@@ -157,7 +157,7 @@ where $\hat{C}_{n_1,\dots,n_N} = (1 / M) \sum_{j=0}^M P_{n_1,\dots,n_N}(x_{1,j},
 
 The moped estimate requires specification of the maximum polynomial order parameter $\mathbf{K}$, in addition to the choice of reference density. In the following section, we outline a computational strategy to estimate the "optimal" maximum polynomial order based on sample data.
 
-### Estimation of the Optimal Maximum Polynomial Order
+### Estimation of the Optimal Maximum Polynomial Order with `validate.mpo()`
 
 Within Wakefield et. al. (2022) we show there exists a finite optimal maximum polynomial order $\mathbf{K}^{*}$ that minimises the $1/f_{\nu}$-weighted $L_2$ norm which we denote $\mathcal{N}_\mathbf{K}$, provided the estimated coefficients $\hat{C}_{n_1,\dots,n_N}$ have non-zero variance as their order increases. That is, provided there exists $m_1,\dots,m_n$ such that for all $n_1>m_1,\dots,n_N>m_N$, $\text{Var}\left(\hat{C}_{n_1,\dots,n_N}\right)>0$ then there exists finite $\mathbf{K}^{*} =(K_1^{*},\dots,K_N^{*})$ i.e. $K_1^{*}<\infty,\dots,K_N^{*}<\infty$, such that, $$
 \mathcal{N}_{\mathbf{K}^{*}}\left(\{\mathbf{x}_j\}_{j=1}^M\right) = \int_{\Omega^{(N)}}\frac{\left|\hat{f}_{\mathbf{X};\mathbf{K}^{*}}(\mathbf{x}; \{\mathbf{x}_j\}_{j=1}^M ) -f_{\mathbf{X}}(\mathbf{x})\right|^2}{f_{\nu}(\mathbf{x})}d\mathbf{x}
@@ -174,6 +174,26 @@ $\int_{\Omega^{(N)}}\frac{f_{\mathbf{X}}(\mathbf{x})^2}{f_{\nu}(\mathbf{x})}d\ma
 Therefore, we can obtain the optimal maximum polynomial order $\mathbf{K}^{*}$, by minimising only the right hand side of equation (13) as the left hand side can be considered as the $\mathcal N_\mathbf{K}$ norm shifted by a constant (with respect to $\mathbf{K}$.
 
 Given another random sample $\{\mathbf{y}_j\}_{j=1}^{M_y}$, we can obtain another independent estimate for $C_{n_1,\dots,n_N}$ given by $\hat{C}_{n_1,\dots,n_N}^{(y)} = (1 / M_y) \sum_{j=0}^{M_y} P_{n_1,\dots,n_N}(\mathbf{y_{j}})$. In practice however, we are usually only issued one random sample. In Wakefield et. al. (2022) we proposed a strategy of repeated splitting of the sample, which is analogous to 2-fold repeated cross validation. In the `moped` package, we implement $n$-fold repeated cross validation to determine $\mathbf{K}^{*}$ and also to determine the variable constant $K^{*}$ which is the optimal maximum polynomial order under the condition that $K_{k_1}^{*}=K_{k_2}^{*}$ for all $k_1,k_2 = 1,\dots,N$.
+
+## Predicting Density and Probability Values with `predict.moped()`
+
+### Predicting Density Values (`type="density"`)
+
+### Predicting Distribution Function Probabilities (`type="distribution"`)
+
+### Predicting Conditional Distribution Function Probabilities (`type="conditional"`) 
+
+### Estimation of Conditional DF and Marginal CDF with `estimate.conditional()` and `estimate.marg.cdf()`.
+
+## Sampling from the `moped` Estimate with `m.resample()` 
+
+### Sampling from a moped estimate with `Uniform` reference density
+
+### Sampling from a moped estimate with non-`Uniform` reference density
+
+## Handling Categorical Variables with `make.cont()` and `make.cat()` 
+
+## A Complete Worked Example
 
 ## Notation Glossary
 

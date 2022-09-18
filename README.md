@@ -118,7 +118,7 @@ val$opt_mpo_vec
 x0 <- Data_x[2,]
 
 pred_1 <- predict(Fit, 
-                  K = val$opt_mpo_vec, 
+                  K = 7, 
                   X = x0, 
                   type = "distribution")
 
@@ -164,9 +164,21 @@ resampled_marginal <- m.resample(Fit,
                                  passes = 1)
 ```
 
+#### Histogram of original and synthetic data
+
+``` r
+hist(resampled_full$wage,
+     main = "Synthetic data",
+     xlab = "wage")
+
+hist(Data$wage,
+     main = "Original data",
+     xlab = "wage")
+```
+
 !!!!!!!add here a histograms for both original data and synthetic data
 
-#### (Optional) Invert the continous-converted variables back to it orginal categorical formate
+#### (Optional) Invert the continous-converted variables back to it orginal categorical format
 
 ``` r
 resample_c <- make.cat(resample_full)

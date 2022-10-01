@@ -6,11 +6,13 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
@@ -33,7 +35,7 @@ install.packages("moped")
 
 Or install the **development** version of moped from [GitHub](https://github.com/) with:
 
-```{r install, eval = FALSE}
+```{r install}
 # install.packages("devtools")
 remotes::install_github("p-osh/moped")
 ```
@@ -56,7 +58,7 @@ Data_full <- ISLR::Wage
 # Must be a dataframe - Categorical Data should be factors
 Data <- Data_full %>% select(age, education, jobclass, wage)
 # Show structure of the dataset
-str(Data)
+# str(Data)
 # Scatter plot matrix of the Data
 pairs(Data)
 ```
@@ -67,7 +69,7 @@ pairs(Data)
 Data_x <- make.cont(Data, catvar = 2:3)
 
 # check the structure of continuous-converted data
-str(Data_x)
+# str(Data_x)
 # Conversion retrains the original categorical information
 all.equal(make.cat(Data_x), Data)
 ```
@@ -183,18 +185,32 @@ resampled_marginal <- m.resample(Fit,
 
 #### Histogram of original and synthetic data
 ```{r}
-hist(resampled_full$wage,
-     main = "Synthetic data",
-     xlab = "wage")
-
-hist(Data$wage,
-     main = "Original data",
-     xlab = "wage")
+Data %>% 
+  ggplot(aes(x = wage)) +
+  geom_histogram(
+    aes(fill = "blue"),
+    colour = "white",
+    alpha = 0.4,
+    binwidth = 35
+    ) +
+  geom_histogram(
+    data = resampled_full,
+    aes(x = wage,
+        fill = "green"),
+    colour = "white",
+    alpha = 0.4,
+    binwidth = 35
+  ) +
+  scale_fill_identity(
+    name = NULL,
+    guide = "legend",
+    labels = c("Full data", "Synthetic data")
+  ) 
 ```
 
 #### (Optional) Invert the continous-converted variables back to it orginal categorical format
 ```{r}
-resample_c <- make.cat(resample_full)
-str(resample_c)
+resample_c <- make.cat(resampled_full)
+# str(resample_c)
 head(resample_c)
 ```

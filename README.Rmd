@@ -208,6 +208,7 @@ Data %>%
   ) 
 ```
 
+
 #### (Optional) Invert the continous-converted variables back to it orginal categorical format
 ```{r}
 resample_c <- make.cat(resampled_full)

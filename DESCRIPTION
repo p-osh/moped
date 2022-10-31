@@ -14,7 +14,10 @@ Authors@R:
              family = "Yang", 
              email = "myan0065@student.monash.edu", 
              role = "ctb"))          
-Description: What the package does (one paragraph).
+Description: Moped package estimates the multivariate orthogonal polynomial based 
+    density function from sample moments (add reference of Brad's paper here and a link). 
+    Subsequently, probabilities and density of joint and marginal distribution can be computed, 
+    and resampled values from the estimated joint and marginal density can be generated.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

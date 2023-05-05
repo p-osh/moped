@@ -281,7 +281,7 @@ moped <- function(
       XMk <- t(sapply(0:K, function(i) Sample[,k]^i))
       Poly[0:K+1,,k] <- A[0:K+1,0:K+1,k]%*%(XMk[0:K+1,])
     }
-  Poly[1,,] <- array(1,dim = dim(Poly[1,,]))
+ Poly[1,,] <- 1# Poly[1,,] <- array(1,dim = dim(Poly[1,,]))
 
   if(opt.mpo){
     calc_cn <- validate.mpo(list(Poly=Poly),K=K,variance = variance,nfolds = nfolds,repeats = repeats)

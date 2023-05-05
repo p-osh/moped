@@ -66,10 +66,14 @@ estimate.marg.cdf <- function(fit,
   if(is.null(K)) K <- fit$opt_mpo
   if(is.null(K)) K <- fit$KMax
   if(!is.null(X)) nprobs <- NROW(X)
+  requireNamespace("R.utils")
   subsetnames <- lapply(1:NCOL(fit$SampleStats$Sample),function(k)1)
   subsetnames[[variable]] <- 1:K+1
-  C <- c(extract.array(fit$Cn,indices = subsetnames))%o%array(1,dim=c(nprobs))
-
+  if(is.vector(fit$Cn)){
+    C <- fit$Cn[1:K+1]%o%array(1,dim=c(nprobs))
+  }else{
+    C <- c(extract.array(fit$Cn,indices = subsetnames))%o%array(1,dim=c(nprobs))
+  }
   XDP <- (fit$PolyCoef[2:(K+1),2:(K+1),variable]/fit$Lambda[1:K,variable])*
     t(array(1:K,dim = rep(K,2)))
   if(fit$Distrib[variable]=="Uniform"){

@@ -106,7 +106,10 @@ m.resample <- function(fit,
 
   OSample <- Sample
   SS <- NROW(Sample)
-  if(NS != SS) Sample <- Sample[sample(1:SS,NS,replace = T),]
+  if(NS != SS){
+    Sample <- data.frame(Sample[sample(1:SS,NS,replace = T),])
+    colnames(Sample) <- colnames(OSample)
+  }
   SS <- NS
   Sample <- as.data.frame(Sample[,variables_names])
   colnames(Sample) <- variables_names
@@ -303,10 +306,11 @@ m.resample <- function(fit,
       }
     }}
   if(SS < NS){
+
     if(er_alert) cat(paste0('\n Warning: ',NS-SS,' Observations were resampled due to errors. \n'))
     ErrorSample <- m.resample(fit = fit,K=K,variables = variables,n = NS-SS+1,
                               fixed.var = fixed.var,
-                              Sample = OSample[nonerror,],
+                              Sample = subset(OSample,1:nrow(OSample)%in%nonerror),
                               bounds= bounds, passes = passes,
                               mps = mps,er_alert = F)
     Sample <- rbind(Sample,ErrorSample)
